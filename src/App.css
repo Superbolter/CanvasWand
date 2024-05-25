@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.canvas-container {
+  flex: 8;
+}
+
+.button-container {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
+  margin: 5px;
+}
