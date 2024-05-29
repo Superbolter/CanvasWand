@@ -9,13 +9,11 @@ import DrawCanvas from "./components/DrawCanvas";
 import { findNearestPoint, findNearestLine } from "./Utils/GeometryUtils"; // Import the utility functions
 import { handleKeyDown, handleKeyUp } from "./Utils/KeyboardUtils";
 import { convertLinesTo3D } from "./Utils/ConvertLinesTo3D";
-import { SNAP_THRESHOLD } from './Constant/SnapThreshold';
+import { SNAP_THRESHOLD, INITIAL_BREADTH} from "./Constant/SnapThreshold";
 
 import * as THREE from "three";
 
 extend({ OrbitControls });
-
-
 
 const App = () => {
   const [lines, setLines] = useState([]);
@@ -30,15 +28,16 @@ const App = () => {
   const [freedome, setFreedome] = useState(false);
   const [newLines, setNewLines] = useState(false);
   const [activeSnap, setActiveSnap] = useState(true);
-  const [rectangleDrawing, setRectangleDrawing] = useState(false); // New state for rectangle drawing mode
+  const [rectangleDrawing, setRectangleDrawing] = useState(false);
   const [helper, setHelper] = useState(false);
   const [rectPoints, setRectPoints] = useState([]);
+  const [hoveredLineIndex, setHoveredLineIndex] = useState(null);
+  const [selectedLineIndex, setSelectedLineIndex] = useState([]);
+  const [keyPressed, setKeyPressed] = useState(false);
 
   useEffect(() => {
     const loadTexture = async () => {
-      const loadedTexture = await new THREE.TextureLoader().load(
-        backgroundImage
-      );
+      const loadedTexture = await new THREE.TextureLoader().load(backgroundImage);
       setTexture(loadedTexture);
     };
     loadTexture();
@@ -59,6 +58,12 @@ const App = () => {
         setRectangleDrawing,
         freedome,
         activeSnap,
+        hoveredLineIndex,
+        setHoveredLineIndex,
+        keyPressed,
+        setKeyPressed,
+        selectedLineIndex,
+        setSelectedLineIndex
       });
     const onKeyUp = (event) => handleKeyUp(event, { setNewLines });
 
@@ -82,6 +87,9 @@ const App = () => {
     setRectangleDrawing,
     freedome,
     activeSnap,
+    hoveredLineIndex,
+    setHoveredLineIndex,
+    keyPressed,
   ]);
 
   const handleSnap = (x, y) => {
@@ -100,6 +108,7 @@ const App = () => {
           startY: lastPoint.y,
           endX: newPoint.x,
           endY: newPoint.y,
+          breadth: INITIAL_BREADTH,
         };
       } else if (newLines) {
         setCurrentLine({
@@ -107,6 +116,7 @@ const App = () => {
           startY: newPoint.y,
           endX: newPoint.x,
           endY: newPoint.y,
+          breadth: INITIAL_BREADTH,
         });
       } else {
         if (!helper) {
@@ -120,16 +130,14 @@ const App = () => {
             newPoint.y = snappedY;
           }
 
-          if (
-            Math.abs(lastPoint.x - newPoint.x) >
-            Math.abs(lastPoint.y - newPoint.y)
-          ) {
+          if (Math.abs(lastPoint.x - newPoint.x) > Math.abs(lastPoint.y - newPoint.y)) {
             // Horizontal line
             newLine = {
               startX: lastPoint.x,
               startY: lastPoint.y,
               endX: newPoint.x,
               endY: lastPoint.y,
+              breadth: INITIAL_BREADTH,
             };
             newPoint.y = lastPoint.y;
           } else {
@@ -139,6 +147,7 @@ const App = () => {
               startY: lastPoint.y,
               endX: lastPoint.x,
               endY: newPoint.y,
+              breadth: INITIAL_BREADTH,
             };
             newPoint.x = lastPoint.x;
           }
@@ -154,6 +163,7 @@ const App = () => {
         startY: newPoint.y,
         endX: newPoint.x,
         endY: newPoint.y,
+        breadth: INITIAL_BREADTH,
       });
     }
   };
@@ -179,14 +189,16 @@ const App = () => {
           startY: startPoint.y,
           endX: x,
           endY: startPoint.y,
+          breadth: INITIAL_BREADTH,
         };
-        const newLine2 = { startX: x, startY: startPoint.y, endX: x, endY: y };
-        const newLine3 = { startX: x, startY: y, endX: startPoint.x, endY: y };
+        const newLine2 = { startX: x, startY: startPoint.y, endX: x, endY: y, breadth: INITIAL_BREADTH };
+        const newLine3 = { startX: x, startY: y, endX: startPoint.x, endY: y, breadth: INITIAL_BREADTH };
         const newLine4 = {
           startX: startPoint.x,
           startY: y,
           endX: startPoint.x,
           endY: startPoint.y,
+          breadth: INITIAL_BREADTH,
         };
 
         const point3 = { x, y };
@@ -223,7 +235,7 @@ const App = () => {
   const handleRectangle = () => {
     setIsDrawing(true);
     setRectangleDrawing(true);
-    setHelper(true); //helper true means you have freedome to draw lines
+    setHelper(true); //helper true means you have freedom to draw lines
   };
 
   const stopDrawing = () => {
@@ -244,12 +256,18 @@ const App = () => {
         <DrawCanvas
           handleCanvasClick={handleCanvasClick}
           lines={lines}
+          setLines={setLines}
           backgroundImage={backgroundImage}
           points={points}
           currentLine={currentLine}
           activeSnap={activeSnap}
           rectangleDrawing={rectangleDrawing}
           rectPoints={rectPoints}
+          hoveredLineIndex={hoveredLineIndex}
+          setHoveredLineIndex={setHoveredLineIndex}
+          selectedLineIndex={selectedLineIndex}
+          setSelectedLineIndex={setSelectedLineIndex}
+          keyPressed={keyPressed}
         />
       )}
       <div
@@ -273,7 +291,7 @@ const App = () => {
           style={{
             width: "100vw",
             height: "100vh",
-            position: "absolute",
+            position:"absolute",
             zIndex: 0,
           }}
         >
@@ -291,3 +309,4 @@ const App = () => {
 };
 
 export default App;
+

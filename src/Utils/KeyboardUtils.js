@@ -1,9 +1,11 @@
-export const handleKeyDown = (event, { points, lines, escapePoints, setPoints, setLines, setCurrentLine, setFreedome, setNewLines, setActiveSnap, setRectangleDrawing, freedome, activeSnap }) => {
+import{ BREADTH_STEP } from "../Constant/SnapThreshold";
+
+export const handleKeyDown = (event, { points, lines, escapePoints, setPoints, setLines, setCurrentLine, setFreedome, setNewLines, setActiveSnap, setRectangleDrawing, freedome, activeSnap, hoveredLineIndex,keyPressed,setKeyPressed, setHoveredLineIndex,selectedLineIndex }) => {
     if (event.key === 'x') {
         if (points.length > 0) {
             const updatedPoints = [...points];
             const updatedLines = [...lines];
-            if(escapePoints.some((point)=>point.x===updatedPoints[updatedPoints.length-1].x && point.y===updatedPoints[updatedPoints.length-1].y)) {
+            if (escapePoints.some((point) => point.x === updatedPoints[updatedPoints.length - 1].x && point.y === updatedPoints[updatedPoints.length - 1].y)) {
                 updatedPoints.pop();
                 setPoints(updatedPoints);
             } else {
@@ -24,6 +26,9 @@ export const handleKeyDown = (event, { points, lines, escapePoints, setPoints, s
                 setCurrentLine(null);
             }
         }
+    }else if(event.key ==='q'){
+        setKeyPressed(!keyPressed);
+
     } else if (event.key === 'a') {
         setFreedome(!freedome);
     } else if (event.key === 'Escape') {
@@ -32,6 +37,26 @@ export const handleKeyDown = (event, { points, lines, escapePoints, setPoints, s
         setActiveSnap(!activeSnap);
     } else if (event.key === 'r') {
         setRectangleDrawing(true);
+    } else if (event.key === '+' && keyPressed) {
+        if (selectedLineIndex.length> 0) {
+            const updatedLines = lines.map((line, index) => {
+                if (selectedLineIndex.includes(index)) {
+                    return { ...line, breadth: Math.min(9, line.breadth + BREADTH_STEP) };
+                }
+                return line;
+            });
+            setLines(updatedLines);
+        }
+    } else if (event.key === '-'&& keyPressed) {
+        if (selectedLineIndex.length> 0) {
+            const updatedLines = lines.map((line, index) => {
+                if (selectedLineIndex.includes(index)) {
+                    return { ...line, breadth: Math.max(4, line.breadth - BREADTH_STEP) };
+                }
+                return line;
+            });
+            setLines(updatedLines);
+        }
     }
 };
 
