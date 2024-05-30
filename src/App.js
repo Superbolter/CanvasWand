@@ -90,6 +90,8 @@ const App = () => {
     hoveredLineIndex,
     setHoveredLineIndex,
     keyPressed,
+    //setSelectedLineIndex,
+    //selectedLineIndex,
   ]);
 
   const handleSnap = (x, y) => {

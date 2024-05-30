@@ -1,14 +1,40 @@
 import{ BREADTH_STEP } from "../Constant/SnapThreshold";
+import { isPointConnected } from "./IsPointConnected";
 
-export const handleKeyDown = (event, { points, lines, escapePoints, setPoints, setLines, setCurrentLine, setFreedome, setNewLines, setActiveSnap, setRectangleDrawing, freedome, activeSnap, hoveredLineIndex,keyPressed,setKeyPressed, setHoveredLineIndex,selectedLineIndex }) => {
+export const handleKeyDown = (event, { points, lines, setPoints, setLines, setCurrentLine, setFreedome, setNewLines, setActiveSnap, setRectangleDrawing, freedome, activeSnap, hoveredLineIndex,keyPressed,setKeyPressed, setHoveredLineIndex,selectedLineIndex,setSelectedLineIndex }) => {
     if (event.key === 'x') {
+       if(keyPressed){
+        const updatedPoints = [...points];
+        const updatedLines = [...lines];
+
+        // Remove selected lines from updatedLines
+        const remainingLines = updatedLines.filter((_, index) => !selectedLineIndex.includes(index));
+
+        // Identify points to be removed
+        const pointsToRemove = updatedPoints.filter(point => 
+            !isPointConnected(point, remainingLines)
+        );
+
+        // Remove points that are no longer connected to any lines
+        const finalPoints = updatedPoints.filter(point => 
+            !pointsToRemove.some(pt => pt.x === point.x && pt.y === point.y)
+        );
+
+        setLines(remainingLines);
+        setPoints(finalPoints);
+        setCurrentLine(null);
+        setSelectedLineIndex([]);
+
+
+       }else{
         if (points.length > 0) {
             const updatedPoints = [...points];
             const updatedLines = [...lines];
-            if (escapePoints.some((point) => point.x === updatedPoints[updatedPoints.length - 1].x && point.y === updatedPoints[updatedPoints.length - 1].y)) {
+            let point = updatedPoints[updatedPoints.length -1]
+           if(!isPointConnected(point,updatedLines)){
                 updatedPoints.pop();
                 setPoints(updatedPoints);
-            } else {
+           } else {
                 updatedPoints.pop(); // Remove the last point
                 updatedLines.pop(); // Remove the last line
                 setPoints(updatedPoints);
@@ -26,6 +52,7 @@ export const handleKeyDown = (event, { points, lines, escapePoints, setPoints, s
                 setCurrentLine(null);
             }
         }
+       }
     }else if(event.key ==='q'){
         setKeyPressed(!keyPressed);
 
@@ -46,6 +73,7 @@ export const handleKeyDown = (event, { points, lines, escapePoints, setPoints, s
                 return line;
             });
             setLines(updatedLines);
+            //setSelectedLineIndex([]);
         }
     } else if (event.key === '-'&& keyPressed) {
         if (selectedLineIndex.length> 0) {
@@ -56,6 +84,7 @@ export const handleKeyDown = (event, { points, lines, escapePoints, setPoints, s
                 return line;
             });
             setLines(updatedLines);
+            //setSelectedLineIndex([]);
         }
     }
 };
