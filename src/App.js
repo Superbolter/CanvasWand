@@ -6,10 +6,10 @@ import CameraControls from "./components/CameraControls";
 import TexturedPlane from "./components/TexturedPlane";
 import Wall3D from "./components/Wall3D";
 import DrawCanvas from "./components/DrawCanvas";
-import { findNearestPoint, findNearestLine } from "./Utils/GeometryUtils"; // Import the utility functions
+import { findNearestPoint, findNearestLine,distanceBetweenPoints } from "./Utils/GeometryUtils"; // Import the utility functions
 import { handleKeyDown, handleKeyUp } from "./Utils/KeyboardUtils";
 import { convertLinesTo3D } from "./Utils/ConvertLinesTo3D";
-import { SNAP_THRESHOLD, INITIAL_BREADTH} from "./Constant/SnapThreshold";
+import { SNAP_THRESHOLD, INITIAL_BREADTH, INITIAL_HEIGHT} from "./Constant/SnapThreshold";
 
 import * as THREE from "three";
 
@@ -34,6 +34,8 @@ const App = () => {
   const [hoveredLineIndex, setHoveredLineIndex] = useState(null);
   const [selectedLineIndex, setSelectedLineIndex] = useState([]);
   const [keyPressed, setKeyPressed] = useState(false);
+  const [factor,setFactor] =useState([1,1,1]); 
+  const [firstLine,setFirstLine] = useState(true);
 
   useEffect(() => {
     const loadTexture = async () => {
@@ -63,7 +65,7 @@ const App = () => {
         keyPressed,
         setKeyPressed,
         selectedLineIndex,
-        setSelectedLineIndex
+        setSelectedLineIndex,factor,
       });
     const onKeyUp = (event) => handleKeyUp(event, { setNewLines });
 
@@ -90,18 +92,63 @@ const App = () => {
     hoveredLineIndex,
     setHoveredLineIndex,
     keyPressed,
+    factor,
     //setSelectedLineIndex,
     //selectedLineIndex,
   ]);
 
   const handleSnap = (x, y) => {
+    console.log("Snap clling");
     const nearestPoint = findNearestPoint(points, x, y, SNAP_THRESHOLD);
     return nearestPoint ? { x: nearestPoint.x, y: nearestPoint.y } : { x, y };
   };
 
   const handleLineDrawing = (x, y, newPoint) => {
+
+    console.log("x: " + x + ", y: " + y);
+
+    if(points.length=== 2 && firstLine){
+        const userHeight = parseFloat(prompt("Enter the height of the first line:"));
+        const userLength = parseFloat(prompt("Enter the length of the first line:"));
+        const userWidth = parseFloat(prompt("Enter the width of the first line:"));
+
+        const point1 = points[points.length - 1];
+        const point2 = points[points.length - 2];
+
+        const lfactor = userLength/distanceBetweenPoints(point2.x,point2.y,point1.x,point1.y);
+        const wfactor = userWidth/INITIAL_BREADTH;
+        const hfactor = userHeight/INITIAL_HEIGHT;
+
+        setFactor([lfactor,wfactor,hfactor]);
+        // const makeLine =lines[lines.length - 1];
+        // makeLine.len = makeLine.len*lfactor;
+        // makeLine.breadth = makeLine.breadth*wfactor;
+        // makeLine.height =makeLine.height*hfactor;
+        // setLines([...lines,makeLine]);
+
+        const lastLine = lines[lines.length - 1];
+        const updatedLine = {
+            ...lastLine,
+         len: lastLine.len * lfactor,
+         breadth: lastLine.breadth * wfactor,
+         height: lastLine.height * hfactor
+        };
+        setLines(prevLines => [...prevLines, updatedLine]);
+
+        setFirstLine(false);
+        
+
+
+
+        
+
+
+    }
     if (points.length > 0 && !helper) {
       const lastPoint = points[points.length - 1];
+
+      console.log("Hii this is last point",lastPoint);
+      console.log("Hii this is new point",newPoint);
       let newLine;
 
       if (freedome) {
@@ -110,27 +157,45 @@ const App = () => {
           startY: lastPoint.y,
           endX: newPoint.x,
           endY: newPoint.y,
-          breadth: INITIAL_BREADTH,
+          breadth: INITIAL_BREADTH*factor[1],
+          len: distanceBetweenPoints(lastPoint.x,lastPoint.y,newPoint.x,newPoint.y)*factor[0],
+          height: INITIAL_HEIGHT*factor[2],
+
         };
       } else if (newLines) {
-        setCurrentLine({
-          startX: newPoint.x,
-          startY: newPoint.y,
-          endX: newPoint.x,
-          endY: newPoint.y,
-          breadth: INITIAL_BREADTH,
-        });
+        setCurrentLine(null);
+        // setCurrentLine({
+        //   startX: newPoint.x,
+        //   startY: newPoint.y,
+        //   endX: newPoint.x,
+        //   endY: newPoint.y,
+        //   breadth: INITIAL_BREADTH,
+        //   len: distanceBetweenPoints(newPoint.x,newPoint.y,newPoint.x,newPoint.y),
+        //   height: INITIAL_HEIGHT,
+        // });
       } else {
         if (!helper) {
+          console.log("If not helper1:",lastPoint,newPoint);
           const nearestLineIndex = findNearestLine(lines, x, y, SNAP_THRESHOLD);
+
+          console.log("If not helper2:",lastPoint,newPoint);
           if (nearestLineIndex !== null) {
             const nearestLine = lines[nearestLineIndex];
             const { startX, startY, endX, endY } = nearestLine;
+            console.log(startX, startY, endX, endY);
             const slope = (endY - startY) / (endX - startX);
+            console.log(slope);//Infinity
             const intercept = startY - slope * startX;
             const snappedY = slope * x + intercept;
-            newPoint.y = snappedY;
+            console.log("If not helper2.5:",lastPoint,newPoint);
+
+            console.log(snappedY);
+
+
+            newPoint.y = isNaN(snappedY)? y:snappedY;//isNaN(newPoint.y) ? y : newPoint.y
           }
+
+          console.log("If not helper3:",lastPoint,newPoint);
 
           if (Math.abs(lastPoint.x - newPoint.x) > Math.abs(lastPoint.y - newPoint.y)) {
             // Horizontal line
@@ -139,9 +204,12 @@ const App = () => {
               startY: lastPoint.y,
               endX: newPoint.x,
               endY: lastPoint.y,
-              breadth: INITIAL_BREADTH,
+              breadth: INITIAL_BREADTH*factor[1],
+              len: distanceBetweenPoints(lastPoint.x,lastPoint.y,newPoint.x,lastPoint.y)*factor[0],
+              height: INITIAL_HEIGHT*factor[2],
             };
             newPoint.y = lastPoint.y;
+            console.log('horizontal distance between points:',newLine,newPoint);
           } else {
             // Vertical line
             newLine = {
@@ -149,24 +217,33 @@ const App = () => {
               startY: lastPoint.y,
               endX: lastPoint.x,
               endY: newPoint.y,
-              breadth: INITIAL_BREADTH,
+              breadth:INITIAL_BREADTH*factor[1],
+              len: distanceBetweenPoints(lastPoint.x,lastPoint.y,lastPoint.x,newPoint.y)*factor[0],
+              height: INITIAL_HEIGHT*factor[2],
             };
             newPoint.x = lastPoint.x;
+
+            console.log('Vertical line distance between points:',newLine,newPoint);
           }
         }
       }
 
-      if (!newLines) {
-        setLines([...lines, newLine]);
+      if (!newLines && newLine) {
+        setLines(prevLines => [...prevLines, newLine]);
+       // console.log("Hii :",setLines);
       }
     } else {
-      setCurrentLine({
-        startX: newPoint.x,
-        startY: newPoint.y,
-        endX: newPoint.x,
-        endY: newPoint.y,
-        breadth: INITIAL_BREADTH,
-      });
+      setCurrentLine(null);
+      // setCurrentLine({
+      //   startX: newPoint.x,
+      //   startY: newPoint.y,
+      //   endX: newPoint.x,
+      //   endY: newPoint.y,
+      //   breadth: 0,
+      //   len: distanceBetweenPoints(newPoint.x,newPoint.y,newPoint.x,newPoint.y),
+      //   height: 0,
+
+      // });
     }
   };
 
@@ -176,8 +253,9 @@ const App = () => {
     let newPoint = activeSnap ? handleSnap(x, y) : { x, y };
 
     if (newLines) {
-      setEscapePoints([...escapePoints, { x, y }]);
+      setEscapePoints(prevPoints => [...prevPoints, { x, y }]);
     }
+    console.log("Hii handle cnvs:",x,y,newPoint);
 
     handleLineDrawing(x, y, newPoint);
 
@@ -219,7 +297,7 @@ const App = () => {
         setPoints([...points, newPoint]);
       }
     } else {
-      setPoints([...points, newPoint]);
+      setPoints(prevPoints => [...prevPoints, newPoint]);
     }
   };
 
