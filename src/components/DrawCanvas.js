@@ -91,8 +91,9 @@ const DrawCanvas = ({ handleCanvasClick, lines, setLines, backgroundImage, point
               const slope = (endY - startY) / (endX - startX);
               const intercept = startY - slope * startX;
               const snappedY = slope * offsetX + intercept;
+              
               console.log("Hii i am passing snap point:",{offsetX,snappedY});
-              handleCanvasClick(offsetX, snappedY);
+              handleCanvasClick(offsetX, isNaN(snappedY)?offsetY:snappedY );
             } else {
 
                 console.log("Hii i am passing snap but not hovered point:",{offsetX,offsetY});
