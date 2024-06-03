@@ -1,7 +1,10 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { SNAP_THRESHOLD, INITIAL_BREADTH, BREADTH_STEP } from '../Constant/SnapThreshold';
+import { SNAP_THRESHOLD, INITIAL_BREADTH, INITIAL_HEIGHT } from '../Constant/SnapThreshold';
+import {distanceBetweenPoints} from '../Utils/GeometryUtils'
 
-const DrawCanvas = ({ handleCanvasClick, lines, setLines, backgroundImage, points, currentLine, activeSnap, rectangleDrawing, rectPoints, hoveredLineIndex, setHoveredLineIndex,selectedLineIndex ,setSelectedLineIndex,keyPressed}) => {
+const firstTwoPoint =[];
+
+const DrawCanvas = ({ handleCanvasClick, lines, setLines, backgroundImage, points, currentLine, activeSnap, rectangleDrawing, rectPoints, hoveredLineIndex, setHoveredLineIndex,selectedLineIndex ,setSelectedLineIndex,keyPressed,factor,setFactor}) => {
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
     const [hoveredPointIndex, setHoveredPointIndex] = useState(null);
@@ -71,59 +74,52 @@ const DrawCanvas = ({ handleCanvasClick, lines, setLines, backgroundImage, point
                 }
             };
         }
-    }, [lines, backgroundImage, points, currentLine, activeSnap, hoveredPointIndex, hoveredLineIndex, rectangleDrawing, rectPoints]);
+    }, [lines,setLines, backgroundImage, points, currentLine, activeSnap, hoveredPointIndex, hoveredLineIndex, rectangleDrawing, rectPoints]);
 
-    const handleMouseDown = (event) => {
-        const { offsetX, offsetY ,button} = event.nativeEvent;
-        if (button === 0 && keyPressed ) {
+
+    const handleMouseDown = useCallback(
+        (event) => {
+          const { offsetX, offsetY, button } = event.nativeEvent;
+          firstTwoPoint.push(offsetX);
+          firstTwoPoint.push(offsetY);
+          console.log(firstTwoPoint.length);
+          if(firstTwoPoint.length === 4){
+            console.log("hii");
+            const userHeight = parseFloat(prompt("Enter the height of the first line:"));
+            const userLength = parseFloat(prompt("Enter the length of the first line:"));
+            const userWidth = parseFloat(prompt("Enter the width of the first line:"));
+            const lfactor = userLength /distanceBetweenPoints(firstTwoPoint[2], firstTwoPoint[3], firstTwoPoint[0], firstTwoPoint[1]);
+            const wfactor = userWidth / INITIAL_BREADTH;
+            const hfactor = userHeight / INITIAL_HEIGHT;
+            setFactor([lfactor, wfactor, hfactor]);
+            return ;
+          }
+          if (button === 0 && keyPressed) {
             if (hoveredLineIndex !== null) {
-                setSelectedLineIndex(prevSelected => [...prevSelected, hoveredLineIndex]);
+              setSelectedLineIndex((prevSelected) => [...prevSelected, hoveredLineIndex]);
             } else {
-                setSelectedLineIndex([]);
+              setSelectedLineIndex([]);
             }
-        }else{
+          } else {
             if (activeSnap && hoveredLineIndex !== null) {
-                const line = lines[hoveredLineIndex];
-                const { startX, startY, endX, endY } = line;
-                const slope = (endY - startY) / (endX - startX);
-                const intercept = startY - slope * startX;
-                const snappedY = slope * offsetX + intercept;
-                handleCanvasClick(offsetX, snappedY);
+              const line = lines[hoveredLineIndex];
+              const { startX, startY, endX, endY } = line;
+              const slope = (endY - startY) / (endX - startX);
+              const intercept = startY - slope * startX;
+              const snappedY = slope * offsetX + intercept;
+              console.log("Hii i am passing snap point:",{offsetX,snappedY});
+              handleCanvasClick(offsetX, isNaN(snappedY)?offsetY:snappedY);
             } else {
-                handleCanvasClick(offsetX, offsetY);
+
+                console.log("Hii i am passing snap but not hovered point:",{offsetX,offsetY});
+              handleCanvasClick(offsetX, offsetY);
             }
-        }
-    };
-
-    const handleMouseMove = (event) => {
-        const { offsetX, offsetY } = event.nativeEvent;
-        let hoveredPoint = null;
-        let hoveredLine = null;
-
-        // Find the index of the nearest point within the snap threshold
-        points.forEach((point, index) => {
-            const distance = Math.sqrt((point.x - offsetX) ** 2 + (point.y - offsetY) ** 2);
-            if (distance < SNAP_THRESHOLD) {
-                hoveredPoint = index;
-            }
-        });
-
-        // Find the index of the nearest line segment within the snap threshold
-        lines.forEach((line, index) => {
-            const [startX, startY, endX, endY] = [line.startX, line.startY, line.endX, line.endY];
-            const distance = pointToSegmentDistance(offsetX, offsetY, startX, startY, endX, endY);
-            if (distance < SNAP_THRESHOLD) {
-                hoveredLine = index;
-            }
-        });
-
-        if (!rectangleDrawing) {
-            setHoveredPointIndex(hoveredPoint);
-            setHoveredLineIndex(hoveredLine);
-        }
-    };
-
-    const pointToSegmentDistance = (px, py, x1, y1, x2, y2) => {
+          }
+        },
+        [handleCanvasClick, hoveredLineIndex, keyPressed, activeSnap, lines, setSelectedLineIndex]
+      );
+    
+      const pointToSegmentDistance = useCallback((px, py, x1, y1, x2, y2) => {
         const dx = x2 - x1;
         const dy = y2 - y1;
         const lengthSquared = dx * dx + dy * dy;
@@ -132,19 +128,52 @@ const DrawCanvas = ({ handleCanvasClick, lines, setLines, backgroundImage, point
         const nearestX = x1 + t * dx;
         const nearestY = y1 + t * dy;
         return Math.sqrt((nearestX - px) ** 2 + (nearestY - py) ** 2);
-    };
-
-    return (
+      }, []);
+    
+      const handleMouseMove = useCallback(
+        (event) => {
+          const { offsetX, offsetY } = event.nativeEvent;
+          let hoveredPoint = null;
+          let hoveredLine = null;
+    
+          // Find the index of the nearest point within the snap threshold
+          points.forEach((point, index) => {
+            const distance = Math.sqrt((point.x - offsetX) ** 2 + (point.y - offsetY) ** 2);
+            if (distance < SNAP_THRESHOLD) {
+              hoveredPoint = index;
+            }
+          });
+    
+          // Find the index of the nearest line segment within the snap threshold
+          lines.forEach((line, index) => {
+            const { startX, startY, endX, endY } = line;
+            const distance = pointToSegmentDistance(offsetX, offsetY, startX, startY, endX, endY);
+            if (distance < SNAP_THRESHOLD) {
+              hoveredLine = index;
+            }
+          });
+    
+          if (!rectangleDrawing) {
+            setHoveredPointIndex(hoveredPoint);
+            setHoveredLineIndex(hoveredLine);
+          }
+        },
+        [points, lines, pointToSegmentDistance, rectangleDrawing]
+      );
+    
+      return (
         <canvas
-            ref={canvasRef}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            width={600}
-            height={400}
-            style={{ border: '1px solid black', position: 'absolute', zIndex: 1 }}
-            id="draw-canvas"
+          ref={canvasRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          width={600}
+          height={400}
+          style={{ border: '1px solid black', position: 'absolute', zIndex: 1 }}
+          id="draw-canvas"
         />
-    );
-};
+      );
+    };
+    
+    export default DrawCanvas;
 
-export default DrawCanvas;
+

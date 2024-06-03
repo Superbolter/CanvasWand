@@ -5,7 +5,7 @@ export const convertLinesTo3D = (lines, setWalls3D, setIs3D) => {
         // Flip the y-coordinates correctly
         const start = [(line.startX - 300) * scaleFactor, -(line.startY - canvasHeight / 2) * scaleFactor, 0];
         const end = [(line.endX - 300) * scaleFactor, -(line.endY - canvasHeight / 2) * scaleFactor, 0];
-        return { start, end };
+        return { start, end,height: line.height * scaleFactor, width: line.breadth * scaleFactor  };
     });
     setWalls3D(walls3DConverted);
     setIs3D(true);

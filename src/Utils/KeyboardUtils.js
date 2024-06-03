@@ -1,7 +1,7 @@
 import{ BREADTH_STEP } from "../Constant/SnapThreshold";
 import { isPointConnected } from "./IsPointConnected";
 
-export const handleKeyDown = (event, { points, lines, setPoints, setLines, setCurrentLine, setFreedome, setNewLines, setActiveSnap, setRectangleDrawing, freedome, activeSnap, hoveredLineIndex,keyPressed,setKeyPressed, setHoveredLineIndex,selectedLineIndex,setSelectedLineIndex }) => {
+export const handleKeyDown = (event, { points, lines, setPoints, setLines, setCurrentLine, setFreedome, setNewLines, setActiveSnap, setRectangleDrawing, freedome, activeSnap, hoveredLineIndex,keyPressed,setKeyPressed, setHoveredLineIndex,selectedLineIndex,setSelectedLineIndex,factor}) => {
     if (event.key === 'x') {
        if(keyPressed){
         const updatedPoints = [...points];
@@ -66,20 +66,25 @@ export const handleKeyDown = (event, { points, lines, setPoints, setLines, setCu
         setRectangleDrawing(true);
     } else if (event.key === '+' && keyPressed) {
         if (selectedLineIndex.length> 0) {
-            const updatedLines = lines.map((line, index) => {
-                if (selectedLineIndex.includes(index)) {
-                    return { ...line, breadth: Math.min(9, line.breadth + BREADTH_STEP) };
-                }
-                return line;
-            });
-            setLines(updatedLines);
-            //setSelectedLineIndex([]);
+            const factorStep = BREADTH_STEP * factor[0];
+            const selectedIndexSet = new Set(selectedLineIndex);
+    
+            setLines(prevLines => {
+            const updatedLines = prevLines.map((line, index) => {
+            if (selectedIndexSet.has(index)) {
+                return { ...line, breadth: Math.min(9, line.breadth + factorStep) };
+            }
+            return line;
+        });
+        return updatedLines;
+    });
+        //setSelectedLineIndex([]);
         }
     } else if (event.key === '-'&& keyPressed) {
         if (selectedLineIndex.length> 0) {
             const updatedLines = lines.map((line, index) => {
                 if (selectedLineIndex.includes(index)) {
-                    return { ...line, breadth: Math.max(4, line.breadth - BREADTH_STEP) };
+                    return { ...line, breadth: Math.max(4, line.breadth - BREADTH_STEP*factor[0]) };
                 }
                 return line;
             });

@@ -6,10 +6,11 @@ import CameraControls from "./components/CameraControls";
 import TexturedPlane from "./components/TexturedPlane";
 import Wall3D from "./components/Wall3D";
 import DrawCanvas from "./components/DrawCanvas";
-import { findNearestPoint, findNearestLine } from "./Utils/GeometryUtils"; // Import the utility functions
+import { findNearestPoint, findNearestLine,distanceBetweenPoints } from "./Utils/GeometryUtils"; // Import the utility functions
 import { handleKeyDown, handleKeyUp } from "./Utils/KeyboardUtils";
 import { convertLinesTo3D } from "./Utils/ConvertLinesTo3D";
-import { SNAP_THRESHOLD, INITIAL_BREADTH} from "./Constant/SnapThreshold";
+import { SNAP_THRESHOLD, INITIAL_BREADTH, INITIAL_HEIGHT} from "./Constant/SnapThreshold";
+import DownloadJSONButton from "./Utils/ConvertToJson";
 
 import * as THREE from "three";
 
@@ -34,6 +35,8 @@ const App = () => {
   const [hoveredLineIndex, setHoveredLineIndex] = useState(null);
   const [selectedLineIndex, setSelectedLineIndex] = useState([]);
   const [keyPressed, setKeyPressed] = useState(false);
+  const [factor,setFactor] =useState([1,1,1]); 
+  const [firstLine,setFirstLine] = useState(true);
 
   useEffect(() => {
     const loadTexture = async () => {
@@ -63,7 +66,7 @@ const App = () => {
         keyPressed,
         setKeyPressed,
         selectedLineIndex,
-        setSelectedLineIndex
+        setSelectedLineIndex,factor,
       });
     const onKeyUp = (event) => handleKeyUp(event, { setNewLines });
 
@@ -90,8 +93,7 @@ const App = () => {
     hoveredLineIndex,
     setHoveredLineIndex,
     keyPressed,
-    //setSelectedLineIndex,
-    //selectedLineIndex,
+    factor,
   ]);
 
   const handleSnap = (x, y) => {
@@ -100,83 +102,75 @@ const App = () => {
   };
 
   const handleLineDrawing = (x, y, newPoint) => {
+  
     if (points.length > 0 && !helper) {
       const lastPoint = points[points.length - 1];
       let newLine;
-
+  
       if (freedome) {
         newLine = {
           startX: lastPoint.x,
           startY: lastPoint.y,
           endX: newPoint.x,
           endY: newPoint.y,
-          breadth: INITIAL_BREADTH,
+          breadth: INITIAL_BREADTH * factor[1],
+          len: distanceBetweenPoints(lastPoint.x, lastPoint.y, newPoint.x, newPoint.y) * factor[0],
+          height: INITIAL_HEIGHT * factor[2],
         };
       } else if (newLines) {
-        setCurrentLine({
-          startX: newPoint.x,
-          startY: newPoint.y,
-          endX: newPoint.x,
-          endY: newPoint.y,
-          breadth: INITIAL_BREADTH,
-        });
+        setCurrentLine(null);
       } else {
-        if (!helper) {
-          const nearestLineIndex = findNearestLine(lines, x, y, SNAP_THRESHOLD);
-          if (nearestLineIndex !== null) {
-            const nearestLine = lines[nearestLineIndex];
-            const { startX, startY, endX, endY } = nearestLine;
-            const slope = (endY - startY) / (endX - startX);
-            const intercept = startY - slope * startX;
-            const snappedY = slope * x + intercept;
-            newPoint.y = snappedY;
-          }
-
-          if (Math.abs(lastPoint.x - newPoint.x) > Math.abs(lastPoint.y - newPoint.y)) {
-            // Horizontal line
-            newLine = {
-              startX: lastPoint.x,
-              startY: lastPoint.y,
-              endX: newPoint.x,
-              endY: lastPoint.y,
-              breadth: INITIAL_BREADTH,
-            };
-            newPoint.y = lastPoint.y;
-          } else {
-            // Vertical line
-            newLine = {
-              startX: lastPoint.x,
-              startY: lastPoint.y,
-              endX: lastPoint.x,
-              endY: newPoint.y,
-              breadth: INITIAL_BREADTH,
-            };
-            newPoint.x = lastPoint.x;
-          }
+        const nearestLineIndex = findNearestLine(lines, x, y, SNAP_THRESHOLD);
+        if (nearestLineIndex !== null) {
+          const nearestLine = lines[nearestLineIndex];
+          const { startX, startY, endX, endY } = nearestLine;
+          const slope = (endY - startY) / (endX - startX);
+          const intercept = startY - slope * startX;
+          const snappedY = slope * x + intercept;
+  
+          newPoint.y = isNaN(snappedY) ? y : snappedY;
+        }
+  
+        if (Math.abs(lastPoint.x - newPoint.x) > Math.abs(lastPoint.y - newPoint.y)) {
+          newLine = {
+            startX: lastPoint.x,
+            startY: lastPoint.y,
+            endX: newPoint.x,
+            endY: lastPoint.y,
+            breadth: INITIAL_BREADTH * factor[1],
+            len: distanceBetweenPoints(lastPoint.x, lastPoint.y, newPoint.x, lastPoint.y) * factor[0],
+            height: INITIAL_HEIGHT * factor[2],
+          };
+          newPoint.y = lastPoint.y;
+        } else {
+          newLine = {
+            startX: lastPoint.x,
+            startY: lastPoint.y,
+            endX: lastPoint.x,
+            endY: newPoint.y,
+            breadth: INITIAL_BREADTH * factor[1],
+            len: distanceBetweenPoints(lastPoint.x, lastPoint.y, lastPoint.x, newPoint.y) * factor[0],
+            height: INITIAL_HEIGHT * factor[2],
+          };
+          newPoint.x = lastPoint.x;
         }
       }
-
-      if (!newLines) {
-        setLines([...lines, newLine]);
+  
+      if (!newLines && newLine) {
+        setLines(prevLines => [...prevLines, newLine]);
       }
     } else {
-      setCurrentLine({
-        startX: newPoint.x,
-        startY: newPoint.y,
-        endX: newPoint.x,
-        endY: newPoint.y,
-        breadth: INITIAL_BREADTH,
-      });
+      setCurrentLine(null);
     }
   };
-
+  
   const handleCanvasClick = (x, y) => {
     if (!isDrawing) return;
 
     let newPoint = activeSnap ? handleSnap(x, y) : { x, y };
 
     if (newLines) {
-      setEscapePoints([...escapePoints, { x, y }]);
+      setEscapePoints(prevPoints => [...prevPoints, { x, y }]);
     }
 
     handleLineDrawing(x, y, newPoint);
@@ -219,7 +213,7 @@ const App = () => {
         setPoints([...points, newPoint]);
       }
     } else {
-      setPoints([...points, newPoint]);
+      setPoints(prevPoints => [...prevPoints, newPoint]);
     }
   };
 
@@ -270,6 +264,8 @@ const App = () => {
           selectedLineIndex={selectedLineIndex}
           setSelectedLineIndex={setSelectedLineIndex}
           keyPressed={keyPressed}
+          factor={factor}
+          setFactor={setFactor}
         />
       )}
       <div
@@ -280,6 +276,7 @@ const App = () => {
             <button onClick={startDrawing}>Start Drawing</button>
             <button onClick={stopDrawing}>Stop Drawing</button>
             <button onClick={handleRectangle}>Rectangle</button>
+            <DownloadJSONButton lines={lines} points={points} />
             <button onClick={convertLinesTo3DHandler}>Convert to 3D</button>
           </>
         ) : (
@@ -302,7 +299,7 @@ const App = () => {
           <AxesHelper />
           <CameraControls />
           {walls3D.map((wall, index) => (
-            <Wall3D key={index} start={wall.start} end={wall.end} />
+            <Wall3D key={index} start={wall.start} end={wall.end} height={wall.height} width={wall.width} />
           ))}
         </Canvas>
       )}
