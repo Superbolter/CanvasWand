@@ -1,15 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { Canvas, extend } from "@react-three/fiber";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setLines,
+  setPoints,
+  setEscapePoints,
+  setWalls3D,
+  toggle3DMode,
+  setIsDrawing,
+  setFreedome,
+  setNewLines,
+  setActiveSnap,
+  setRectangleDrawing,
+  setHelper,
+  setRectPoints,
+  setHoveredLineIndex,
+  setKeyPressed,
+  setSelectedLineIndex,
+} from "./features/drawing/drwingSlice";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import AxesHelper from "./components/AxesHelper";
 import CameraControls from "./components/CameraControls";
 import TexturedPlane from "./components/TexturedPlane";
 import Wall3D from "./components/Wall3D";
 import DrawCanvas from "./components/DrawCanvas";
-import { findNearestPoint, findNearestLine,distanceBetweenPoints } from "./Utils/GeometryUtils"; // Import the utility functions
+import {
+  findNearestPoint,
+  findNearestLine,
+  distanceBetweenPoints,
+} from "./Utils/GeometryUtils";
 import { handleKeyDown, handleKeyUp } from "./Utils/KeyboardUtils";
 import { convertLinesTo3D } from "./Utils/ConvertLinesTo3D";
-import { SNAP_THRESHOLD, INITIAL_BREADTH, INITIAL_HEIGHT} from "./Constant/SnapThreshold";
+import {
+  SNAP_THRESHOLD,
+  INITIAL_BREADTH,
+  INITIAL_HEIGHT,
+} from "./Constant/SnapThreshold";
 import DownloadJSONButton from "./Utils/ConvertToJson";
 
 import * as THREE from "three";
@@ -17,30 +43,35 @@ import * as THREE from "three";
 extend({ OrbitControls });
 
 const App = () => {
-  const [lines, setLines] = useState([]);
-  const [points, setPoints] = useState([]);
-  const [escapePoints, setEscapePoints] = useState([]);
-  const [walls3D, setWalls3D] = useState([]);
-  const [is3D, setIs3D] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState("./img.jpg");
   const [texture, setTexture] = useState(null);
   const [currentLine, setCurrentLine] = useState(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [freedome, setFreedome] = useState(false);
-  const [newLines, setNewLines] = useState(false);
-  const [activeSnap, setActiveSnap] = useState(true);
-  const [rectangleDrawing, setRectangleDrawing] = useState(false);
-  const [helper, setHelper] = useState(false);
-  const [rectPoints, setRectPoints] = useState([]);
-  const [hoveredLineIndex, setHoveredLineIndex] = useState(null);
-  const [selectedLineIndex, setSelectedLineIndex] = useState([]);
-  const [keyPressed, setKeyPressed] = useState(false);
-  const [factor,setFactor] =useState([1,1,1]); 
-  const [firstLine,setFirstLine] = useState(true);
+
+  const dispatch = useDispatch();
+  const {
+    lines,
+    points,
+    escapePoints,
+    is3D,
+    walls3D,
+    isDrawing,
+    freedome,
+    newLines,
+    activeSnap,
+    rectangleDrawing,
+    helper,
+    rectPoints,
+    hoveredLineIndex,
+    selectedLineIndex,
+    keyPressed,
+    factor,
+  } = useSelector((state) => state.drawing);
 
   useEffect(() => {
     const loadTexture = async () => {
-      const loadedTexture = await new THREE.TextureLoader().load(backgroundImage);
+      const loadedTexture = await new THREE.TextureLoader().load(
+        backgroundImage
+      );
       setTexture(loadedTexture);
     };
     loadTexture();
@@ -49,9 +80,9 @@ const App = () => {
   useEffect(() => {
     const onKeyDown = (event) =>
       handleKeyDown(event, {
+        dispatch,
         points,
         lines,
-        escapePoints,
         setPoints,
         setLines,
         setCurrentLine,
@@ -62,13 +93,14 @@ const App = () => {
         freedome,
         activeSnap,
         hoveredLineIndex,
-        setHoveredLineIndex,
         keyPressed,
         setKeyPressed,
+        setHoveredLineIndex,
         selectedLineIndex,
-        setSelectedLineIndex,factor,
+        setSelectedLineIndex,
+        factor,
       });
-    const onKeyUp = (event) => handleKeyUp(event, { setNewLines });
+    const onKeyUp = (event) => handleKeyUp(event, { dispatch, setNewLines });
 
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("keyup", onKeyUp);
@@ -96,17 +128,18 @@ const App = () => {
     factor,
   ]);
 
+  //useKeyboardEvent();
+
   const handleSnap = (x, y) => {
     const nearestPoint = findNearestPoint(points, x, y, SNAP_THRESHOLD);
     return nearestPoint ? { x: nearestPoint.x, y: nearestPoint.y } : { x, y };
   };
 
   const handleLineDrawing = (x, y, newPoint) => {
-  
     if (points.length > 0 && !helper) {
       const lastPoint = points[points.length - 1];
       let newLine;
-  
+
       if (freedome) {
         newLine = {
           startX: lastPoint.x,
@@ -114,7 +147,13 @@ const App = () => {
           endX: newPoint.x,
           endY: newPoint.y,
           breadth: INITIAL_BREADTH * factor[1],
-          len: distanceBetweenPoints(lastPoint.x, lastPoint.y, newPoint.x, newPoint.y) * factor[0],
+          len:
+            distanceBetweenPoints(
+              lastPoint.x,
+              lastPoint.y,
+              newPoint.x,
+              newPoint.y
+            ) * factor[0],
           height: INITIAL_HEIGHT * factor[2],
         };
       } else if (newLines) {
@@ -127,18 +166,27 @@ const App = () => {
           const slope = (endY - startY) / (endX - startX);
           const intercept = startY - slope * startX;
           const snappedY = slope * x + intercept;
-  
+
           newPoint.y = isNaN(snappedY) ? y : snappedY;
         }
-  
-        if (Math.abs(lastPoint.x - newPoint.x) > Math.abs(lastPoint.y - newPoint.y)) {
+
+        if (
+          Math.abs(lastPoint.x - newPoint.x) >
+          Math.abs(lastPoint.y - newPoint.y)
+        ) {
           newLine = {
             startX: lastPoint.x,
             startY: lastPoint.y,
             endX: newPoint.x,
             endY: lastPoint.y,
             breadth: INITIAL_BREADTH * factor[1],
-            len: distanceBetweenPoints(lastPoint.x, lastPoint.y, newPoint.x, lastPoint.y) * factor[0],
+            len:
+              distanceBetweenPoints(
+                lastPoint.x,
+                lastPoint.y,
+                newPoint.x,
+                lastPoint.y
+              ) * factor[0],
             height: INITIAL_HEIGHT * factor[2],
           };
           newPoint.y = lastPoint.y;
@@ -149,28 +197,34 @@ const App = () => {
             endX: lastPoint.x,
             endY: newPoint.y,
             breadth: INITIAL_BREADTH * factor[1],
-            len: distanceBetweenPoints(lastPoint.x, lastPoint.y, lastPoint.x, newPoint.y) * factor[0],
+            len:
+              distanceBetweenPoints(
+                lastPoint.x,
+                lastPoint.y,
+                lastPoint.x,
+                newPoint.y
+              ) * factor[0],
             height: INITIAL_HEIGHT * factor[2],
           };
           newPoint.x = lastPoint.x;
         }
       }
-  
+
       if (!newLines && newLine) {
-        setLines(prevLines => [...prevLines, newLine]);
+        dispatch(setLines([...lines, newLine]));
       }
     } else {
       setCurrentLine(null);
     }
   };
-  
+
   const handleCanvasClick = (x, y) => {
     if (!isDrawing) return;
 
     let newPoint = activeSnap ? handleSnap(x, y) : { x, y };
 
     if (newLines) {
-      setEscapePoints(prevPoints => [...prevPoints, { x, y }]);
+      dispatch(setEscapePoints([...escapePoints, { x, y }]));
     }
 
     handleLineDrawing(x, y, newPoint);
@@ -187,8 +241,20 @@ const App = () => {
           endY: startPoint.y,
           breadth: INITIAL_BREADTH,
         };
-        const newLine2 = { startX: x, startY: startPoint.y, endX: x, endY: y, breadth: INITIAL_BREADTH };
-        const newLine3 = { startX: x, startY: y, endX: startPoint.x, endY: y, breadth: INITIAL_BREADTH };
+        const newLine2 = {
+          startX: x,
+          startY: startPoint.y,
+          endX: x,
+          endY: y,
+          breadth: INITIAL_BREADTH,
+        };
+        const newLine3 = {
+          startX: x,
+          startY: y,
+          endX: startPoint.x,
+          endY: y,
+          breadth: INITIAL_BREADTH,
+        };
         const newLine4 = {
           startX: startPoint.x,
           startY: y,
@@ -201,41 +267,40 @@ const App = () => {
         const point2 = { x: startPoint.x, y: y };
         const point4 = { x: x, y: startPoint.y };
 
-        setLines([...lines, newLine1, newLine2, newLine3, newLine4]);
-        setPoints([...points, point2, point3, point4]);
-        setRectPoints([...rectPoints, point2, point3, point4]); ///checkpoint
+        dispatch(setLines([...lines, newLine1, newLine2, newLine3, newLine4]));
+        dispatch(setPoints([...points, point2, point3, point4]));
+        dispatch(setRectPoints([...rectPoints, point2, point3, point4])); ///checkpoint
 
         //rectPoints.pop();
         setCurrentLine(null);
       } else if (rectPoints.length % 2 === 0) {
-        console.log("Rectangle point :", { x, y });
-        setRectPoints([...rectPoints, newPoint]);
-        setPoints([...points, newPoint]);
+        dispatch(setRectPoints([...rectPoints, newPoint]));
+        dispatch(setPoints([...points, newPoint]));
       }
     } else {
-      setPoints(prevPoints => [...prevPoints, newPoint]);
+      dispatch(setPoints([...points, newPoint]));
     }
   };
 
   const handleToggleMode = () => {
-    setIs3D((prevMode) => !prevMode);
+    dispatch(toggle3DMode());
   };
 
   const convertLinesTo3DHandler = () => {
-    convertLinesTo3D(lines, setWalls3D, setIs3D);
+    convertLinesTo3D(dispatch, lines, setWalls3D, toggle3DMode);
   };
 
   const startDrawing = () => {
-    setIsDrawing(true);
+    dispatch(setIsDrawing(true));
   };
   const handleRectangle = () => {
-    setIsDrawing(true);
-    setRectangleDrawing(true);
-    setHelper(true); //helper true means you have freedom to draw lines
+    dispatch(setIsDrawing(true));
+    dispatch(setRectangleDrawing(true));
+    dispatch(setHelper(true)); //helper true means you have freedom to draw lines
   };
 
   const stopDrawing = () => {
-    setIsDrawing(false);
+    dispatch(setIsDrawing(false));
   };
 
   return (
@@ -251,21 +316,10 @@ const App = () => {
       {!is3D && (
         <DrawCanvas
           handleCanvasClick={handleCanvasClick}
-          lines={lines}
-          setLines={setLines}
           backgroundImage={backgroundImage}
-          points={points}
           currentLine={currentLine}
-          activeSnap={activeSnap}
-          rectangleDrawing={rectangleDrawing}
-          rectPoints={rectPoints}
           hoveredLineIndex={hoveredLineIndex}
           setHoveredLineIndex={setHoveredLineIndex}
-          selectedLineIndex={selectedLineIndex}
-          setSelectedLineIndex={setSelectedLineIndex}
-          keyPressed={keyPressed}
-          factor={factor}
-          setFactor={setFactor}
         />
       )}
       <div
@@ -290,7 +344,7 @@ const App = () => {
           style={{
             width: "100vw",
             height: "100vh",
-            position:"absolute",
+            position: "absolute",
             zIndex: 0,
           }}
         >
@@ -299,7 +353,13 @@ const App = () => {
           <AxesHelper />
           <CameraControls />
           {walls3D.map((wall, index) => (
-            <Wall3D key={index} start={wall.start} end={wall.end} height={wall.height} width={wall.width} />
+            <Wall3D
+              key={index}
+              start={wall.start}
+              end={wall.end}
+              height={wall.height}
+              width={wall.width}
+            />
           ))}
         </Canvas>
       )}
@@ -308,4 +368,3 @@ const App = () => {
 };
 
 export default App;
-
