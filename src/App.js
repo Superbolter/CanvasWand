@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Canvas, extend } from "@react-three/fiber";
 import { useDispatch, useSelector } from "react-redux";
+import convert from 'convert-units';
+
 import {
   setLines,
   setPoints,
@@ -24,10 +26,12 @@ import CameraControls from "./components/CameraControls";
 import TexturedPlane from "./components/TexturedPlane";
 import Wall3D from "./components/Wall3D";
 import DrawCanvas from "./components/DrawCanvas";
+import {LengthConverter} from "./components/LengthConverter";
 import {
   findNearestPoint,
   findNearestLine,
   distanceBetweenPoints,
+  uniqueId,
 } from "./Utils/GeometryUtils";
 import { handleKeyDown, handleKeyUp } from "./Utils/KeyboardUtils";
 import { convertLinesTo3D } from "./Utils/ConvertLinesTo3D";
@@ -43,6 +47,8 @@ import * as THREE from "three";
 extend({ OrbitControls });
 
 const App = () => {
+
+  
   const [backgroundImage, setBackgroundImage] = useState("./img.jpg");
   const [texture, setTexture] = useState(null);
   const [currentLine, setCurrentLine] = useState(null);
@@ -65,6 +71,7 @@ const App = () => {
     selectedLineIndex,
     keyPressed,
     factor,
+    measured,
   } = useSelector((state) => state.drawing);
 
   useEffect(() => {
@@ -132,12 +139,13 @@ const App = () => {
 
   const handleSnap = (x, y) => {
     const nearestPoint = findNearestPoint(points, x, y, SNAP_THRESHOLD);
-    return nearestPoint ? { x: nearestPoint.x, y: nearestPoint.y } : { x, y };
+    return nearestPoint ? { x: nearestPoint.x, y: nearestPoint.y ,id:nearestPoint.id} : { x, y ,id:uniqueId()};
   };
 
   const handleLineDrawing = (x, y, newPoint) => {
     if (points.length > 0 && !helper) {
       const lastPoint = points[points.length - 1];
+      const lastPointId = lastPoint.id;
       let newLine;
 
       if (freedome) {
@@ -146,6 +154,8 @@ const App = () => {
           startY: lastPoint.y,
           endX: newPoint.x,
           endY: newPoint.y,
+          startId: lastPointId,
+          endId: newPoint.id,
           breadth: INITIAL_BREADTH * factor[1],
           len:
             distanceBetweenPoints(
@@ -179,14 +189,15 @@ const App = () => {
             startY: lastPoint.y,
             endX: newPoint.x,
             endY: lastPoint.y,
+            startId: lastPointId,
+            endId: newPoint.id,
             breadth: INITIAL_BREADTH * factor[1],
-            len:
-              distanceBetweenPoints(
-                lastPoint.x,
-                lastPoint.y,
-                newPoint.x,
-                lastPoint.y
-              ) * factor[0],
+            len:convert(distanceBetweenPoints(
+              lastPoint.x,
+              lastPoint.y,
+              newPoint.x,
+              lastPoint.y
+            ) * factor[0]).from(measured).to('mm'),
             height: INITIAL_HEIGHT * factor[2],
           };
           newPoint.y = lastPoint.y;
@@ -196,14 +207,16 @@ const App = () => {
             startY: lastPoint.y,
             endX: lastPoint.x,
             endY: newPoint.y,
+            startId: lastPointId,
+            endId: newPoint.id,
             breadth: INITIAL_BREADTH * factor[1],
             len:
-              distanceBetweenPoints(
-                lastPoint.x,
-                lastPoint.y,
-                lastPoint.x,
-                newPoint.y
-              ) * factor[0],
+            convert(distanceBetweenPoints(
+              lastPoint.x,
+              lastPoint.y,
+              newPoint.x,
+              lastPoint.y
+            ) * factor[0]).from(measured).to('mm'),
             height: INITIAL_HEIGHT * factor[2],
           };
           newPoint.x = lastPoint.x;
@@ -221,7 +234,7 @@ const App = () => {
   const handleCanvasClick = (x, y) => {
     if (!isDrawing) return;
 
-    let newPoint = activeSnap ? handleSnap(x, y) : { x, y };
+    let newPoint = activeSnap ? handleSnap(x, y) : { x, y,id:uniqueId() };
 
     if (newLines) {
       dispatch(setEscapePoints([...escapePoints, { x, y }]));
@@ -332,6 +345,7 @@ const App = () => {
             <button onClick={handleRectangle}>Rectangle</button>
             <DownloadJSONButton lines={lines} points={points} />
             <button onClick={convertLinesTo3DHandler}>Convert to 3D</button>
+            <LengthConverter/>
           </>
         ) : (
           <button onClick={handleToggleMode}>

@@ -4,3 +4,4 @@ export const isPointConnected = (point, lines) => {
         (line.endX === point.x && line.endY === point.y)
     );
 };
+

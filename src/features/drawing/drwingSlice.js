@@ -18,6 +18,7 @@ const initialState = {
   keyPressed: false,
   factor: [1, 1, 1],
   firstLine: true,
+  measured: 'in',
 };
 
 const drawingSlice = createSlice({
@@ -81,6 +82,9 @@ const drawingSlice = createSlice({
     setFirstLine: (state, action) => {
       state.firstLine = action.payload;
     },
+    setMeasured: (state, action) => {
+      state.measured = action.payload;
+    },
   },
 });
 
@@ -104,6 +108,7 @@ export const {
   setKeyPressed,
   setFactor,
   setFirstLine,
+  setMeasured
 } = drawingSlice.actions;
 
 export default drawingSlice.reducer;

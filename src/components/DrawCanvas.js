@@ -24,6 +24,8 @@ const DrawCanvas = ({
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const [hoveredPointIndex, setHoveredPointIndex] = useState(null);
+  const [currentHoverPoint, setCurrentHoverPoint] = useState(null);
+
 
   const {
     lines,
@@ -33,6 +35,7 @@ const DrawCanvas = ({
     selectedLineIndex,
     keyPressed,
     rectPoints,
+    factor,
   } = useSelector((state) => state.drawing);
 
   const dispatch = useDispatch();
@@ -98,6 +101,17 @@ const DrawCanvas = ({
           context.fill();
         });
 
+        if(points.length>0 && currentHoverPoint){
+          const point =points[points.length-1];
+          context.fillStyle = "black";
+          context.font = "16px Arial";
+          context.fillText(
+            `Distance: ${Math.ceil(distanceBetweenPoints(point.x,point.y,currentHoverPoint.x,currentHoverPoint.y)*factor[0]).toFixed(2)}`,
+            currentHoverPoint.x + 10,
+            currentHoverPoint.y + 10,
+          );
+        };
+
         if (currentLine) {
           context.beginPath();
           context.moveTo(currentLine.startX, currentLine.startY);
@@ -117,6 +131,7 @@ const DrawCanvas = ({
     hoveredLineIndex,
     rectangleDrawing,
     rectPoints,
+    currentHoverPoint
   ]);
 
   const handleMouseDown = useCallback(
@@ -192,6 +207,7 @@ const DrawCanvas = ({
   const handleMouseMove = useCallback(
     (event) => {
       const { offsetX, offsetY } = event.nativeEvent;
+      setCurrentHoverPoint({x: offsetX, y: offsetY});
       let hoveredPoint = null;
       let hoveredLine = null;
 
