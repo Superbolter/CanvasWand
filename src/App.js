@@ -1,32 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { Canvas, extend } from "@react-three/fiber";
+import { extend } from "@react-three/fiber";
 import { useDispatch, useSelector } from "react-redux";
 import convert from 'convert-units';
+import UIControls from "./components/UiComponent";
+import CanvasDrawing from "./components/CanvasDrawing";
+import * as THREE from "three";
+
 
 import {
   setLines,
   setPoints,
   setEscapePoints,
-  setWalls3D,
-  toggle3DMode,
-  setIsDrawing,
   setFreedome,
   setNewLines,
   setActiveSnap,
   setRectangleDrawing,
-  setHelper,
   setRectPoints,
   setHoveredLineIndex,
   setKeyPressed,
   setSelectedLineIndex,
 } from "./features/drawing/drwingSlice";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import AxesHelper from "./components/AxesHelper";
-import CameraControls from "./components/CameraControls";
-import TexturedPlane from "./components/TexturedPlane";
-import Wall3D from "./components/Wall3D";
 import DrawCanvas from "./components/DrawCanvas";
-import {LengthConverter} from "./components/LengthConverter";
 import {
   findNearestPoint,
   findNearestLine,
@@ -34,24 +29,20 @@ import {
   uniqueId,
 } from "./Utils/GeometryUtils";
 import { handleKeyDown, handleKeyUp } from "./Utils/KeyboardUtils";
-import { convertLinesTo3D } from "./Utils/ConvertLinesTo3D";
 import {
   SNAP_THRESHOLD,
   INITIAL_BREADTH,
   INITIAL_HEIGHT,
 } from "./Constant/SnapThreshold";
-import DownloadJSONButton from "./Utils/ConvertToJson";
-
-import * as THREE from "three";
 
 extend({ OrbitControls });
 
 const App = () => {
-
-  
+  const [currentLine, setCurrentLine] = useState(null);
   const [backgroundImage, setBackgroundImage] = useState("./img.jpg");
   const [texture, setTexture] = useState(null);
-  const [currentLine, setCurrentLine] = useState(null);
+
+
 
   const dispatch = useDispatch();
   const {
@@ -59,7 +50,6 @@ const App = () => {
     points,
     escapePoints,
     is3D,
-    walls3D,
     isDrawing,
     freedome,
     newLines,
@@ -73,16 +63,6 @@ const App = () => {
     factor,
     measured,
   } = useSelector((state) => state.drawing);
-
-  useEffect(() => {
-    const loadTexture = async () => {
-      const loadedTexture = await new THREE.TextureLoader().load(
-        backgroundImage
-      );
-      setTexture(loadedTexture);
-    };
-    loadTexture();
-  }, [backgroundImage]);
 
   useEffect(() => {
     const onKeyDown = (event) =>
@@ -135,7 +115,15 @@ const App = () => {
     factor,
   ]);
 
-  //useKeyboardEvent();
+  useEffect(() => {
+    const loadTexture = async () => {
+      const loadedTexture = await new THREE.TextureLoader().load(
+        backgroundImage
+      );
+      setTexture(loadedTexture);
+    };
+    loadTexture();
+  }, [backgroundImage]);
 
   const handleSnap = (x, y) => {
     const nearestPoint = findNearestPoint(points, x, y, SNAP_THRESHOLD);
@@ -294,29 +282,7 @@ const App = () => {
       dispatch(setPoints([...points, newPoint]));
     }
   };
-
-  const handleToggleMode = () => {
-    dispatch(toggle3DMode());
-  };
-
-  const convertLinesTo3DHandler = () => {
-    convertLinesTo3D(dispatch, lines, setWalls3D, toggle3DMode);
-  };
-
-  const startDrawing = () => {
-    dispatch(setIsDrawing(true));
-  };
-  const handleRectangle = () => {
-    dispatch(setIsDrawing(true));
-    dispatch(setRectangleDrawing(true));
-    dispatch(setHelper(true)); //helper true means you have freedom to draw lines
-  };
-
-  const stopDrawing = () => {
-    dispatch(setIsDrawing(false));
-  };
-
-  return (
+ return (
     <div
       style={{
         display: "flex",
@@ -335,48 +301,8 @@ const App = () => {
           setHoveredLineIndex={setHoveredLineIndex}
         />
       )}
-      <div
-        style={{ position: "absolute", top: "20px", right: "20px", zIndex: 2 }}
-      >
-        {!is3D ? (
-          <>
-            <button onClick={startDrawing}>Start Drawing</button>
-            <button onClick={stopDrawing}>Stop Drawing</button>
-            <button onClick={handleRectangle}>Rectangle</button>
-            <DownloadJSONButton lines={lines} points={points} />
-            <button onClick={convertLinesTo3DHandler}>Convert to 3D</button>
-            <LengthConverter/>
-          </>
-        ) : (
-          <button onClick={handleToggleMode}>
-            {is3D ? "2D Mode" : "3D Mode"}
-          </button>
-        )}
-      </div>
-      {is3D && (
-        <Canvas
-          style={{
-            width: "100vw",
-            height: "100vh",
-            position: "absolute",
-            zIndex: 0,
-          }}
-        >
-          <ambientLight intensity={1} />
-          {texture && <TexturedPlane texture={texture} />}
-          <AxesHelper />
-          <CameraControls />
-          {walls3D.map((wall, index) => (
-            <Wall3D
-              key={index}
-              start={wall.start}
-              end={wall.end}
-              height={wall.height}
-              width={wall.width}
-            />
-          ))}
-        </Canvas>
-      )}
+      <UIControls/>
+      <CanvasDrawing texture={texture}/>
     </div>
   );
 };
