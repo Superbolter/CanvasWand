@@ -5,11 +5,14 @@ import {
   INITIAL_HEIGHT,
 } from "../Constant/SnapThreshold";
 import { distanceBetweenPoints } from "../Utils/GeometryUtils";
+import convert from "convert-units";
 import {
   setLines,
   setHoveredLineIndex,
   setSelectedLineIndex,
   setFactor,
+  setIdSelection,
+  setFormVisible,
 } from "../features/drawing/drwingSlice";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -26,7 +29,6 @@ const DrawCanvas = ({
   const [hoveredPointIndex, setHoveredPointIndex] = useState(null);
   const [currentHoverPoint, setCurrentHoverPoint] = useState(null);
 
-
   const {
     lines,
     points,
@@ -36,6 +38,9 @@ const DrawCanvas = ({
     keyPressed,
     rectPoints,
     factor,
+    idSelection,
+    formVisibles,
+    measured,
   } = useSelector((state) => state.drawing);
 
   const dispatch = useDispatch();
@@ -78,7 +83,10 @@ const DrawCanvas = ({
         );
 
         lines.forEach((line, index) => {
-          context.lineWidth = line.breadth || INITIAL_BREADTH;
+          context.lineWidth =
+            convert(line.breadth * factor[1])
+              .from("mm")
+              .to(measured) || INITIAL_BREADTH;
           context.beginPath();
           context.moveTo(line.startX, line.startY);
           context.lineTo(line.endX, line.endY);
@@ -92,7 +100,7 @@ const DrawCanvas = ({
 
         points.forEach((point, index) => {
           context.beginPath();
-          context.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+          context.arc(point.x, point.y, 3, 0, 2 * Math.PI);
           if (activeSnap && hoveredPointIndex === index) {
             context.fillStyle = "blue";
           } else {
@@ -101,16 +109,23 @@ const DrawCanvas = ({
           context.fill();
         });
 
-        if(points.length>0 && currentHoverPoint){
-          const point =points[points.length-1];
+        if (points.length > 0 && currentHoverPoint) {
+          const point = points[points.length - 1];
           context.fillStyle = "black";
-          context.font = "16px Arial";
+          context.font = "10px Arial";
           context.fillText(
-            `Distance: ${Math.ceil(distanceBetweenPoints(point.x,point.y,currentHoverPoint.x,currentHoverPoint.y)*factor[0]).toFixed(2)}`,
-            currentHoverPoint.x + 10,
-            currentHoverPoint.y + 10,
+            `${Math.ceil(
+              distanceBetweenPoints(
+                point.x,
+                point.y,
+                currentHoverPoint.x,
+                currentHoverPoint.y
+              ) * factor[0]
+            ).toFixed(2)}`,
+            currentHoverPoint.x - 10,
+            currentHoverPoint.y - 10
           );
-        };
+        }
 
         if (currentLine) {
           context.beginPath();
@@ -131,7 +146,8 @@ const DrawCanvas = ({
     hoveredLineIndex,
     rectangleDrawing,
     rectPoints,
-    currentHoverPoint
+    currentHoverPoint,
+    formVisibles,
   ]);
 
   const handleMouseDown = useCallback(
@@ -157,8 +173,8 @@ const DrawCanvas = ({
             firstTwoPoint[0],
             firstTwoPoint[1]
           );
-        const wfactor = userWidth / INITIAL_BREADTH;
-        const hfactor = userHeight / INITIAL_HEIGHT;
+        const wfactor = INITIAL_BREADTH / userWidth;
+        const hfactor = INITIAL_HEIGHT / userHeight;
         dispatch(setFactor([lfactor, wfactor, hfactor]));
         return;
       }
@@ -169,6 +185,15 @@ const DrawCanvas = ({
           );
         } else {
           dispatch(setSelectedLineIndex([]));
+        }
+      } else if (button === 2 && keyPressed) {
+        if (hoveredLineIndex !== null) {
+          const refrence = lines[hoveredLineIndex];
+          const newSelection = { si: refrence.startId, ei: refrence.endId };
+          dispatch(setIdSelection([...idSelection, newSelection]));
+          dispatch(setFormVisible(true));
+        } else {
+          dispatch(setIdSelection([]));
         }
       } else {
         if (activeSnap && hoveredLineIndex !== null) {
@@ -190,6 +215,7 @@ const DrawCanvas = ({
       activeSnap,
       lines,
       setSelectedLineIndex,
+      idSelection,
     ]
   );
 
@@ -207,7 +233,7 @@ const DrawCanvas = ({
   const handleMouseMove = useCallback(
     (event) => {
       const { offsetX, offsetY } = event.nativeEvent;
-      setCurrentHoverPoint({x: offsetX, y: offsetY});
+      setCurrentHoverPoint({ x: offsetX, y: offsetY });
       let hoveredPoint = null;
       let hoveredLine = null;
 

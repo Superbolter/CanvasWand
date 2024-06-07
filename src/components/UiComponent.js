@@ -10,14 +10,15 @@ const UIControls = () => {
   const {
     is3D,
     lines,
-    points
+    points,
+    measured,
   } = useSelector((state) => state.drawing); 
   const handleToggleMode = () => {
     dispatch(toggle3DMode());
   };
 
   const convertLinesTo3DHandler = () => {
-    convertLinesTo3D(dispatch, lines, setWalls3D, toggle3DMode);
+    convertLinesTo3D(dispatch, lines, setWalls3D, toggle3DMode,measured);
   };
 
   const startDrawing = () => {

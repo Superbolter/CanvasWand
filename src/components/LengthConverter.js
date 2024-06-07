@@ -19,10 +19,10 @@ export const LengthConverter = () => {
         <div>
             <label htmlFor="lengthUnit">Select Length Unit:</label>
             <select id="lengthUnit" onChange={handleUnitChange}>
+                <option value="in">Inches</option>
                 <option value="m">Meters</option>
                 <option value="cm">Centimeters</option>
                 <option value="mm">Millimeters</option>
-                <option value="in">Inches</option>
                 <option value="ft">Feet</option>
             </select>
         </div>

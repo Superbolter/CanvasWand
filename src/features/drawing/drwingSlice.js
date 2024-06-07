@@ -2,11 +2,12 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   lines: [],
+  formVisibles: false,
   points: [],
   escapePoints: [],
   is3D: false,
   walls3D: [],
-  isDrawing: false,
+  isDrawing: true,
   freedome: false,
   newLines: false,
   activeSnap: true,
@@ -15,6 +16,7 @@ const initialState = {
   rectPoints: [],
   hoveredLineIndex: null,
   selectedLineIndex: [],
+  idSelection:[],
   keyPressed: false,
   factor: [1, 1, 1],
   firstLine: true,
@@ -30,6 +32,9 @@ const drawingSlice = createSlice({
     },
     addPoint: (state, action) => {
       state.points.push(action.payload);
+    },
+    setFormVisible: (state, action) => {
+      state.formVisibles = action.payload;
     },
     setLines: (state, action) => {
       state.lines = action.payload;
@@ -73,6 +78,9 @@ const drawingSlice = createSlice({
     setSelectedLineIndex: (state, action) => {
       state.selectedLineIndex = action.payload;
     },
+    setIdSelection: (state, action) => {
+      state.idSelection = action.payload;
+    },
     setKeyPressed: (state, action) => {
       state.keyPressed = action.payload;
     },
@@ -92,6 +100,7 @@ export const {
   addLine,
   addPoint,
   setLines,
+  setFormVisible,
   setPoints,
   setEscapePoints,
   setWalls3D,
@@ -105,6 +114,7 @@ export const {
   setRectPoints,
   setHoveredLineIndex,
   setSelectedLineIndex,
+  setIdSelection,
   setKeyPressed,
   setFactor,
   setFirstLine,

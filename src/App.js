@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import convert from 'convert-units';
 import UIControls from "./components/UiComponent";
 import CanvasDrawing from "./components/CanvasDrawing";
+import LineEditForm from "./components/LineEditForm";
 import * as THREE from "three";
 
 
@@ -43,7 +44,6 @@ const App = () => {
   const [texture, setTexture] = useState(null);
 
 
-
   const dispatch = useDispatch();
   const {
     lines,
@@ -62,7 +62,11 @@ const App = () => {
     keyPressed,
     factor,
     measured,
+    formVisibles,
+  
   } = useSelector((state) => state.drawing);
+
+
 
   useEffect(() => {
     const onKeyDown = (event) =>
@@ -144,15 +148,14 @@ const App = () => {
           endY: newPoint.y,
           startId: lastPointId,
           endId: newPoint.id,
-          breadth: INITIAL_BREADTH * factor[1],
-          len:
-            distanceBetweenPoints(
-              lastPoint.x,
-              lastPoint.y,
-              newPoint.x,
-              newPoint.y
-            ) * factor[0],
-          height: INITIAL_HEIGHT * factor[2],
+          breadth: convert(INITIAL_BREADTH/factor[1]).from(measured).to('mm'),
+          len:convert(distanceBetweenPoints(
+            lastPoint.x,
+            lastPoint.y,
+            newPoint.x,
+            newPoint.y
+          ) * factor[0]).from(measured).to('mm'),
+          height: convert(INITIAL_HEIGHT/factor[2]).from(measured).to('mm'),
         };
       } else if (newLines) {
         setCurrentLine(null);
@@ -179,14 +182,14 @@ const App = () => {
             endY: lastPoint.y,
             startId: lastPointId,
             endId: newPoint.id,
-            breadth: INITIAL_BREADTH * factor[1],
+            breadth: convert(INITIAL_BREADTH/factor[1]).from(measured).to('mm'),
             len:convert(distanceBetweenPoints(
               lastPoint.x,
               lastPoint.y,
               newPoint.x,
               lastPoint.y
             ) * factor[0]).from(measured).to('mm'),
-            height: INITIAL_HEIGHT * factor[2],
+            height: convert(INITIAL_HEIGHT/factor[2]).from(measured).to('mm'),
           };
           newPoint.y = lastPoint.y;
         } else {
@@ -197,15 +200,15 @@ const App = () => {
             endY: newPoint.y,
             startId: lastPointId,
             endId: newPoint.id,
-            breadth: INITIAL_BREADTH * factor[1],
+            breadth: convert(INITIAL_BREADTH/factor[1]).from(measured).to('mm'),
             len:
             convert(distanceBetweenPoints(
               lastPoint.x,
               lastPoint.y,
-              newPoint.x,
-              lastPoint.y
+              lastPoint.x,
+              newPoint.y
             ) * factor[0]).from(measured).to('mm'),
-            height: INITIAL_HEIGHT * factor[2],
+            height: convert(INITIAL_HEIGHT/factor[2]).from(measured).to('mm'),
           };
           newPoint.x = lastPoint.x;
         }
@@ -282,7 +285,7 @@ const App = () => {
       dispatch(setPoints([...points, newPoint]));
     }
   };
- return (
+  return (
     <div
       style={{
         display: "flex",
@@ -302,6 +305,9 @@ const App = () => {
         />
       )}
       <UIControls/>
+      {formVisibles && (
+        <LineEditForm/>
+      )}
       <CanvasDrawing texture={texture}/>
     </div>
   );
