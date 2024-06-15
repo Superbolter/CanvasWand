@@ -1,22 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import "./App.css"
 import { Canvas } from '@react-three/fiber';
 import { Grid, Line } from '@react-three/drei';
 import { useDispatch, useSelector } from 'react-redux';
-import { setLines } from './features/drawing/drwingSlice';
+import { setLines,setStoreLines} from './features/drawing/drwingSlice';
 
 export const App = () => {
   const dispatch = useDispatch();
-  const { lines } = useSelector((state) => state.drawing);
+  const { lines,storeLines} = useSelector((state) => state.drawing);
 
-  const addPoint = (lineIndex, newPoint) => {
+
+  const calculateLength = (point1, point2) => {
+    const [x1, y1, z1] = point1||[0,0,0];
+    const [x2, y2, z2] = point2;
+    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2);
+  };
+
+  const addPoint = (lineIndex,newPoint,startPoint) => {
+    console.log('hii :',startPoint);
+    console.log("hee:",newPoint);
+    console.log('hoo:',lineIndex);
+    const newId = Date.now();
+    const newLine = {
+      id:newId,
+      lineIndex:lineIndex,
+      points:[startPoint,newPoint],
+      length:calculateLength(startPoint||[0,0,0],newPoint)
+
+    }
+    dispatch(setStoreLines([...storeLines,newLine]));
+    
     const updatedLines = lines.map((line, index) =>
       index === lineIndex ? { ...line, points: [...line.points, newPoint] } : line
     );
     dispatch(setLines(updatedLines));
   };
 
-  const movePoint = (lineIndex, pointIndex, newPoint) => {
+  const movePoint = (lineIndex, pointIndex, newPoint,startPoint) => {
     const updatedLines = lines.map((line, index) =>
       index === lineIndex ? {
         ...line,
@@ -103,8 +123,8 @@ function PolyLine({ points, lineIndex, addPoint, movePoint }) {
           position={point}
           lineIndex={lineIndex}
           pointIndex={index}
-          addPoint={newPoint => addPoint(lineIndex, newPoint)}
-          movePoint={(newPoint) => movePoint(lineIndex, index, newPoint)}
+          addPoint={(newPoint,startPoint) => addPoint(lineIndex, newPoint,startPoint)}
+          movePoint={(newPoint,startPoint) => movePoint(lineIndex, index, newPoint,startPoint)}
         />
       ))}
     </>
@@ -115,20 +135,26 @@ function EndPoint({ position, lineIndex, pointIndex, addPoint, movePoint }) {
   const [hovered, setHover] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [currentPosition, setCurrentPosition] = useState(position.slice());
+  let capturePoint = useRef(null);
 
   const down = event => {
     event.stopPropagation();
     event.target.setPointerCapture(event.pointerId);
+    capturePoint.current = event.unprojectedPoint.toArray() ;
+    console.log("Hii i am here ",capturePoint.current);
     setDragging(true);
+    
   };
 
   const up = event => {
     if (dragging) {
       const newPosition = event.unprojectedPoint.toArray();
+      const startPoint =capturePoint.current;
+      console.log("Hii i am here 2 ",startPoint);
       if (event.button === 2) {
-        movePoint(newPosition);
+        movePoint(newPosition,startPoint);
       } else {
-        addPoint(newPosition);
+        addPoint(newPosition,startPoint);
       }
     }
     setDragging(false);

@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  lines: [{ id: 1, points: [[-100, -100, 0], [-100, -100, 0]] }],
+  //lines: [{ id: 1, points: [[-100, -100, 0], [-100, -100, 0]] }],
+  lines: [{ id: 1, points: [[-100, -100, 0], [-100, -100, 0]],length :0 }],
+  storeLines:[],
   widthChangeType:'between',
   formVisibles: false,
   points: [],
@@ -17,6 +19,7 @@ const initialState = {
   rectangleDrawing: false,
   helper: false,
   rectPoints: [],
+  startPosition :null,
   hoveredLineIndex: null,
   selectedLineIndex: [],
   idSelection:[],
@@ -32,6 +35,12 @@ const drawingSlice = createSlice({
   reducers: {
     addLine: (state, action) => {
       state.lines.push(action.payload);
+    },
+    setStartPosition: (state, action) => {
+      state.startPosition = action.payload;
+    },
+    setStoreLines:(state,action) => {
+      state.storeLines = action.payload;
     },
     setWidthChangeType: (state, action) => {
       state.widthChangeType = action.payload;
@@ -78,11 +87,42 @@ const drawingSlice = createSlice({
       state.measured = action.payload;
     },
   },
+
+
+
+
+//   setLines(state, action) {
+//     state.lines = action.payload;
+//   },
+//   addLine(state, action) {
+//     state.lines.push(action.payload);
+//   },
+//   updateLine(state, action) {
+//     const { id, newPoints } = action.payload;
+//     const line = state.lines.find(line => line.id === id);
+//     if (line) {
+//       line.points = newPoints;
+//       line.length = calculateLength(newPoints);
+//     }
+//   }
+// }
 });
+
+const calculateLength = (points) => {
+  let length = 0;
+  for (let i = 1; i < points.length; i++) {
+    const [x1, y1, z1] = points[i - 1];
+    const [x2, y2, z2] = points[i];
+    length += Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2);
+  }
+  return length;
+};
 
 export const {
   addLine,
   addPoint,
+  setStartPosition,
+  updateLine,
   updateLastLine,
   setWidthChangeType,
   setLines,
@@ -90,6 +130,7 @@ export const {
   setBreak,
   setFormVisible,
   setPoints,
+  setStoreLines,
   setEscapePoints,
   setWalls3D,
   toggle3DMode,
