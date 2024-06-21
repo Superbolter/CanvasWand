@@ -1,35 +1,50 @@
 // BoxGeometry.js
 import { Vector3 } from "three";
+import React, { useMemo } from "react";
+import { useLoader } from "@react-three/fiber";
+import { TextureLoader } from "three";
+import { extend } from "@react-three/fiber";
+import Brick1 from "../assets/Bricks1.jpg"; // Adjust the path to your texture
+import * as THREE from "three";
+import { useSelector } from "react-redux";
+import convert from "convert-units";
 
-import React, { useMemo } from 'react';
-import { useLoader } from '@react-three/fiber';
-import { TextureLoader } from 'three';
-import { extend } from '@react-three/fiber';
-import Brick1 from '../assets/Bricks1.jpg'; // Adjust the path to your texture
-import * as THREE from 'three';
-
-const WallGeometry = ({ start, end, width = 10, isSelected, onClick, handlePointClick, currentPoint, newPointMode, opacity = 0.5 }) => {
-
+const WallGeometry = ({
+  start,
+  end,
+  dimension,
+  isSelected,
+  onClick,
+  handlePointClick,
+  currentPoint,
+  newPointMode,
+  opacity = 0.5,
+}) => {
   const texture = useLoader(TextureLoader, Brick1);
+  const { measured,factor } = useSelector((state) => state.drawing);
 
-  console.log(texture);
-  
   if (!start || !end) return null;
-
-
-  
-  
 
   const length = start.distanceTo(end);
   const midpoint = new Vector3().addVectors(start, end).multiplyScalar(0.48);
 
   // Determine the rotation angle for the box
   const angle = Math.atan2(end.y - start.y, end.x - start.x);
+  const height = convert(dimension.height*factor[2]).from("mm").to(measured);
 
   return (
     <>
-      <mesh position={[midpoint.x,midpoint.y,midpoint.z+30]} rotation={[0, 0, angle]}>
-        <boxGeometry args={[length, width, 60]} />
+      <mesh
+        position={[midpoint.x, midpoint.y, midpoint.z + height/2]}
+        rotation={[0, 0, angle]}
+      >
+        <boxGeometry
+          args={[
+            length,
+            convert(dimension.width*factor[1]).from("mm").to(measured),
+            height,
+          ]}
+        />
         <meshBasicMaterial map={texture} side={THREE.DoubleSide} />
       </mesh>
     </>
@@ -38,7 +53,6 @@ const WallGeometry = ({ start, end, width = 10, isSelected, onClick, handlePoint
 
 export default WallGeometry;
 
-
 // import React, { useMemo } from 'react';
 // import { useLoader } from '@react-three/fiber';
 // import { TextureLoader } from 'three';
@@ -46,7 +60,6 @@ export default WallGeometry;
 // import { BoxGeometry } from 'three';
 // import Brick1 from '../assets/Bricks1.jpg'; // Adjust the path to your texture
 // import * as THREE from 'three';
-
 
 // extend({ BoxGeometry });
 
@@ -101,7 +114,6 @@ export default WallGeometry;
 // };
 
 // export default WallGeometry;
-
 
 // import { Vector3 } from "three";
 // import React from 'react';

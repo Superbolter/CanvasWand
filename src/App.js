@@ -2,31 +2,53 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Grid } from "@react-three/drei";
+import convert from "convert-units";
+import { INITIAL_BREADTH, INITIAL_HEIGHT } from "./constant/constant.js";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setPoints,
   setStoreLines,
   setPerpendicularLine,
+  setFactor,
+  setMeasured,
+  setInformation,
+  setIdSelection,
 } from "./features/drawing/drwingSlice.js";
 import { uniqueId, calculateAlignedPoint } from "./utils/uniqueId";
 import { Vector3 } from "three";
 import BoxGeometry from "./component/BoxGeometry.js"; // Import the BoxGeometry component
-import WallGeometry from "./component/WallGeometry.js"; 
-
+import WallGeometry from "./component/WallGeometry.js";
+import { LengthConverter } from "./component/LengthConverter.js";
+import LineEditForm from "./component/LineEditForm.js";
 export const App = () => {
   const dispatch = useDispatch();
-  const { points, storeLines, perpendicularLine } = useSelector(
-    (state) => state.drawing
-  );
+  const {
+    points,
+    storeLines,
+    idSelection,
+    perpendicularLine,
+    factor,
+    measured,
+    information,
+  } = useSelector((state) => state.drawing);
 
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedLines, setSelectedLines] = useState([]);
+  const [firstTime, setFirstTime] = useState(true);
 
   const addPoint = (newPoint, startPoint) => {
     const newLine = {
       id: uniqueId(),
       points: [startPoint, newPoint],
-      length: startPoint.distanceTo(newPoint),
+      length: convert(startPoint.distanceTo(newPoint) * factor[0])
+        .from(measured)
+        .to("mm"),
+      width: convert(INITIAL_BREADTH / factor[1])
+        .from(measured)
+        .to("mm"),
+      height: convert(INITIAL_HEIGHT / factor[2])
+        .from(measured)
+        .to("mm"),
     };
     dispatch(setStoreLines([...storeLines, newLine]));
   };
@@ -71,7 +93,7 @@ export const App = () => {
       if (event.key === "x" || event.key === "X") {
         deleteLastPoint();
       }
-      if (selectionMode && (event.key === "a" || event.key === "A")) {
+      if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
         deleteSelectedLines();
       }
     };
@@ -109,9 +131,31 @@ export const App = () => {
     if (newPoints.length >= 2) {
       addPoint(point, newPoints[newPoints.length - 2]);
     }
+
+    if (newPoints.length === 2 && firstTime) {
+      setFirstTime(false);
+      const userHeight = parseFloat(
+        prompt("Enter the height of the first line:")
+      );
+      const userLength = parseFloat(
+        prompt("Enter the length of the first line:")
+      );
+      const userWidth = parseFloat(
+        prompt("Enter the width of the first line:")
+      );
+      const lfactor =
+        userLength / point.distanceTo(newPoints[newPoints.length - 2]);
+      const wfactor = INITIAL_BREADTH / userWidth;
+      const hfactor = INITIAL_HEIGHT / userHeight;
+      dispatch(setFactor([lfactor, wfactor, hfactor]));
+
+      dispatch(setPoints([]));
+      dispatch(setStoreLines([]));
+    }
   };
 
   const handleLineClick = (id) => {
+   
     if (selectionMode) {
       setSelectedLines((prev) =>
         prev.includes(id)
@@ -119,6 +163,11 @@ export const App = () => {
           : [...prev, id]
       );
     }
+    //dispatch(setIdSelection([...selectedLines]));
+  };
+  const handleInformtion = () => {
+    setSelectionMode(!selectionMode);
+    dispatch(setInformation(!information));
   };
 
   useEffect(() => {
@@ -146,11 +195,12 @@ export const App = () => {
               key={line.id}
               start={line.points[0]}
               end={line.points[1]}
+              dimension={{ width: line.width, height: line.height }}
               isSelected={selectedLines.includes(line.id)}
               onClick={() => handleLineClick(line.id)}
             />
           ))}
-          
+
           {/* 2D grid */}
           <Grid
             rotation={[Math.PI / 2, 0, 0]}
@@ -173,8 +223,7 @@ export const App = () => {
         <div className="perspective-canvas">
           <Canvas
             style={{ height: 400, width: "100%" }}
-            camera={{ position: [0,0, 800], fov: 75 }}
-
+            camera={{ position: [0, 0, 800], fov: 75 }}
           >
             {/* Render lines in 3D view */}
             {storeLines.map((line) => (
@@ -182,11 +231,13 @@ export const App = () => {
                 key={line.id}
                 start={line.points[0]}
                 end={line.points[1]}
+                dimension={{ width: line.width, height: line.height }}
                 isSelected={selectedLines.includes(line.id)}
+                isChoose ={idSelection.includes(line.id)}
                 onClick={() => handleLineClick(line.id)}
               />
             ))}
-            
+
             {/* 3D grid */}
             <Grid
               rotation={[Math.PI / 2, 0, 0]}
@@ -198,38 +249,27 @@ export const App = () => {
               sectionColor="lightgray"
               fadeDistance={10000}
               infiniteGrid
-              //fadeStrength={1}
-              //fadeFrom={1}
             />
-            
+
             {/* Orbit controls for 3D view */}
             <OrbitControls />
           </Canvas>
         </div>
-        
+
         {/* Buttons for interaction */}
         <div className="button-container1">
           <button onClick={deleteLastPoint}>Delete Last Point</button>
           <button onClick={perpendicularHandler}>
-            {perpendicularLine ? "Perpendicular Line" : "Not Perpendicular Line"}
+            {perpendicularLine
+              ? "Perpendicular Line"
+              : "Not Perpendicular Line"}
           </button>
           <button onClick={toggleSelectionMode}>
             {selectionMode ? "Cancel Select and Delete" : "Select and Delete"}
           </button>
-          <button>Dummy Button 2</button>
-          <button>Dummy Button 3</button>
-          <button>Dummy Button 2</button>
-          <button>Dummy Button 3</button>
-          <button>Dummy Button 2</button>
-          <button>Dummy Button 3</button>
-          <button>Dummy Button 2</button>
-          <button>Dummy Button 3</button>
-          <button>Dummy Button 2</button>
-          <button>Dummy Button 3</button>
-          <button>Dummy Button 2</button>
-          <button>Dummy Button 3</button>
-          <button>Dummy Button 2</button>
-          <button>Dummy Button 3</button>
+          <button onClick={handleInformtion}>Information</button>
+          <LengthConverter />
+          {information && <LineEditForm selectedLines={selectedLines} setSelectedLines={setSelectedLines}/>}
 
         </div>
       </div>
