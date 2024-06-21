@@ -1,95 +1,157 @@
-import React, { useState, useEffect,useRef } from 'react';
-import "./App.css"
-import { Canvas } from '@react-three/fiber';
-import { Grid, Line } from '@react-three/drei';
-import { useDispatch, useSelector } from 'react-redux';
-import { setLines,setStoreLines} from './features/drawing/drwingSlice';
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, Grid } from "@react-three/drei";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setPoints,
+  setStoreLines,
+  setPerpendicularLine,
+} from "./features/drawing/drwingSlice.js";
+import { uniqueId, calculateAlignedPoint } from "./utils/uniqueId";
+import { Vector3 } from "three";
+import BoxGeometry from "./component/BoxGeometry.js"; // Import the BoxGeometry component
+import WallGeometry from "./component/WallGeometry.js"; 
 
 export const App = () => {
   const dispatch = useDispatch();
-  const { lines,storeLines} = useSelector((state) => state.drawing);
+  const { points, storeLines, perpendicularLine } = useSelector(
+    (state) => state.drawing
+  );
 
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedLines, setSelectedLines] = useState([]);
 
-  const calculateLength = (point1, point2) => {
-    const [x1, y1, z1] = point1||[0,0,0];
-    const [x2, y2, z2] = point2;
-    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2);
-  };
-
-  const addPoint = (lineIndex,newPoint,startPoint) => {
-    console.log('hii :',startPoint);
-    console.log("hee:",newPoint);
-    console.log('hoo:',lineIndex);
-    const newId = Date.now();
+  const addPoint = (newPoint, startPoint) => {
     const newLine = {
-      id:newId,
-      lineIndex:lineIndex,
-      points:[startPoint,newPoint],
-      length:calculateLength(startPoint||[0,0,0],newPoint)
-
-    }
-    dispatch(setStoreLines([...storeLines,newLine]));
-    
-    const updatedLines = lines.map((line, index) =>
-      index === lineIndex ? { ...line, points: [...line.points, newPoint] } : line
-    );
-    dispatch(setLines(updatedLines));
-  };
-
-  const movePoint = (lineIndex, pointIndex, newPoint,startPoint) => {
-    const updatedLines = lines.map((line, index) =>
-      index === lineIndex ? {
-        ...line,
-        points: line.points.map((point, pIndex) =>
-          pIndex === pointIndex ? newPoint : point
-        )
-      } : line
-    );
-    dispatch(setLines(updatedLines));
+      id: uniqueId(),
+      points: [startPoint, newPoint],
+      length: startPoint.distanceTo(newPoint),
+    };
+    dispatch(setStoreLines([...storeLines, newLine]));
   };
 
   const deleteLastPoint = () => {
-    const updatedLines = lines.map((line, index) => {
-      if (index === lines.length - 1 && line.points.length > 1) {
-        return { ...line, points: line.points.slice(0, -1) };
-      }
-      return line;
+    const updatedLines = storeLines.slice(0, -1);
+    const updatedPoints = points.slice(0, -1);
+    dispatch(setStoreLines(updatedLines));
+    dispatch(setPoints(updatedPoints));
+  };
+
+  const deleteSelectedLines = () => {
+    const updatedLines = storeLines.filter(
+      (line) => !selectedLines.includes(line.id)
+    );
+    const pointsToKeep = [];
+
+    updatedLines.forEach((line) => {
+      pointsToKeep.push(line.points[0], line.points[1]);
     });
-    dispatch(setLines(updatedLines));
+
+    const updatedPoints = points.filter((point) =>
+      pointsToKeep.some((p) => p.equals(point))
+    );
+
+    dispatch(setStoreLines(updatedLines));
+    dispatch(setPoints(updatedPoints));
+    setSelectedLines([]);
+  };
+
+  const perpendicularHandler = () => {
+    dispatch(setPerpendicularLine(!perpendicularLine));
+  };
+
+  const toggleSelectionMode = () => {
+    setSelectionMode(!selectionMode);
+    setSelectedLines([]);
   };
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === 'x' || event.key === 'X') {
+      if (event.key === "x" || event.key === "X") {
         deleteLastPoint();
+      }
+      if (selectionMode && (event.key === "a" || event.key === "A")) {
+        deleteSelectedLines();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [lines]);
+  }, [storeLines, selectionMode, selectedLines, points]);
+
+  const handleClick = (event) => {
+    if (selectionMode) return; // Prevent drawing new lines in selection mode
+
+    const canvasContainer = document.querySelector(".canvas-container");
+    const rect = canvasContainer.getBoundingClientRect();
+
+    let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    const cameraWidth = rect.width;
+    const cameraHeight = rect.height;
+
+    const posX = x * (cameraWidth / 2);
+    const posY = y * (cameraHeight / 2);
+
+    let point = new Vector3(posX, posY, 0);
+
+    if (perpendicularLine && points.length > 0) {
+      point = calculateAlignedPoint(points[points.length - 1], point);
+    }
+    const newPoints = [...points, point];
+    dispatch(setPoints(newPoints));
+
+    if (newPoints.length >= 2) {
+      addPoint(point, newPoints[newPoints.length - 2]);
+    }
+  };
+
+  const handleLineClick = (id) => {
+    if (selectionMode) {
+      setSelectedLines((prev) =>
+        prev.includes(id)
+          ? prev.filter((lineId) => lineId !== id)
+          : [...prev, id]
+      );
+    }
+  };
+
+  useEffect(() => {
+    console.log("Points updated:", points);
+  }, [points]);
 
   return (
     <div className="container">
       <div className="canvas-container">
+        {/* 2D (Orthographic) Canvas */}
         <Canvas
-          style={{ height: window.innerHeight, width: '100%' }}
+          style={{
+            height: window.innerHeight,
+            width: "100%",
+            background: "#f0f0f0",
+          }}
           orthographic
           raycaster={{ params: { Line: { threshold: 5 } } }}
           camera={{ position: [0, 0, 500], zoom: 1 }}
+          onClick={handleClick}
         >
-          {lines.map((line, index) => (
-            <PolyLine
+          {/* Render lines in 2D view */}
+          {storeLines.map((line) => (
+            <BoxGeometry
               key={line.id}
-              points={line.points}
-              lineIndex={index}
-              addPoint={addPoint}
-              movePoint={movePoint}
+              start={line.points[0]}
+              end={line.points[1]}
+              isSelected={selectedLines.includes(line.id)}
+              onClick={() => handleLineClick(line.id)}
             />
           ))}
+          
+          {/* 2D grid */}
           <Grid
             rotation={[Math.PI / 2, 0, 0]}
             cellSize={100}
@@ -100,84 +162,79 @@ export const App = () => {
             sectionColor="lightgray"
             fadeDistance={10000}
             infiniteGrid
+            fadeStrength={1}
+            fadeFrom={1}
           />
         </Canvas>
       </div>
+
       <div className="button-container">
-        <button onClick={deleteLastPoint}>Delete Last Point</button>
-        <button>Dummy Button 1</button>
-        <button>Dummy Button 2</button>
-        <button>Dummy Button 3</button>
+        {/* 3D (Perspective) Canvas */}
+        <div className="perspective-canvas">
+          <Canvas
+            style={{ height: 400, width: "100%" }}
+            camera={{ position: [0,0, 800], fov: 75 }}
+
+          >
+            {/* Render lines in 3D view */}
+            {storeLines.map((line) => (
+              <WallGeometry
+                key={line.id}
+                start={line.points[0]}
+                end={line.points[1]}
+                isSelected={selectedLines.includes(line.id)}
+                onClick={() => handleLineClick(line.id)}
+              />
+            ))}
+            
+            {/* 3D grid */}
+            <Grid
+              rotation={[Math.PI / 2, 0, 0]}
+              cellSize={100}
+              cellThickness={2}
+              cellColor="red"
+              sectionSize={20}
+              sectionThickness={1.5}
+              sectionColor="lightgray"
+              fadeDistance={10000}
+              infiniteGrid
+              //fadeStrength={1}
+              //fadeFrom={1}
+            />
+            
+            {/* Orbit controls for 3D view */}
+            <OrbitControls />
+          </Canvas>
+        </div>
+        
+        {/* Buttons for interaction */}
+        <div className="button-container1">
+          <button onClick={deleteLastPoint}>Delete Last Point</button>
+          <button onClick={perpendicularHandler}>
+            {perpendicularLine ? "Perpendicular Line" : "Not Perpendicular Line"}
+          </button>
+          <button onClick={toggleSelectionMode}>
+            {selectionMode ? "Cancel Select and Delete" : "Select and Delete"}
+          </button>
+          <button>Dummy Button 2</button>
+          <button>Dummy Button 3</button>
+          <button>Dummy Button 2</button>
+          <button>Dummy Button 3</button>
+          <button>Dummy Button 2</button>
+          <button>Dummy Button 3</button>
+          <button>Dummy Button 2</button>
+          <button>Dummy Button 3</button>
+          <button>Dummy Button 2</button>
+          <button>Dummy Button 3</button>
+          <button>Dummy Button 2</button>
+          <button>Dummy Button 3</button>
+          <button>Dummy Button 2</button>
+          <button>Dummy Button 3</button>
+
+        </div>
       </div>
     </div>
   );
 };
 
-function PolyLine({ points, lineIndex, addPoint, movePoint }) {
-  return (
-    <>
-      <Line points={points.flat()} lineWidth={20} color="green" />
-      {points.map((point, index) => (
-        <EndPoint
-          key={index}
-          position={point}
-          lineIndex={lineIndex}
-          pointIndex={index}
-          addPoint={(newPoint,startPoint) => addPoint(lineIndex, newPoint,startPoint)}
-          movePoint={(newPoint,startPoint) => movePoint(lineIndex, index, newPoint,startPoint)}
-        />
-      ))}
-    </>
-  );
-}
-
-function EndPoint({ position, lineIndex, pointIndex, addPoint, movePoint }) {
-  const [hovered, setHover] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  const [currentPosition, setCurrentPosition] = useState(position.slice());
-  let capturePoint = useRef(null);
-
-  const down = event => {
-    event.stopPropagation();
-    event.target.setPointerCapture(event.pointerId);
-    capturePoint.current = event.unprojectedPoint.toArray() ;
-    console.log("Hii i am here ",capturePoint.current);
-    setDragging(true);
-    
-  };
-
-  const up = event => {
-    if (dragging) {
-      const newPosition = event.unprojectedPoint.toArray();
-      const startPoint =capturePoint.current;
-      console.log("Hii i am here 2 ",startPoint);
-      if (event.button === 2) {
-        movePoint(newPosition,startPoint);
-      } else {
-        addPoint(newPosition,startPoint);
-      }
-    }
-    setDragging(false);
-  };
-
-  const move = event => {
-    if (dragging) {
-      const newPosition = event.unprojectedPoint.toArray();
-      setCurrentPosition(newPosition);
-    }
-  };
-
-  return (
-    <mesh
-      position={currentPosition}
-      onPointerOver={() => setHover(true)}
-      onPointerOut={() => setHover(false)}
-      onPointerDown={down}
-      onPointerUp={up}
-      onPointerMove={move}
-    >
-      <sphereGeometry args={[10, 16, 16]} />
-      <meshBasicMaterial color={hovered ? 'hotpink' : 'orange'} />
-    </mesh>
-  );
-}
+export default App;

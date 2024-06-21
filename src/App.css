@@ -1,8 +1,8 @@
-/* styles.css */
 body, html {
   margin: 0;
   padding: 0;
   height: 100%;
+  overflow: hidden;
 }
 
 .container {
@@ -11,25 +11,55 @@ body, html {
 }
 
 .canvas-container {
-  flex: 0 0 70%; /* 70% of the width */
+ width:70%; /* 70% of the width */
   height: 100%; /* Full height of viewport */
   background-color: #f0f0f0; /* Optional: Background color for clarity */
   overflow: hidden; /* Ensure content doesn't overflow */
 }
 
 .button-container {
-  flex: 0 0 30%; /* 30% of the width */
-  height: 100vh; /* Full height of viewport */
+  /* flex: 0 0 30%; 30% of the width */
+  /* display: flex;
+  flex-direction: column; */
+  width:30%;
+  
+  display: grid;
+  grid-template-rows: repeat(2, 1fr); /* Two rows with automatic height */
+ 
+  
+  /* Full height of viewport */
+  background-color: #e0e0e0; /* Optional: Background color for clarity */
+}
+
+.perspective-canvas {
+  /* flex: 1; Take up 50% of the container height */
+  
+}
+
+.buttons {
+  flex: 1; /* Take up 50% of the container height */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #e0e0e0; /* Optional: Background color for clarity */
-  padding: 10px;
 }
 
-.button-container button {
+.button-container1 {
+//flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  /* display: flex;
+  flex-direction: row; */
+  
+  
+  align-items: center;
+  /* Align buttons to the bottom */
+  /* height: 100vh; */
+  border-radius:red
+}
+
+.button-container1 button {
   margin: 5px;
-  padding: 10px;
-  font-size: 16px;
+  padding: 5px; /* Smaller padding for smaller buttons */
+  font-size: 12px; /* Smaller font size for smaller buttons */
 }
