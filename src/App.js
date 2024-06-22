@@ -35,6 +35,7 @@ export const App = () => {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedLines, setSelectedLines] = useState([]);
   const [firstTime, setFirstTime] = useState(true);
+  const [newLine, setNewLine] = useState(false);
 
   const addPoint = (newPoint, startPoint) => {
     const newLine = {
@@ -123,6 +124,12 @@ export const App = () => {
     const posY = y * (cameraHeight / 2);
 
     let point = new Vector3(posX, posY, 0);
+    if(newLine){
+      setNewLine(false);
+      const newPoint =[...points,point];
+      dispatch(setPoints(newPoint));
+      return;
+    }
 
     if (perpendicularLine && points.length > 0) {
       point = calculateAlignedPoint(points[points.length - 1], point);
@@ -265,6 +272,10 @@ export const App = () => {
         {/* Buttons for interaction */}
         <div className="button-container1">
           <button onClick={deleteLastPoint}>Delete Last Point</button>
+          <button onClick={()=>{setNewLine(true)}}>
+            {
+              newLine ?"NewLineAdded":"Add New Line"
+            }</button>
           <button onClick={perpendicularHandler}>
             {perpendicularLine
               ? "Perpendicular Line"

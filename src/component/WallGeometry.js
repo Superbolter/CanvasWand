@@ -17,7 +17,7 @@ const WallGeometry = ({
   widthchangetype,
   isSelected,
   onClick,
-  handlePointClick,
+  //handlePointClick,
   currentPoint,
   newPointMode,
   opacity = 0.5,

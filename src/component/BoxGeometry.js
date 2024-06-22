@@ -13,7 +13,7 @@ const BoxGeometry = ({
   isSelected,
   isChoose,
   onClick,
-  handlePointClick,
+  //handlePointClick,
   currentPoint,
   newPointMode,
   opacity = 0.5,
@@ -66,10 +66,10 @@ const BoxGeometry = ({
       </mesh>
       <mesh
         position={start}
-        onClick={(e) => {
-          e.stopPropagation();
-          handlePointClick(start);
-        }}
+       // onClick={(e) => {
+          //e.stopPropagation();
+          //handlePointClick(start);
+        //}}
       >
         <sphereGeometry args={[10, 16, 16]} />
         <meshBasicMaterial
@@ -80,10 +80,10 @@ const BoxGeometry = ({
       </mesh>
       <mesh
         position={end}
-        onClick={(e) => {
-          e.stopPropagation();
-          handlePointClick(end);
-        }}
+        //onClick={(e) => {
+          //e.stopPropagation();
+          //handlePointClick(end);
+        //}}
       >
         <sphereGeometry args={[10, 16, 16]} />
         <meshBasicMaterial
