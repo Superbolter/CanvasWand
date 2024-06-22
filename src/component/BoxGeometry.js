@@ -8,6 +8,8 @@ const BoxGeometry = ({
   start,
   end,
   dimension,
+  widthchange,
+  widthchangetype,
   isSelected,
   isChoose,
   onClick,
@@ -21,7 +23,31 @@ const BoxGeometry = ({
   if (!start || !end) return null;
 
   const length = start.distanceTo(end);
+  const width = convert(dimension.width*factor[1]).from("mm").to(measured)
   const midpoint = new Vector3().addVectors(start, end).multiplyScalar(0.5);
+
+  if(end.y === start.y){
+    if (widthchangetype === 'inside') {
+      // Adjust the width to inside (keeping the horizontal level unchanged)
+      midpoint.y += widthchange ;
+    } else if (widthchangetype === 'outside') {
+      // Adjust the width to outside (keeping the horizontal level unchanged)
+      midpoint.y -= widthchange ;
+     
+    }
+  }
+  else{
+    if (widthchangetype === 'inside') {
+      // Adjust the width to inside (keeping the vertical level unchanged)
+      midpoint.x -= widthchange ;
+     
+    } else if (widthchangetype === 'outside') {
+      // Adjust the width to outside (keeping the vertical level unchanged)
+
+      midpoint.x += widthchange ;
+      
+    }
+  }
 
   // Determine the rotation angle for the box
   const angle = Math.atan2(end.y - start.y, end.x - start.x);
@@ -30,7 +56,7 @@ const BoxGeometry = ({
     <>
       <mesh position={midpoint} rotation={[0, 0, angle]} onClick={onClick}>
         <boxGeometry
-          args={[length, convert(dimension.width*factor[1]).from("mm").to(measured), 0]}
+          args={[length, width, 0]}
         />
         <meshBasicMaterial
           color={isSelected ? "green" : isChoose ? "pink" : "blue"}

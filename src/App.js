@@ -49,6 +49,8 @@ export const App = () => {
       height: convert(INITIAL_HEIGHT / factor[2])
         .from(measured)
         .to("mm"),
+      widthchangetype:'between',
+      widthchange:0,
     };
     dispatch(setStoreLines([...storeLines, newLine]));
   };
@@ -196,6 +198,8 @@ export const App = () => {
               start={line.points[0]}
               end={line.points[1]}
               dimension={{ width: line.width, height: line.height }}
+              widthchange ={line.widthchange}
+              widthchangetype={line.widthchangetype}
               isSelected={selectedLines.includes(line.id)}
               onClick={() => handleLineClick(line.id)}
             />
@@ -232,6 +236,8 @@ export const App = () => {
                 start={line.points[0]}
                 end={line.points[1]}
                 dimension={{ width: line.width, height: line.height }}
+                widthchange ={line.widthchange}
+                widthchangetype={line.widthchangetype}
                 isSelected={selectedLines.includes(line.id)}
                 isChoose ={idSelection.includes(line.id)}
                 onClick={() => handleLineClick(line.id)}
@@ -269,7 +275,7 @@ export const App = () => {
           </button>
           <button onClick={handleInformtion}>Information</button>
           <LengthConverter />
-          {information && <LineEditForm selectedLines={selectedLines} setSelectedLines={setSelectedLines}/>}
+          {information && <LineEditForm selectedLines={selectedLines} setSelectedLines={setSelectedLines} setSelectionMode ={setSelectionMode}/>}
 
         </div>
       </div>

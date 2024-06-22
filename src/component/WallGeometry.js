@@ -13,6 +13,8 @@ const WallGeometry = ({
   start,
   end,
   dimension,
+  widthchange,
+  widthchangetype,
   isSelected,
   onClick,
   handlePointClick,
@@ -26,11 +28,36 @@ const WallGeometry = ({
   if (!start || !end) return null;
 
   const length = start.distanceTo(end);
+  const height = convert(dimension.height*factor[2]).from("mm").to(measured);
+  const width = convert(dimension.width*factor[1]).from("mm").to(measured);
   const midpoint = new Vector3().addVectors(start, end).multiplyScalar(0.48);
+
+  if(end.y === start.y){
+    if (widthchangetype === 'inside') {
+      // Adjust the width to inside (keeping the horizontal level unchanged)
+      midpoint.y += widthchange ;
+    } else if (widthchangetype === 'outside') {
+      // Adjust the width to outside (keeping the horizontal level unchanged)
+      midpoint.y -= widthchange ;
+     
+    }
+  }
+  else{
+    if (widthchangetype === 'inside') {
+      // Adjust the width to inside (keeping the vertical level unchanged)
+      midpoint.x -= widthchange ;
+     
+    } else if (widthchangetype === 'outside') {
+      // Adjust the width to outside (keeping the vertical level unchanged)
+
+      midpoint.x += widthchange ;
+      
+    }
+  }
 
   // Determine the rotation angle for the box
   const angle = Math.atan2(end.y - start.y, end.x - start.x);
-  const height = convert(dimension.height*factor[2]).from("mm").to(measured);
+  
 
   return (
     <>
@@ -41,7 +68,7 @@ const WallGeometry = ({
         <boxGeometry
           args={[
             length,
-            convert(dimension.width*factor[1]).from("mm").to(measured),
+            width,
             height,
           ]}
         />

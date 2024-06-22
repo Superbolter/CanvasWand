@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setStoreLines,setInformation,information, setIdSelection, setWidthChangeType } from "../features/drawing/drwingSlice";
 import convert from 'convert-units';
 
-const LineEditForm = ({selectedLines,setSelectedLines}) => {
+const LineEditForm = ({selectedLines,setSelectedLines,setSelectionMode}) => {
   const { storeLines, idSelection, measured, widthChangeType,information } = useSelector((state) => state.drawing);
   const dispatch = useDispatch();
 
@@ -24,45 +24,27 @@ const LineEditForm = ({selectedLines,setSelectedLines}) => {
   const handleSave = (e) => {
         e.preventDefault();
         if (selectedLine) {
-       // const widthChange = width - convert(selectedLine.width).from('mm').to(measured);
+         const widthchange = (width - convert(selectedLine.width).from('mm').to(measured))/2;
+         const widthchangetype =widthChangeType;
 
         const updatedLine = {
           ...selectedLine,
           length: parseFloat(convert(length).from(measured).to('mm')),
           width: parseFloat(convert(width).from(measured).to('mm')),
           height: parseFloat(convert(height).from(measured).to('mm')),
+          widthchange: widthchange,
+          widthchangetype: widthchangetype,
+          
         };
-
-        // if(selectedLine.endY === selectedLine.startY){
-        //   if (widthChangeType === 'inside') {
-        //     // Adjust the width to inside (keeping the horizontal level unchanged)
-        //     updatedLine.startY += widthChange / 2;
-        //     updatedLine.endY += widthChange / 2;
-        //   } else if (widthChangeType === 'outside') {
-        //     // Adjust the width to outside (keeping the horizontal level unchanged)
-        //     updatedLine.startY -= widthChange / 2;
-        //     updatedLine.endY -= widthChange / 2;
-        //   }
-        // }
-        // else{
-        //   if (widthChangeType === 'inside') {
-        //     // Adjust the width to inside (keeping the vertical level unchanged)
-        //     updatedLine.startX -= widthChange / 2;
-        //     updatedLine.endX -= widthChange / 2;
-        //   } else if (widthChangeType === 'outside') {
-        //     // Adjust the width to outside (keeping the vertical level unchanged)
-
-        //     updatedLine.startX += widthChange / 2;
-        //     updatedLine.endX += widthChange / 2;
-        //   }
-        // }
     
           dispatch(setStoreLines(storeLines.map(line =>
             line.id === updatedLine.id ? updatedLine : line
           )));
-          
+
+          setSelectedLines([]);
+          setSelectionMode(false);
           dispatch(setInformation(false));
-          dispatch(setSelectedLines([]));
+          
         }
       };
 
@@ -84,7 +66,7 @@ const LineEditForm = ({selectedLines,setSelectedLines}) => {
         <input type="text" value={height} onChange={(e) => setHeight(e.target.value)} />
       </label>
       <br />
-      {/* <label>
+      <label>
         <input
           type="radio"
           value="inside"
@@ -110,7 +92,7 @@ const LineEditForm = ({selectedLines,setSelectedLines}) => {
           onChange={() => dispatch(setWidthChangeType('between'))}
         />
         Between
-      </label> */}
+      </label>
       <br />
       <button onClick={handleSave}>Save</button>
     </div>

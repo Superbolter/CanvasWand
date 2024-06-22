@@ -9,6 +9,7 @@ const initialState = {
   measured: 'in',
   information: false,
   idSelection: [],
+  widthChangeType:'between',
 };
 
 export const drawingSlice = createSlice({
@@ -36,10 +37,13 @@ export const drawingSlice = createSlice({
     setInformation: (state, action) => {
       state.information = action.payload;
     },
+    setWidthChangeType: (state, action) => {
+      state.widthChangeType = action.payload;
+    },
   },
 });
 
-export const { setPoints, setStoreLines, setIdSelection,setPerpendicularLine ,setFactor,setMeasured,setInformation} = drawingSlice.actions;
+export const { setPoints, setStoreLines, setIdSelection,setPerpendicularLine ,setFactor,setMeasured,setInformation,setWidthChangeType} = drawingSlice.actions;
 
 export default drawingSlice.reducer;
 
