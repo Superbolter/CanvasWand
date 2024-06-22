@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, Grid } from "@react-three/drei";
+import { OrbitControls, Grid, Line, Text } from "@react-three/drei";
 import convert from "convert-units";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "./constant/constant.js";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,6 +36,9 @@ export const App = () => {
   const [selectedLines, setSelectedLines] = useState([]);
   const [firstTime, setFirstTime] = useState(true);
   const [newLine, setNewLine] = useState(false);
+  const [currentMousePosition, setCurrentMousePosition] = useState(null);
+  const [distance, setDistance] = useState(0);
+  const [stop,setStop] = useState(false);
 
   const addPoint = (newPoint, startPoint) => {
     const newLine = {
@@ -50,8 +53,8 @@ export const App = () => {
       height: convert(INITIAL_HEIGHT / factor[2])
         .from(measured)
         .to("mm"),
-      widthchangetype:'between',
-      widthchange:0,
+      widthchangetype: "between",
+      widthchange: 0,
     };
     dispatch(setStoreLines([...storeLines, newLine]));
   };
@@ -95,6 +98,8 @@ export const App = () => {
     const handleKeyDown = (event) => {
       if (event.key === "x" || event.key === "X") {
         deleteLastPoint();
+      }if (event.key === "s" || event.key === "S") {
+        setStop(!stop);
       }
       if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
         deleteSelectedLines();
@@ -106,7 +111,7 @@ export const App = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [storeLines, selectionMode, selectedLines, points]);
+  }, [storeLines, selectionMode, selectedLines, points,stop]);
 
   const handleClick = (event) => {
     if (selectionMode) return; // Prevent drawing new lines in selection mode
@@ -124,9 +129,9 @@ export const App = () => {
     const posY = y * (cameraHeight / 2);
 
     let point = new Vector3(posX, posY, 0);
-    if(newLine){
+    if (newLine) {
       setNewLine(false);
-      const newPoint =[...points,point];
+      const newPoint = [...points, point];
       dispatch(setPoints(newPoint));
       return;
     }
@@ -161,10 +166,39 @@ export const App = () => {
       dispatch(setPoints([]));
       dispatch(setStoreLines([]));
     }
+    setCurrentMousePosition(null); // Clear the temporary line on click
+    setDistance(0); // Reset distance display
+  };
+
+  const handleMouseMove = (event) => {
+    if (points.length === 0 || stop || newLine) return; // No point to start from or not in perpendicular mode
+
+    const canvasContainer = document.querySelector(".canvas-container");
+    const rect = canvasContainer.getBoundingClientRect();
+
+    let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    const cameraWidth = rect.width;
+    const cameraHeight = rect.height;
+
+    const posX = x * (cameraWidth / 2);
+    const posY = y * (cameraHeight / 2);
+
+    let point = new Vector3(posX, posY, 0);
+
+    if (perpendicularLine) {
+      point = calculateAlignedPoint(points[points.length - 1], point);
+    }
+
+    setCurrentMousePosition(point);
+
+    const lastPoint = points[points.length - 1];
+    const currentDistance = lastPoint.distanceTo(point);
+    setDistance(currentDistance * factor[0]);
   };
 
   const handleLineClick = (id) => {
-   
     if (selectionMode) {
       setSelectedLines((prev) =>
         prev.includes(id)
@@ -185,7 +219,7 @@ export const App = () => {
 
   return (
     <div className="container">
-      <div className="canvas-container">
+      <div className="canvas-container" onMouseMove={handleMouseMove}>
         {/* 2D (Orthographic) Canvas */}
         <Canvas
           style={{
@@ -205,12 +239,37 @@ export const App = () => {
               start={line.points[0]}
               end={line.points[1]}
               dimension={{ width: line.width, height: line.height }}
-              widthchange ={line.widthchange}
+              widthchange={line.widthchange}
               widthchangetype={line.widthchangetype}
               isSelected={selectedLines.includes(line.id)}
               onClick={() => handleLineClick(line.id)}
             />
           ))}
+
+          {currentMousePosition && points.length > 0 && !stop && (
+            <>
+              <Line
+                points={[points[points.length - 1], currentMousePosition]}
+                color="blue"
+                lineWidth={5}
+              />
+              <Text
+                position={[
+                  (points[points.length - 1].x + currentMousePosition.x) / 2,
+                  (points[points.length - 1].y + currentMousePosition.y) / 2 +
+                    10,
+                  0,
+                ]}
+                color="black"
+                anchorX="center"
+                anchorY="middle"
+                fontSize={10}
+                fontWeight="bold" 
+              >
+                {`${distance.toFixed(2)} ${measured}`}
+              </Text>
+            </>
+          )}
 
           {/* 2D grid */}
           <Grid
@@ -243,10 +302,10 @@ export const App = () => {
                 start={line.points[0]}
                 end={line.points[1]}
                 dimension={{ width: line.width, height: line.height }}
-                widthchange ={line.widthchange}
+                widthchange={line.widthchange}
                 widthchangetype={line.widthchangetype}
                 isSelected={selectedLines.includes(line.id)}
-                isChoose ={idSelection.includes(line.id)}
+                isChoose={idSelection.includes(line.id)}
                 onClick={() => handleLineClick(line.id)}
               />
             ))}
@@ -272,10 +331,13 @@ export const App = () => {
         {/* Buttons for interaction */}
         <div className="button-container1">
           <button onClick={deleteLastPoint}>Delete Last Point</button>
-          <button onClick={()=>{setNewLine(true)}}>
-            {
-              newLine ?"NewLineAdded":"Add New Line"
-            }</button>
+          <button
+            onClick={() => {
+              setNewLine(true);
+            }}
+          >
+            {newLine ? "NewLineAdded" : "Add New Line"}
+          </button>
           <button onClick={perpendicularHandler}>
             {perpendicularLine
               ? "Perpendicular Line"
@@ -286,8 +348,13 @@ export const App = () => {
           </button>
           <button onClick={handleInformtion}>Information</button>
           <LengthConverter />
-          {information && <LineEditForm selectedLines={selectedLines} setSelectedLines={setSelectedLines} setSelectionMode ={setSelectionMode}/>}
-
+          {information && (
+            <LineEditForm
+              selectedLines={selectedLines}
+              setSelectedLines={setSelectedLines}
+              setSelectionMode={setSelectionMode}
+            />
+          )}
         </div>
       </div>
     </div>
