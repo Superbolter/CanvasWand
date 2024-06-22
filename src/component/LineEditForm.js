@@ -57,7 +57,7 @@ const LineEditForm = ({selectedLines,setSelectedLines,setSelectionMode}) => {
       </label>
       <br />
       <label>
-        Width:
+        Thickness:
         <input type="text" value={width} onChange={(e) => setWidth(e.target.value)} />
       </label>
       <br />

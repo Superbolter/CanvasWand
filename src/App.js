@@ -20,6 +20,7 @@ import BoxGeometry from "./component/BoxGeometry.js"; // Import the BoxGeometry 
 import WallGeometry from "./component/WallGeometry.js";
 import { LengthConverter } from "./component/LengthConverter.js";
 import LineEditForm from "./component/LineEditForm.js";
+import BackgroundImage from "./component/background.js";
 export const App = () => {
   const dispatch = useDispatch();
   const {
@@ -155,7 +156,7 @@ export const App = () => {
         prompt("Enter the length of the first line:")
       );
       const userWidth = parseFloat(
-        prompt("Enter the width of the first line:")
+        prompt("Enter the thickness of the first line:")
       );
       const lfactor =
         userLength / point.distanceTo(newPoints[newPoints.length - 2]);
@@ -232,6 +233,7 @@ export const App = () => {
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
         >
+           <BackgroundImage />
           {/* Render lines in 2D view */}
           {storeLines.map((line) => (
             <BoxGeometry
