@@ -15,6 +15,7 @@ import {
   setIdSelection,
 } from "./features/drawing/drwingSlice.js";
 import { uniqueId, calculateAlignedPoint } from "./utils/uniqueId";
+import {snapToPoint} from "./utils/snapping.js"
 import { Vector3 } from "three";
 import BoxGeometry from "./component/BoxGeometry.js"; // Import the BoxGeometry component
 import WallGeometry from "./component/WallGeometry.js";
@@ -114,6 +115,7 @@ export const App = () => {
     };
   }, [storeLines, selectionMode, selectedLines, points,stop]);
 
+
   const handleClick = (event) => {
     if (selectionMode) return; // Prevent drawing new lines in selection mode
 
@@ -140,6 +142,7 @@ export const App = () => {
     if (perpendicularLine && points.length > 0) {
       point = calculateAlignedPoint(points[points.length - 1], point);
     }
+    point = snapToPoint(point,points,storeLines); //snapping 
     const newPoints = [...points, point];
     dispatch(setPoints(newPoints));
 
