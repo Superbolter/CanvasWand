@@ -5,6 +5,8 @@ import { OrbitControls, Grid, Line, Text } from "@react-three/drei";
 import convert from "convert-units";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "./constant/constant.js";
 import { useDispatch, useSelector } from "react-redux";
+import DownloadJSONButton from "./component/ConvertToJson.js";
+import { getLineIntersection } from "./utils/intersect.js";
 import {
   setPoints,
   setStoreLines,
@@ -15,7 +17,7 @@ import {
   setIdSelection,
 } from "./features/drawing/drwingSlice.js";
 import { uniqueId, calculateAlignedPoint } from "./utils/uniqueId";
-import {snapToPoint} from "./utils/snapping.js"
+import { snapToPoint } from "./utils/snapping.js";
 import { Vector3 } from "three";
 import BoxGeometry from "./component/BoxGeometry.js"; // Import the BoxGeometry component
 import WallGeometry from "./component/WallGeometry.js";
@@ -40,10 +42,12 @@ export const App = () => {
   const [newLine, setNewLine] = useState(false);
   const [currentMousePosition, setCurrentMousePosition] = useState(null);
   const [distance, setDistance] = useState(0);
-  const [stop,setStop] = useState(false);
+  const [stop, setStop] = useState(false);
 
   const addPoint = (newPoint, startPoint) => {
-    const newLine = {
+
+    console.log('hello', newPoint, startPoint);
+    let newLine = {
       id: uniqueId(),
       points: [startPoint, newPoint],
       length: convert(startPoint.distanceTo(newPoint) * factor[0])
@@ -58,8 +62,109 @@ export const App = () => {
       widthchangetype: "between",
       widthchange: 0,
     };
-    dispatch(setStoreLines([...storeLines, newLine]));
+  
+    let updatedStoreLines = [...storeLines];
+    let intersections = [];
+    let newPoints = [...points];
+  
+    // Collect all intersections
+    storeLines.forEach((line) => {
+      const intersection = getLineIntersection(
+        line.points[0],
+        line.points[1],
+        startPoint,
+        newPoint
+      );
+      if (intersection) {
+        intersections.push({ line, intersection });
+      }
+    });
+
+    console.log("intersection points",intersections);
+  
+    // Sort intersections based on their distance from startPoint along the new line
+    intersections.sort((a, b) =>
+      startPoint.distanceTo(a.intersection) - startPoint.distanceTo(b.intersection)
+    );
+  
+    let currentStartPoint = startPoint;
+  
+    // Store new segments of the new line
+    intersections.forEach(({ intersection }) => {
+      const splitNewLine = {
+        ...newLine,
+        id: uniqueId(),
+        points: [currentStartPoint, intersection],
+      };
+      splitNewLine.length = convert(
+        splitNewLine.points[0].distanceTo(splitNewLine.points[1]) * factor[0]
+      )
+        .from(measured)
+        .to("mm");
+  
+      updatedStoreLines.push(splitNewLine);
+  
+      // Update the currentStartPoint for the next segment
+      currentStartPoint = intersection;
+      newPoints.push(currentStartPoint);
+    });
+  
+    // Add the final segment of the new line
+    const finalNewLineSegment = {
+      ...newLine,
+      id: uniqueId(),
+      points: [currentStartPoint, newPoint],
+    };
+    finalNewLineSegment.length = convert(
+      finalNewLineSegment.points[0].distanceTo(finalNewLineSegment.points[1]) * factor[0]
+    )
+      .from(measured)
+      .to("mm");
+  
+    updatedStoreLines.push(finalNewLineSegment);
+    newPoints.push(newPoint);
+  
+    // Also handle splitting the existing lines at the intersection points
+    intersections.forEach(({ line, intersection }) => {
+      const splitLine1 = {
+        ...line,
+        id: uniqueId(),
+        points: [line.points[0], intersection],
+      };
+      const splitLine2 = {
+        ...line,
+        id: uniqueId(),
+        points: [intersection, line.points[1]],
+      };
+  
+      // Calculate lengths for new segments
+      splitLine1.length = convert(
+        splitLine1.points[0].distanceTo(splitLine1.points[1]) * factor[0]
+      )
+        .from(measured)
+        .to("mm");
+      splitLine2.length = convert(
+        splitLine2.points[0].distanceTo(splitLine2.points[1]) * factor[0]
+      )
+        .from(measured)
+        .to("mm");
+  
+      // Replace the old line with the new segments
+      const lineIndex = updatedStoreLines.findIndex((l) => l.id === line.id);
+      updatedStoreLines.splice(lineIndex, 1, splitLine1, splitLine2);
+
+      // Insert the intersection point into the points array
+    const startIdx = newPoints.findIndex(point => point.equals(line.points[0]));
+    const endIdx = newPoints.findIndex(point => point.equals(line.points[1]));
+    if (startIdx !== -1 && endIdx !== -1 && startIdx < endIdx) {
+      newPoints.splice(startIdx + 1, 0, intersection);
+    }
+    });
+    dispatch(setPoints(newPoints));
+  
+    dispatch(setStoreLines(updatedStoreLines));
   };
+  
 
   const deleteLastPoint = () => {
     const updatedLines = storeLines.slice(0, -1);
@@ -100,7 +205,8 @@ export const App = () => {
     const handleKeyDown = (event) => {
       if (event.key === "x" || event.key === "X") {
         deleteLastPoint();
-      }if (event.key === "s" || event.key === "S") {
+      }
+      if (event.key === "s" || event.key === "S") {
         setStop(!stop);
       }
       if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
@@ -113,8 +219,7 @@ export const App = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [storeLines, selectionMode, selectedLines, points,stop]);
-
+  }, [storeLines, selectionMode, selectedLines, points, stop]);
 
   const handleClick = (event) => {
     if (selectionMode) return; // Prevent drawing new lines in selection mode
@@ -142,7 +247,7 @@ export const App = () => {
     if (perpendicularLine && points.length > 0) {
       point = calculateAlignedPoint(points[points.length - 1], point);
     }
-    point = snapToPoint(point,points,storeLines); //snapping 
+    point = snapToPoint(point, points, storeLines); //snapping
     const newPoints = [...points, point];
     dispatch(setPoints(newPoints));
 
@@ -218,7 +323,7 @@ export const App = () => {
   };
 
   useEffect(() => {
-    console.log("Points updated:", points);
+    //console.log("Points updated:", points);
   }, [points]);
 
   return (
@@ -236,7 +341,7 @@ export const App = () => {
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
         >
-           <BackgroundImage />
+          <BackgroundImage />
           {/* Render lines in 2D view */}
           {storeLines.map((line) => (
             <BoxGeometry
@@ -269,7 +374,7 @@ export const App = () => {
                 anchorX="center"
                 anchorY="middle"
                 fontSize={10}
-                fontWeight="bold" 
+                fontWeight="bold"
               >
                 {`${distance.toFixed(2)} ${measured}`}
               </Text>
@@ -352,6 +457,7 @@ export const App = () => {
             {selectionMode ? "Cancel Select and Delete" : "Select and Delete"}
           </button>
           <button onClick={handleInformtion}>Information</button>
+          <DownloadJSONButton lines={storeLines} points={points} />
           <LengthConverter />
           {information && (
             <LineEditForm
