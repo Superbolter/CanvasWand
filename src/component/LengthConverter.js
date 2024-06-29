@@ -12,7 +12,7 @@ const useLengthUnitSelector = () => {
     return { handleUnitChange };
 };
 
-export const LengthConverter = () => {
+ const LengthConverter = () => {
     const { handleUnitChange } = useLengthUnitSelector();
 
     return (
@@ -28,3 +28,4 @@ export const LengthConverter = () => {
         </div>
     );
 };
+export default LengthConverter;
