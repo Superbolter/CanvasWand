@@ -252,7 +252,6 @@ export const useDrawing = () => {
       const newPoint = [...points, point];
       const breaking = [...breakPoint, point];
       setBreakPoint(breaking);
-      console.log("BreakPoints", breaking);
       dispatch(setPoints(newPoint));
       return;
     }
@@ -285,8 +284,23 @@ export const useDrawing = () => {
       const hfactor = INITIAL_HEIGHT / userHeight;
       dispatch(setFactor([lfactor, wfactor, hfactor]));
 
-      dispatch(setPoints([]));
-      dispatch(setStoreLines([]));
+
+      let newLine = {
+        id: uniqueId(),
+        points: [newPoints[newPoints.length - 2], point],
+        length: convert(newPoints[newPoints.length - 2].distanceTo(point) * lfactor)
+          .from(measured)
+          .to("mm"),
+        width: convert(INITIAL_BREADTH / wfactor)
+          .from(measured)
+          .to("mm"),
+        height: convert(INITIAL_HEIGHT /hfactor )
+          .from(measured)
+          .to("mm"),
+        widthchangetype: "between",
+        widthchange: 0,
+      };
+      dispatch(setStoreLines([newLine]));
     }
     setCurrentMousePosition(null); // Clear the temporary line on click
     setDistance(0); // Reset distance display
