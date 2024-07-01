@@ -73,3 +73,4 @@ const DownloadJSONButton = ({ lines, points }) => {
 };
 
 export default DownloadJSONButton;
+

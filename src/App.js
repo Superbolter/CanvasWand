@@ -17,6 +17,8 @@ export const App = () => {
     handleLineClick,
     handleInformtion,
     deleteLastPoint,
+    handleMouseDown,
+    handleMouseUp,
     toggleSelectionMode,
     perpendicularHandler,
     newLine,
@@ -25,6 +27,8 @@ export const App = () => {
     selectedLines,
     setSelectedLines,
     setSelectionMode,
+    toggleDragMode,
+    dragMode,
     currentMousePosition,
     distance,
     stop,
@@ -38,7 +42,10 @@ export const App = () => {
 
   return (
     <div className="container">
-      <div className="canvas-container" onMouseMove={handleMouseMove}>
+      <div className="canvas-container"
+        onMouseMove={handleMouseMove}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}>
         {/* 2D (Orthographic) Canvas */}
         <Canvas
           style={{
@@ -162,6 +169,9 @@ export const App = () => {
           </button>
           <button onClick={toggleSelectionMode}>
             {selectionMode ? "Cancel Select and Delete" : "Select and Delete"}
+          </button>
+          <button onClick={toggleDragMode}>
+            {dragMode ? "Disable Drag Mode" : "Enable Drag Mode"}
           </button>
           <button onClick={handleInformtion}>Information</button>
           <DownloadJSONButton lines={storeLines} points={points} />

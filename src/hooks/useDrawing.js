@@ -10,7 +10,7 @@ import {
   setInformation,
   setIdSelection,
 } from "../features/drawing/drwingSlice.js";
-import { uniqueId, calculateAlignedPoint } from "../utils/uniqueId";
+import { uniqueId, calculateAlignedPoint,replaceValue } from "../utils/uniqueId";
 import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
@@ -35,9 +35,11 @@ export const useDrawing = () => {
   const [distance, setDistance] = useState(0);
   const [stop, setStop] = useState(false);
   const [breakPoint, setBreakPoint] = useState([]);
+  const [draggingPointIndex, setDraggingPointIndex] = useState(null);
+  const [dragMode, setDragMode] = useState(false);
 
   const addPoint = (newPoint, startPoint) => {
-    console.log("hello", newPoint, startPoint);
+    
     let newLine = {
       id: uniqueId(),
       points: [startPoint, newPoint],
@@ -173,7 +175,7 @@ export const useDrawing = () => {
       console.log("deleted");
       updatedPoints = updatedPoints.slice(0, -1);
     }
-    if (updatedPoints.length == 1) {
+    if (updatedPoints.length === 1) {
       updatedPoints = updatedPoints.slice(0, -1);
     }
     dispatch(setStoreLines(updatedLines));
@@ -230,6 +232,7 @@ export const useDrawing = () => {
 
   const handleClick = (event) => {
     if (selectionMode) return; // Prevent drawing new lines in selection mode
+    if (dragMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
     const rect = canvasContainer.getBoundingClientRect();
@@ -290,7 +293,7 @@ export const useDrawing = () => {
   };
 
   const handleMouseMove = (event) => {
-    if (points.length === 0 || stop || newLine) return; // No point to start from or not in perpendicular mode
+    if ((points.length === 0 || stop || newLine)&& !dragMode) return; // No point to start from or not in perpendicular mode
 
     const canvasContainer = document.querySelector(".canvas-container");
     const rect = canvasContainer.getBoundingClientRect();
@@ -315,6 +318,86 @@ export const useDrawing = () => {
     const lastPoint = points[points.length - 1];
     const currentDistance = lastPoint.distanceTo(point);
     setDistance(currentDistance * factor[0]);
+
+
+    if(draggingPointIndex!==null){
+      let beforeUpdation = points[draggingPointIndex];
+      console.log("before Point",beforeUpdation);
+      let updatedPoints = [...points]; 
+      const updated = replaceValue(updatedPoints,beforeUpdation,point);
+      //updatedPoints[draggingPointIndex] = point;
+      console.log(updated);
+      dispatch(setPoints(updated));
+
+      // checked above
+      
+
+      const updatedLines = storeLines.map((line)=>{
+        let updatedLine = { ...line }; // Shallow copy of the line object
+        console.log("updatedLine", updatedLine);
+        console.log(beforeUpdation);
+        if(updatedLine.points[0].equals(beforeUpdation)){
+          console.log('FIRST UPDATE');
+          updatedLine ={
+            ...updatedLine,
+            points:[point,updatedLine.points[1]],
+            length:convert(point.distanceTo(updatedLine.points[1]) * factor[0])
+            .from(measured)
+            .to("mm")
+          };
+        }
+          
+        if(updatedLine.points[1].equals(beforeUpdation)){
+          console.log('SECOND UPDATE');
+          console.log(updatedLine.points[1]);
+          console.log(point);
+          updatedLine ={
+            ...updatedLine,
+            points:[updatedLine.points[0],point],
+            length:convert(updatedLine.points[0].distanceTo(point) * factor[0])
+            .from(measured)
+            .to("mm")
+          };
+
+        }
+        return updatedLine;
+      });
+
+      console.log(" Hello updatedline:",updatedLines);
+
+      dispatch(setStoreLines(updatedLines));
+
+    }
+  };
+
+
+  const handleMouseDown = (event) => {
+    if (!dragMode) return;
+
+    const canvasContainer = document.querySelector(".canvas-container");
+    const rect = canvasContainer.getBoundingClientRect();
+
+    let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    const cameraWidth = rect.width;
+    const cameraHeight = rect.height;
+
+    const posX = x * (cameraWidth / 2);
+    const posY = y * (cameraHeight / 2);
+
+    const point = new Vector3(posX, posY, 0);
+
+    const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10); // Adjust threshold as necessary
+    if (pointIndex !== -1) {
+      console.log("hello i am here ",pointIndex);
+      setDraggingPointIndex(pointIndex);
+    }
+  };
+
+  const handleMouseUp = () => {
+    console.log("completed");
+    setDraggingPointIndex(null);
   };
 
   const handleLineClick = (id) => {
@@ -333,12 +416,19 @@ export const useDrawing = () => {
     dispatch(setInformation(!information));
   };
 
+
+  const toggleDragMode = () => {
+    setDragMode(!dragMode);
+  };
+
   return {
     handleClick,
     handleMouseMove,
     handleLineClick,
     handleInformtion,
     deleteLastPoint,
+    handleMouseDown,
+    handleMouseUp,
     toggleSelectionMode,
     perpendicularHandler,
     newLine,
@@ -347,6 +437,8 @@ export const useDrawing = () => {
     selectedLines,
     setSelectedLines,
     setSelectionMode,
+    toggleDragMode,
+    dragMode,
     currentMousePosition,
     distance,
     stop,

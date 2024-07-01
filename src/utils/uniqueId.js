@@ -29,4 +29,10 @@ export const calculateAlignedPoint = (previousPoint, newPosition) => {
   
     return newPoint;
   };
+
+
+  export const replaceValue =( updatedPoints,oldValue,newValue)=>{
+    console.log("hii", updatedPoints,oldValue,newValue);
+    return updatedPoints.map(val=>val===oldValue?newValue:val);
+  };
   
