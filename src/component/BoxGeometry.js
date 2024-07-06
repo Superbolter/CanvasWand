@@ -11,6 +11,7 @@ const BoxGeometry = ({
   widthchange,
   widthchangetype,
   isSelected,
+  type,
   isChoose,
   onClick,
   //handlePointClick,
@@ -59,7 +60,8 @@ const BoxGeometry = ({
           args={[length, width, 0]}
         />
         <meshBasicMaterial
-          color={isSelected ? "green" : isChoose ? "pink" : "blue"}
+          color={type === "door" ? "orange" : isSelected ? "green" : isChoose ? "pink" : "blue"}
+
           transparent={true}
           opacity={opacity}
         />
@@ -73,7 +75,7 @@ const BoxGeometry = ({
       >
         <sphereGeometry args={[10, 16, 16]} />
         <meshBasicMaterial
-          color={newPointMode && start.equals(currentPoint) ? "yellow" : "red"}
+          color={type === "door" ? "brown" : newPointMode && start.equals(currentPoint) ? "yellow" : "red"}
           transparent={true}
           opacity={opacity}
         />
@@ -87,7 +89,7 @@ const BoxGeometry = ({
       >
         <sphereGeometry args={[10, 16, 16]} />
         <meshBasicMaterial
-          color={newPointMode && end.equals(currentPoint) ? "yellow" : "red"}
+          color={type === "door" ? "brown" : newPointMode && end.equals(currentPoint) ? "yellow" : "red"}
           transparent={true}
           opacity={opacity}
         />

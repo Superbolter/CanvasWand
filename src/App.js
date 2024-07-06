@@ -9,11 +9,21 @@ import LengthConverter from "./component/LengthConverter";
 import LineEditForm from "./component/LineEditForm";
 import BackgroundImage from "./component/background";
 import { useDrawing } from "./hooks/useDrawing";
+import {
+  setPoints,
+  setStoreLines,
+  setPerpendicularLine,
+  setFactor,
+  setInformation,
+  setIdSelection,
+} from "./features/drawing/drwingSlice.js";
+import { DraggableDoor } from "./component/DragDrop";
 
 export const App = () => {
   const {
     handleClick,
     handleMouseMove,
+    addOn,
     handleLineClick,
     handleInformtion,
     deleteLastPoint,
@@ -28,6 +38,8 @@ export const App = () => {
     setSelectedLines,
     setSelectionMode,
     toggleDragMode,
+    toggleDoorWindowMode,
+    doorWindowMode,
     dragMode,
     currentMousePosition,
     distance,
@@ -38,14 +50,23 @@ export const App = () => {
     measured,
     information,
     idSelection,
+    doorPosition,
+    setDoorPosition,
+    isDraggingDoor,
+    setIsDraggingDoor,
+    handlePointerDown,
+    handlePointerUp,
+    handlePointerMove,
   } = useDrawing();
 
   return (
     <div className="container">
-      <div className="canvas-container"
+      <div
+        className="canvas-container"
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}>
+        onMouseUp={handleMouseUp}
+      >
         {/* 2D (Orthographic) Canvas */}
         <Canvas
           style={{
@@ -58,6 +79,18 @@ export const App = () => {
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
         >
+          {addOn && (
+            <DraggableDoor
+              doorPosition={doorPosition}
+              setDoorPosition={setDoorPosition}
+              setIsDraggingDoor={setIsDraggingDoor}
+              isDraggingDoor={isDraggingDoor}
+              handlePointerDown={handlePointerDown}
+              handlePointerUp={handlePointerUp}
+              setStoreLines={setStoreLines}
+              storeLines={storeLines}
+            />
+          )}
           <BackgroundImage />
           {/* Render lines in 2D view */}
           {storeLines.map((line) => (
@@ -68,8 +101,10 @@ export const App = () => {
               dimension={{ width: line.width, height: line.height }}
               widthchange={line.widthchange}
               widthchangetype={line.widthchangetype}
+              type={line.type}
               isSelected={selectedLines.includes(line.id)}
               onClick={() => handleLineClick(line.id)}
+              
             />
           ))}
 
@@ -174,6 +209,13 @@ export const App = () => {
             {dragMode ? "Disable Drag Mode" : "Enable Drag Mode"}
           </button>
           <button onClick={handleInformtion}>Information</button>
+          <button onClick={toggleDoorWindowMode}>
+            {doorWindowMode === "none"
+              ? "Add Door"
+              : doorWindowMode === "door"
+              ? "Place Door"
+              : "Door Mode"}
+          </button>
           <DownloadJSONButton lines={storeLines} points={points} />
           <LengthConverter />
           {information && (

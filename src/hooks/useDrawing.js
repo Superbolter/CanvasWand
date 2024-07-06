@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import convert from "convert-units";
 import { Vector3 } from "three";
@@ -8,9 +8,13 @@ import {
   setPerpendicularLine,
   setFactor,
   setInformation,
-  setIdSelection,
+  
 } from "../features/drawing/drwingSlice.js";
-import { uniqueId, calculateAlignedPoint,replaceValue } from "../utils/uniqueId";
+import {
+  uniqueId,
+  calculateAlignedPoint,
+  replaceValue,
+} from "../utils/uniqueId";
 import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
@@ -37,9 +41,126 @@ export const useDrawing = () => {
   const [breakPoint, setBreakPoint] = useState([]);
   const [draggingPointIndex, setDraggingPointIndex] = useState(null);
   const [dragMode, setDragMode] = useState(false);
+  const [doorWindowMode, setDoorWindowMode] = useState(false);
+  const [hoveredLine, setHoveredLine] = useState([]);
+  const [addOn, setaddOn] = useState(null);
+  const [isDraggingDoor, setIsDraggingDoor] = useState(false);
+  const [doorPosition, setDoorPosition] = useState([]);
+  const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
+
+  const [doorPoint, setdoorPoint] = useState([]);
+
+  const handlePointerDown = useCallback(
+    (event, right, left, mesh) => {
+      setIsDraggingDoor(true);
+      setDoorWindowMode(true);
+      event.stopPropagation();
+    },
+    [selectionMode, dragMode]
+  );
+
+  const handlePointerUp = useCallback(
+    (event, line, right, left) => {
+      
+
+      const startPoint = new Vector3(
+        left.current.position.x,
+        left.current.position.y,
+        0
+      );
+      const endPoint = new Vector3(
+        right.current.position.x,
+        right.current.position.y,
+        0
+      );
+
+      
+      let index = null;
+      points.forEach((ele, i) => {
+        if (ele === line.points[0] && points[i + 1] === line.points[1]) {
+          index = i;
+        }
+      });
+      let updatedPoint = [...points];
+
+      if (index != null) {
+        if (
+          endPoint.distanceTo(line.points[0]) <
+          endPoint.distanceTo(line.points[1])
+        ) {
+          updatedPoint.splice(index, 0, endPoint, startPoint);
+        } else {
+          updatedPoint.splice(index, 0, startPoint, endPoint);
+          dispatch(setPoints(updatedPoint));
+        }
+      }
+
+      const idx = storeLines.findIndex((ele) => ele.id === line.id);
+
+      const line1 = {
+        id: uniqueId(),
+        points: [line.points[0], startPoint],
+        length: convert(line.points[0].distanceTo(startPoint) * factor[0])
+          .from(measured)
+          .to("mm"),
+        width: convert(INITIAL_BREADTH / factor[1])
+          .from(measured)
+          .to("mm"),
+        height: convert(INITIAL_HEIGHT / factor[2])
+          .from(measured)
+          .to("mm"),
+        widthchangetype: "between",
+        widthchange: 0,
+        type: "wall",
+      };
+      const line2 = {
+        id: uniqueId(),
+        points: [endPoint, line.points[1]],
+        length: convert(endPoint.distanceTo(line.points[1]) * factor[0])
+          .from(measured)
+          .to("mm"),
+        width: convert(INITIAL_BREADTH / factor[1])
+          .from(measured)
+          .to("mm"),
+        height: convert(INITIAL_HEIGHT / factor[2])
+          .from(measured)
+          .to("mm"),
+        widthchangetype: "between",
+        widthchange: 0,
+        type: "wall",
+      };
+      const line3 = {
+        id: uniqueId(),
+        points: [startPoint, endPoint],
+        length: convert(startPoint.distanceTo(endPoint) * factor[0])
+          .from(measured)
+          .to("mm"),
+        width: convert(INITIAL_BREADTH / factor[1])
+          .from(measured)
+          .to("mm"),
+        height: convert(INITIAL_HEIGHT / factor[2])
+          .from(measured)
+          .to("mm"),
+        widthchangetype: "between",
+        widthchange: 0,
+        type: "door",
+      };
+      
+      const updatedLine = [...storeLines];
+      
+      updatedLine.splice(idx, 1, line1, line3, line2);
+      
+
+      dispatch(setStoreLines(updatedLine));
+      setIsDraggingDoor(false);
+      // setDoorWindowMode(false);
+      event.stopPropagation();
+      setaddOn(false);
+    },
+    [selectionMode, dragMode, storeLines, factor, measured, dispatch]
+  );
 
   const addPoint = (newPoint, startPoint) => {
-    
     let newLine = {
       id: uniqueId(),
       points: [startPoint, newPoint],
@@ -54,6 +175,7 @@ export const useDrawing = () => {
         .to("mm"),
       widthchangetype: "between",
       widthchange: 0,
+      type: "wall",
     };
 
     let updatedStoreLines = [...storeLines];
@@ -72,8 +194,6 @@ export const useDrawing = () => {
         intersections.push({ line, intersection });
       }
     });
-
-    console.log("intersection points", intersections);
 
     // Sort intersections based on their distance from startPoint along the new line
     intersections.sort(
@@ -172,7 +292,6 @@ export const useDrawing = () => {
 
     const hasBreakPoint = breakPoint.includes(lastPoint);
     if (hasBreakPoint) {
-      console.log("deleted");
       updatedPoints = updatedPoints.slice(0, -1);
     }
     if (updatedPoints.length === 1) {
@@ -231,8 +350,8 @@ export const useDrawing = () => {
   }, [storeLines, selectionMode, selectedLines, points, stop]);
 
   const handleClick = (event) => {
-    if (selectionMode) return; // Prevent drawing new lines in selection mode
-    if (dragMode) return;
+    if (selectionMode || dragMode || doorWindowMode) return; // Prevent drawing new lines in selection mode
+    //if (dragMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
     const rect = canvasContainer.getBoundingClientRect();
@@ -284,21 +403,23 @@ export const useDrawing = () => {
       const hfactor = INITIAL_HEIGHT / userHeight;
       dispatch(setFactor([lfactor, wfactor, hfactor]));
 
-
       let newLine = {
         id: uniqueId(),
         points: [newPoints[newPoints.length - 2], point],
-        length: convert(newPoints[newPoints.length - 2].distanceTo(point) * lfactor)
+        length: convert(
+          newPoints[newPoints.length - 2].distanceTo(point) * lfactor
+        )
           .from(measured)
           .to("mm"),
         width: convert(INITIAL_BREADTH / wfactor)
           .from(measured)
           .to("mm"),
-        height: convert(INITIAL_HEIGHT /hfactor )
+        height: convert(INITIAL_HEIGHT / hfactor)
           .from(measured)
           .to("mm"),
         widthchangetype: "between",
         widthchange: 0,
+        type: "wall",
       };
       dispatch(setStoreLines([newLine]));
     }
@@ -307,7 +428,8 @@ export const useDrawing = () => {
   };
 
   const handleMouseMove = (event) => {
-    if ((points.length === 0 || stop || newLine)&& !dragMode) return; // No point to start from or not in perpendicular mode
+    if ((points.length === 0 || stop || newLine || doorWindowMode) && !dragMode)
+      return; // No point to start from or not in perpendicular mode
 
     const canvasContainer = document.querySelector(".canvas-container");
     const rect = canvasContainer.getBoundingClientRect();
@@ -323,7 +445,7 @@ export const useDrawing = () => {
 
     let point = new Vector3(posX, posY, 0);
 
-    if (perpendicularLine) {
+    if (perpendicularLine && draggingPointIndex === null) {
       point = calculateAlignedPoint(points[points.length - 1], point);
     }
 
@@ -333,57 +455,63 @@ export const useDrawing = () => {
     const currentDistance = lastPoint.distanceTo(point);
     setDistance(currentDistance * factor[0]);
 
-
-    if(draggingPointIndex!==null){
+    if (draggingPointIndex !== null) {
       let beforeUpdation = points[draggingPointIndex];
-      console.log("before Point",beforeUpdation);
-      let updatedPoints = [...points]; 
-      const updated = replaceValue(updatedPoints,beforeUpdation,point);
-      //updatedPoints[draggingPointIndex] = point;
-      console.log(updated);
+      console.log("HelloWorld");
+      console.log("before Point", beforeUpdation);
+
+      let prevPoint = points[draggingPointIndex - 1];
+      let nextPoint = points[draggingPointIndex + 1];
+       if (prevPoint) {
+        if (Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)) {
+          point.y = prevPoint.y; // Align horizontally
+        } else {
+          point.x = prevPoint.x; // Align vertically
+        }
+      } else if (nextPoint) {
+        if (Math.abs(point.x - nextPoint.x) > Math.abs(point.y - nextPoint.y)) {
+          point.y = nextPoint.y; // Align horizontally
+        } else {
+          point.x = nextPoint.x; // Align vertically
+        }
+      }
+
+      let updatedPoints = [...points];
+      const updated = replaceValue(updatedPoints, beforeUpdation, point);
       dispatch(setPoints(updated));
 
-      // checked above
-      
-
-      const updatedLines = storeLines.map((line)=>{
+      const updatedLines = storeLines.map((line) => {
         let updatedLine = { ...line }; // Shallow copy of the line object
-        console.log("updatedLine", updatedLine);
-        console.log(beforeUpdation);
-        if(updatedLine.points[0].equals(beforeUpdation)){
-          console.log('FIRST UPDATE');
-          updatedLine ={
+        if (updatedLine.points[0].equals(beforeUpdation)) {
+         
+          updatedLine = {
             ...updatedLine,
-            points:[point,updatedLine.points[1]],
-            length:convert(point.distanceTo(updatedLine.points[1]) * factor[0])
-            .from(measured)
-            .to("mm")
+            points: [point, updatedLine.points[1]],
+            length: convert(point.distanceTo(updatedLine.points[1]) * factor[0])
+              .from(measured)
+              .to("mm"),
           };
         }
-          
-        if(updatedLine.points[1].equals(beforeUpdation)){
-          console.log('SECOND UPDATE');
-          console.log(updatedLine.points[1]);
-          console.log(point);
-          updatedLine ={
-            ...updatedLine,
-            points:[updatedLine.points[0],point],
-            length:convert(updatedLine.points[0].distanceTo(point) * factor[0])
-            .from(measured)
-            .to("mm")
-          };
 
+        if (updatedLine.points[1].equals(beforeUpdation)) {
+          
+          updatedLine = {
+            ...updatedLine,
+            points: [updatedLine.points[0], point],
+            length: convert(updatedLine.points[0].distanceTo(point) * factor[0])
+              .from(measured)
+              .to("mm"),
+          };
         }
         return updatedLine;
       });
 
-      console.log(" Hello updatedline:",updatedLines);
-
+     
       dispatch(setStoreLines(updatedLines));
-
     }
-  };
 
+    
+  };
 
   const handleMouseDown = (event) => {
     if (!dragMode) return;
@@ -401,16 +529,16 @@ export const useDrawing = () => {
     const posY = y * (cameraHeight / 2);
 
     const point = new Vector3(posX, posY, 0);
+    console.log("Hii i am here ii ", points);
 
-    const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10); // Adjust threshold as necessary
+    const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10); 
     if (pointIndex !== -1) {
-      console.log("hello i am here ",pointIndex);
+      console.log("hello i am here ", pointIndex);
       setDraggingPointIndex(pointIndex);
     }
   };
 
   const handleMouseUp = () => {
-    console.log("completed");
     setDraggingPointIndex(null);
   };
 
@@ -422,6 +550,14 @@ export const useDrawing = () => {
           : [...prev, id]
       );
     }
+    // if(type ==='door'){
+    //   setaddOn(!addOn);
+    //   setdoorPoint(...points);
+    //   const midpoint = new Vector3().addVectors(points[0],points[1]).multiplyScalar(0.5);
+    //   const length = points[0].distanceTo(points[1]);
+    //   setDoorPosition(midpoint);
+    //   setDimensions({l:length,W:10,h:50});
+
     //dispatch(setIdSelection([...selectedLines]));
   };
 
@@ -430,28 +566,25 @@ export const useDrawing = () => {
     dispatch(setInformation(!information));
   };
 
-
   const toggleDragMode = () => {
     setDragMode(!dragMode);
   };
 
+  const toggleDoorWindowMode = (mode) => {
+    setaddOn("door");
+    setIsDraggingDoor(true);
+    setSelectionMode(false);
+    setDragMode(false);
+    setDoorWindowMode(!doorWindowMode);
+  };
+
   return {
-    handleClick,
-    handleMouseMove,
-    handleLineClick,
-    handleInformtion,
-    deleteLastPoint,
-    handleMouseDown,
-    handleMouseUp,
-    toggleSelectionMode,
-    perpendicularHandler,
+    doorWindowMode,
     newLine,
-    setNewLine,
+    doorPoint,
     selectionMode,
     selectedLines,
-    setSelectedLines,
-    setSelectionMode,
-    toggleDragMode,
+    addOn,
     dragMode,
     currentMousePosition,
     distance,
@@ -462,5 +595,29 @@ export const useDrawing = () => {
     measured,
     information,
     idSelection,
+    doorPosition,
+    isDraggingDoor,
+    dimensions,
+
+    handleClick,
+    handleMouseMove,
+    handleLineClick,
+    setNewLine,
+    setdoorPoint,
+    handleInformtion,
+    deleteLastPoint,
+    setSelectedLines,
+    setSelectionMode,
+    toggleDragMode,
+    handleMouseDown,
+    handleMouseUp,
+    toggleSelectionMode,
+    perpendicularHandler,
+    toggleDoorWindowMode,
+    setDoorPosition,
+    setIsDraggingDoor, // New state setter
+    handlePointerDown,
+    handlePointerUp,
+    setDimensions,
   };
 };
