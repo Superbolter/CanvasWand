@@ -76,24 +76,27 @@ export const useDrawing = () => {
 
       
       let index = null;
+
       points.forEach((ele, i) => {
         if (ele === line.points[0] && points[i + 1] === line.points[1]) {
           index = i;
         }
       });
       let updatedPoint = [...points];
-
+      
       if (index != null) {
         if (
           endPoint.distanceTo(line.points[0]) <
           endPoint.distanceTo(line.points[1])
         ) {
-          updatedPoint.splice(index, 0, endPoint, startPoint);
+          updatedPoint.splice(index+1, 0, endPoint, startPoint);
         } else {
-          updatedPoint.splice(index, 0, startPoint, endPoint);
-          dispatch(setPoints(updatedPoint));
+          updatedPoint.splice(index+1, 0, startPoint, endPoint);
+          
         }
+        dispatch(setPoints(updatedPoint));
       }
+     
 
       const idx = storeLines.findIndex((ele) => ele.id === line.id);
 
@@ -153,7 +156,16 @@ export const useDrawing = () => {
 
       dispatch(setStoreLines(updatedLine));
       setIsDraggingDoor(false);
-      // setDoorWindowMode(false);
+
+
+      setSelectionMode(false);
+      setDragMode(false);
+      setTimeout(() => {
+        setDoorWindowMode(false);
+      }, 1000);
+
+
+      
       event.stopPropagation();
       setaddOn(false);
     },
@@ -457,24 +469,60 @@ export const useDrawing = () => {
 
     if (draggingPointIndex !== null) {
       let beforeUpdation = points[draggingPointIndex];
-      console.log("HelloWorld");
-      console.log("before Point", beforeUpdation);
+      
 
       let prevPoint = points[draggingPointIndex - 1];
+      
       let nextPoint = points[draggingPointIndex + 1];
-       if (prevPoint) {
-        if (Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)) {
-          point.y = prevPoint.y; // Align horizontally
-        } else {
-          point.x = prevPoint.x; // Align vertically
+      if(perpendicularLine){
+        if (prevPoint && nextPoint) {
+          // Check if all coordinates are different
+         
+          if (point.x !== prevPoint.x && point.y !== prevPoint.y && point.x !== nextPoint.x && point.y !== nextPoint.y) {
+            // Calculate the direction vector of the line (prevPoint to nextPoint)
+            const dx = nextPoint.x - prevPoint.x;
+            const dy = nextPoint.y - prevPoint.y;
+        
+            // Normalize the direction vector
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const dirX = dx / length;
+            const dirY = dy / length;
+        
+            // Calculate the vector from prevPoint to point
+            const px = point.x - prevPoint.x;
+            const py = point.y - prevPoint.y;
+        
+            // Project the point onto the line
+            const dotProduct = px * dirX + py * dirY;
+            point.x = prevPoint.x + dotProduct * dirX;
+            point.y = prevPoint.y + dotProduct * dirY;
+           } else {
+            // Align with the previous point
+            if (Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)) {
+              point.y = prevPoint.y; // Align horizontally
+            } else {
+              point.x = prevPoint.x; // Align vertically
+            }
+          }
         }
-      } else if (nextPoint) {
-        if (Math.abs(point.x - nextPoint.x) > Math.abs(point.y - nextPoint.y)) {
-          point.y = nextPoint.y; // Align horizontally
-        } else {
-          point.x = nextPoint.x; // Align vertically
+         else if (prevPoint) {
+          if (Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)) {
+            
+            point.y = prevPoint.y; // Align horizontally
+          } else {
+            
+            point.x = prevPoint.x; // Align vertically
+          }
+         } else if (nextPoint) {
+          // Align with the next point if there's no previous point
+          if (Math.abs(point.x - nextPoint.x) > Math.abs(point.y - nextPoint.y)) {
+            point.y = nextPoint.y; // Align horizontally
+          } else {
+            point.x = nextPoint.x; // Align vertically
+          }
         }
       }
+
 
       let updatedPoints = [...points];
       const updated = replaceValue(updatedPoints, beforeUpdation, point);
@@ -529,11 +577,11 @@ export const useDrawing = () => {
     const posY = y * (cameraHeight / 2);
 
     const point = new Vector3(posX, posY, 0);
-    console.log("Hii i am here ii ", points);
+    
 
     const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10); 
     if (pointIndex !== -1) {
-      console.log("hello i am here ", pointIndex);
+     
       setDraggingPointIndex(pointIndex);
     }
   };
