@@ -21,6 +21,7 @@ const WallGeometry = ({
   currentPoint,
   newPointMode,
   opacity = 0.5,
+  type,
 }) => {
   const texture = useLoader(TextureLoader, Brick1);
   const { measured,factor } = useSelector((state) => state.drawing);
@@ -61,7 +62,7 @@ const WallGeometry = ({
 
   return (
     <>
-      <mesh
+    { type !=="imaginary" && (<mesh
         position={[midpoint.x, midpoint.y, midpoint.z + height/2]}
         rotation={[0, 0, angle]}
       >
@@ -73,7 +74,7 @@ const WallGeometry = ({
           ]}
         />
         <meshBasicMaterial map={texture} side={THREE.DoubleSide} />
-      </mesh>
+      </mesh>)}
     </>
   );
 };

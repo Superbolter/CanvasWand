@@ -46,6 +46,7 @@ export const App = () => {
     stop,
     points,
     storeLines,
+    roomSelect,
     perpendicularLine,
     measured,
     information,
@@ -57,6 +58,10 @@ export const App = () => {
     handlePointerDown,
     handlePointerUp,
     handlePointerMove,
+    toggleSelectionroomMood,
+    roomSelectors,
+    handlemode,
+    type,
   } = useDrawing();
 
   return (
@@ -104,7 +109,6 @@ export const App = () => {
               type={line.type}
               isSelected={selectedLines.includes(line.id)}
               onClick={() => handleLineClick(line.id)}
-              
             />
           ))}
 
@@ -166,6 +170,7 @@ export const App = () => {
                 dimension={{ width: line.width, height: line.height }}
                 widthchange={line.widthchange}
                 widthchangetype={line.widthchangetype}
+                type={line.type}
                 isSelected={selectedLines.includes(line.id)}
                 isChoose={idSelection.includes(line.id)}
                 onClick={() => handleLineClick(line.id)}
@@ -193,6 +198,9 @@ export const App = () => {
         {/* Buttons for interaction */}
         <div className="button-container1">
           <button onClick={deleteLastPoint}>Delete Last Point</button>
+          <button onClick={toggleSelectionroomMood}>
+            {roomSelect ? "selectingRoom" : "roomSelecter"}
+          </button>
           <button onClick={() => setNewLine(!newLine)}>
             {newLine ? "NewLineAdded" : "Add New Line"}
           </button>
@@ -203,12 +211,17 @@ export const App = () => {
               : "Not Perpendicular Line"}
           </button>
           <button onClick={toggleSelectionMode}>
-            {selectionMode ? "Cancel Select and Delete" : "Select and Delete"}
+            {selectionMode && !roomSelect
+              ? "Cancel Select and Delete"
+              : "Select and Delete"}
           </button>
           <button onClick={toggleDragMode}>
             {dragMode ? "Disable Drag Mode" : "Enable Drag Mode"}
           </button>
           <button onClick={handleInformtion}>Information</button>
+          <button onClick={handlemode}>
+            {type === "imaginary" ? "imaginary line" : "real line"}
+          </button>
           <button onClick={toggleDoorWindowMode}>
             {doorWindowMode === "none"
               ? "Add Door"
@@ -216,7 +229,11 @@ export const App = () => {
               ? "Place Door"
               : "Door Mode"}
           </button>
-          <DownloadJSONButton lines={storeLines} points={points} />
+          <DownloadJSONButton
+            lines={storeLines}
+            points={points}
+            roomSelectors={roomSelectors}
+          />
           <LengthConverter />
           {information && (
             <LineEditForm

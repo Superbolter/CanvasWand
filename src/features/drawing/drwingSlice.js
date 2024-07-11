@@ -1,15 +1,18 @@
 // drawingSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   points: [],
   storeLines: [],
+  roomSelect: false,
+  roomSelectors: [],
   perpendicularLine: true,
   factor: [1, 1, 1],
-  measured: 'in',
+  measured: "in",
   information: false,
   idSelection: [],
-  widthChangeType:'between',
+  widthChangeType: "between",
+  type:"wall",
 };
 
 export const drawingSlice = createSlice({
@@ -22,11 +25,17 @@ export const drawingSlice = createSlice({
     setStoreLines: (state, action) => {
       state.storeLines = action.payload;
     },
+    setRoomSelectors: (state, action) => {
+      state.roomSelectors = action.payload;
+    },
     setIdSelection: (state, action) => {
       state.idSelection = action.payload;
     },
     setPerpendicularLine: (state, action) => {
       state.perpendicularLine = action.payload;
+    },
+    setRoomSelect: (state, action) => {
+      state.roomSelect = action.payload;
     },
     setFactor: (state, action) => {
       state.factor = action.payload;
@@ -40,14 +49,27 @@ export const drawingSlice = createSlice({
     setWidthChangeType: (state, action) => {
       state.widthChangeType = action.payload;
     },
+    setType: (state, action) => {
+      state.type = action.payload;
+    },
   },
 });
 
-export const { setPoints, setStoreLines, setIdSelection,setPerpendicularLine ,setFactor,setMeasured,setInformation,setWidthChangeType} = drawingSlice.actions;
+export const {
+  setPoints,
+  setStoreLines,
+  setIdSelection,
+  setPerpendicularLine,
+  setFactor,
+  setMeasured,
+  setInformation,
+  setWidthChangeType,
+  roomSelect,
+  roomSelectors,
+  setRoomSelect,
+  setRoomSelectors,
+  type,
+  setType,
+} = drawingSlice.actions;
 
 export default drawingSlice.reducer;
-
-
-
-
-

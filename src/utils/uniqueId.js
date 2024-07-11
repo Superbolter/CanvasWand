@@ -2,7 +2,7 @@ import {v4 as uuidv4} from 'uuid';
 import { Vector3 } from "three";
 
 export const uniqueId = () => {
-    let uniqueId = uuidv4().slice(0,8);
+    let uniqueId = uuidv4();
     return uniqueId;
 };
 

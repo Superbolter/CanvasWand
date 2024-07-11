@@ -8,6 +8,8 @@ import {
   setPerpendicularLine,
   setFactor,
   setInformation,
+  setRoomSelect,setRoomSelectors,
+  setType,
   
 } from "../features/drawing/drwingSlice.js";
 import {
@@ -28,7 +30,7 @@ export const useDrawing = () => {
     perpendicularLine,
     factor,
     measured,
-    information,
+    information,roomSelect,roomSelectors, type,
   } = useSelector((state) => state.drawing);
 
   const [selectionMode, setSelectionMode] = useState(false);
@@ -47,6 +49,7 @@ export const useDrawing = () => {
   const [isDraggingDoor, setIsDraggingDoor] = useState(false);
   const [doorPosition, setDoorPosition] = useState([]);
   const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
+  const [check,setCheck]= useState(true);
 
   const [doorPoint, setdoorPoint] = useState([]);
 
@@ -187,7 +190,7 @@ export const useDrawing = () => {
         .to("mm"),
       widthchangetype: "between",
       widthchange: 0,
-      type: "wall",
+      type:type,
     };
 
     let updatedStoreLines = [...storeLines];
@@ -347,6 +350,10 @@ export const useDrawing = () => {
     }
     if (event.key === "s" || event.key === "S") {
       setStop(!stop);
+    }
+    if(event.key === "r" || event.key === "R"){
+      room();
+
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
       deleteSelectedLines();
@@ -590,8 +597,66 @@ export const useDrawing = () => {
     setDraggingPointIndex(null);
   };
 
+
+
+
+
+
+
+
+
+
+
+  const room =()=>{
+    const roomName = prompt("Enter the room Name:");
+    
+    const room = {
+      roomId: uniqueId(),
+      roomName: roomName,
+      wallIds: [...selectedLines],
+    }
+
+
+    dispatch(setRoomSelectors([...roomSelectors,room]));
+    setSelectedLines([]);
+    dispatch(setRoomSelect(false));
+
+  }
+
+
+  const toggleSelectionroomMood= () => {
+    setSelectionMode(!selectionMode);
+    dispatch(setRoomSelect(true));
+    setSelectedLines([]);
+  };
+
+
+
+
+
+
+
+
+
+
+  
+
   const handleLineClick = (id) => {
-    if (selectionMode) {
+    
+
+
+    if(selectionMode && roomSelect){
+
+
+      
+      setSelectedLines((prev) =>
+        prev.includes(id)
+          ? prev.filter((lineId) => lineId !== id)
+          : [...prev, id]);
+
+
+    }
+    else if (selectionMode) {
       setSelectedLines((prev) =>
         prev.includes(id)
           ? prev.filter((lineId) => lineId !== id)
@@ -626,6 +691,17 @@ export const useDrawing = () => {
     setDoorWindowMode(!doorWindowMode);
   };
 
+
+
+  const handlemode=() => {
+    setCheck(!check);
+    if(check){
+      dispatch(setType("imaginary"));
+    }else{
+      dispatch(setType("wall"));
+    }
+  };
+
   return {
     doorWindowMode,
     newLine,
@@ -646,6 +722,8 @@ export const useDrawing = () => {
     doorPosition,
     isDraggingDoor,
     dimensions,
+    roomSelect,
+    roomSelectors,
 
     handleClick,
     handleMouseMove,
@@ -667,5 +745,8 @@ export const useDrawing = () => {
     handlePointerDown,
     handlePointerUp,
     setDimensions,
+    toggleSelectionroomMood,
+    handlemode,
+    
   };
 };
