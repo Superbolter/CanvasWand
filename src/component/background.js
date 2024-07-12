@@ -13,7 +13,7 @@ const BackgroundImage = () => {
   return (
     <mesh position={[0, 0, 0]}>
       <planeGeometry args={[viewport.width, viewport.height]}  />
-      <meshBasicMaterial map={texture} opacity={1}/>
+      <meshBasicMaterial map={texture}  transparent = {0.3} opacity={0.2}/>
     </mesh>
   );
 };

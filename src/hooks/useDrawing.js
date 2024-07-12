@@ -53,6 +53,12 @@ export const useDrawing = () => {
 
   const [doorPoint, setdoorPoint] = useState([]);
 
+
+
+const [snappingPoint, setSnappingPoint] = useState([]);
+const [showSnapLine, setShowSnapLine] = useState(false);
+
+
   const handlePointerDown = useCallback(
     (event, right, left, mesh) => {
       setIsDraggingDoor(true);
@@ -210,12 +216,16 @@ export const useDrawing = () => {
       }
     });
 
+    console.log("intersect: " ,intersections);
+
     // Sort intersections based on their distance from startPoint along the new line
     intersections.sort(
       (a, b) =>
         startPoint.distanceTo(a.intersection) -
         startPoint.distanceTo(b.intersection)
     );
+
+    console.log("intersections: " ,intersections);
 
     let currentStartPoint = startPoint;
 
@@ -385,8 +395,12 @@ export const useDrawing = () => {
     const posY = y * (cameraHeight / 2);
 
     let point = new Vector3(posX, posY, 0);
+    
     if (newLine) {
       setNewLine(false);
+      point = snapToPoint(point, points, storeLines);
+
+
       const newPoint = [...points, point];
       const breaking = [...breakPoint, point];
       setBreakPoint(breaking);
@@ -400,6 +414,12 @@ export const useDrawing = () => {
     point = snapToPoint(point, points, storeLines); //snapping
     const newPoints = [...points, point];
     dispatch(setPoints(newPoints));
+
+
+    if(showSnapLine){
+      addPoint(snappingPoint[0],newPoints[newPoints.length - 2]);
+    }
+
 
     if (newPoints.length >= 2) {
       addPoint(point, newPoints[newPoints.length - 2]);
@@ -469,6 +489,31 @@ export const useDrawing = () => {
     }
 
     setCurrentMousePosition(point);
+    let cuuPoint =point;
+    // Check for snapping
+  let snapFound = false;
+  for (let i = 0; i < points.length; i++) {
+    if (Math.abs(points[i].x - point.x)< 10  && (points[points.length-1].y!==points[i].y && points[points.length-1].x!==points[i].x)) {
+      cuuPoint.x = points[i].x;
+      let newarr = [cuuPoint,points[i]];
+      setSnappingPoint([...newarr]);
+      snapFound = true;
+      break;
+    } else if (Math.abs(points[i].y - point.y) < 10  && (points[points.length-1].y!==points[i].y && points[points.length-1].x!==points[i].x)) {
+      cuuPoint.y = points[i].y;
+      let newarr = [cuuPoint,points[i]];
+      setSnappingPoint([...newarr]);
+      snapFound = true;
+      break;
+    }
+  }
+
+  if (!snapFound) {
+    setSnappingPoint([]);
+  }
+
+  setShowSnapLine(snapFound);
+  //setCurrentMousePosition(point);
 
     const lastPoint = points[points.length - 1];
     const currentDistance = lastPoint.distanceTo(point);
@@ -724,6 +769,12 @@ export const useDrawing = () => {
     dimensions,
     roomSelect,
     roomSelectors,
+
+
+    snappingPoint, 
+    showSnapLine,
+    setShowSnapLine,
+    setSnappingPoint,
 
     handleClick,
     handleMouseMove,

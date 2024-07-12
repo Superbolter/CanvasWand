@@ -62,6 +62,11 @@ export const App = () => {
     roomSelectors,
     handlemode,
     type,
+
+    snappingPoint,
+    showSnapLine,
+    setShowSnapLine,
+    setSnappingPoint,
   } = useDrawing();
 
   return (
@@ -112,6 +117,16 @@ export const App = () => {
             />
           ))}
 
+          
+            {showSnapLine && snappingPoint && (
+              <Line
+              points={[snappingPoint[1], snappingPoint[0]]}
+              color="green"
+              lineWidth={5}
+            />
+            )}
+             
+
           {currentMousePosition && points.length > 0 && !stop && (
             <>
               <Line
@@ -141,11 +156,11 @@ export const App = () => {
           <Grid
             rotation={[Math.PI / 2, 0, 0]}
             cellSize={100}
-            cellThickness={2}
-            cellColor="red"
-            sectionSize={20}
-            sectionThickness={1.5}
-            sectionColor="lightgray"
+            cellThickness={0}
+            //cellColor="gray"
+            sectionSize={40}
+            //sectionThickness={1.5}
+            sectionColor="gray"
             fadeDistance={10000}
             infiniteGrid
             fadeStrength={1}
