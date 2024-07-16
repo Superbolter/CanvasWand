@@ -311,7 +311,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     dispatch(setPoints(newPoints));
 
     dispatch(setStoreLines(updatedStoreLines));
-    // console.log(storeLines)
+  
   };
 
   const deleteLastPoint = () => {
