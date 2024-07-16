@@ -1,0 +1,25 @@
+const Color = {
+  primary1: "#E1544E",
+  primary2: "#EA8783",
+  primary3: "#F3BBB8",
+  accent1: "#4B73EC",
+  accent2: "#607DD7",
+  accent3: "#7487C3",
+  signalAlert1: "#F5C84F",
+  signalAlert2: "#F8D984",
+  signalAlert3: "#FBE9B9",
+  signalError1: "#FF544E",
+  signalError2: "#FF8783",
+  signalError3: "#FFBBB8",
+  signalSuccess1: "#77C595",
+  signalSuccess2: "#A0D6B5",
+  signalSuccess3: "#C9E8D5",
+  neutral1: "#2B2B2B",
+  neutral2: "#666666",
+  neutral3: "#999999",
+  white1: "#E4E4E4",
+  white2: "#FFFFFF",
+  white3: "#F7FAFC",
+};
+
+export default Color;
