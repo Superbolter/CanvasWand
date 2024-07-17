@@ -90,7 +90,7 @@ export const App = () => {
       //   0,
       // ])
     }
-  }, [storeLines]);
+  }, [storeLines,type_id]);
 
   return (
     <div className="container">
