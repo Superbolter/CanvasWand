@@ -8,14 +8,21 @@ import Unlocked from "../assets/Unlocked.png"
 import Delete from "../assets/Delete.png"
 import "./WallPropertiesPopup.css";
 import Close from "../assets/Close.png"
+import { useDispatch, useSelector } from 'react-redux';
+import { setTypeId } from '../Actions/DrawingActions.js';
 const WallPropertiesPopup = () => {
+  const typeId=useSelector((state)=>state.Drawing.type_id);
+  const dispatch=useDispatch();
+  const handleCloseClick=()=>{
+    dispatch(setTypeId(0));
+  }
   return (
     <div>
-     <div className='popup-container'>
+     <div className={typeId===1?'popup-container':"popup-container-hidden"} >
 
       <div className='header-container'>
        <Typography  modifiers={["header6", "medium"]} style={{fontSize: "16px",lineHeight:" 18px",textAlign: "left"}}>Wall Properties</Typography>
-       <img style={{width:"28px", height:"28px"}} src={Close} alt="" />
+       <img onClick={handleCloseClick} style={{width:"28px", height:"28px"}} src={Close} alt="" />
       </div>
       <div className='input-container'>
        <div className='height-input-container'>

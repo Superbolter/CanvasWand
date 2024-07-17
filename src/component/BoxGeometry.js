@@ -11,7 +11,7 @@ const BoxGeometry = ({
   widthchange,
   widthchangetype,
   isSelected,
-  type,
+  typeId,
   isChoose,
   onClick,
   //handlePointClick,
@@ -20,7 +20,7 @@ const BoxGeometry = ({
   opacity = 0.5,
 }) => {
   const { measured,factor,roomSelect } = useSelector((state) => state.drawing);
-
+  
   if (!start || !end) return null;
 
   const length = start.distanceTo(end);
@@ -60,7 +60,7 @@ const BoxGeometry = ({
           args={[length, width, 0]}
         />
         <meshBasicMaterial
-          color={type ==="imaginary" ? "grey": type === "door" ? "#EE918E" : (isSelected && roomSelect) ? "blue" : (isSelected && !roomSelect) ?'green': isChoose ? "pink" : "#787878"}
+          color={typeId===1?"grey": typeId === 2 ? "#EE918E" : typeId===3?"#BEE7FE":typeId===4?"#6360FB":(isSelected && roomSelect) ? "blue" : (isSelected && !roomSelect) ?'green': isChoose ? "pink" : "#787878"}
 
           transparent={true}
           //opacity={opacity}
@@ -75,7 +75,7 @@ const BoxGeometry = ({
       >
         <sphereGeometry args={[4, 16, 16]} />
         <meshBasicMaterial
-          color={type === "door" ? "brown" : newPointMode && start.equals(currentPoint) ? "yellow" : "black"}
+          color={typeId === 2 ? "brown" : newPointMode && start.equals(currentPoint) ? "yellow" : "black"}
           transparent={true}
           opacity={opacity}
         />
@@ -89,7 +89,7 @@ const BoxGeometry = ({
       >
         <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial
-          color={type === "door" ? "brown" : newPointMode && end.equals(currentPoint) ? "yellow" : "black"}
+          color={typeId === 2 ? "brown" : newPointMode && end.equals(currentPoint) ? "yellow" : "black"}
           transparent={true}
           opacity={opacity}
         />

@@ -23,6 +23,7 @@ import DrawtoolHeader from "./component/DrawtoolHeader.js";
 import WallPropertiesPopup from "./component/WallPropertiesPopup.js";
 import WindowPropertiesPopup from "./component/WindowPropertiesPopup.js";
 import ContextualMenu from "./component/ContextualMenu.js";
+import { Provider, useSelector } from "react-redux";
 
 export const App = () => {
   const {
@@ -74,10 +75,11 @@ export const App = () => {
     setSnappingPoint,
   } = useDrawing();
 
-  
+  const type_id=useSelector((state)=>state.Drawing.type_id);
 
   useEffect(() => {
-    // console.log(storeLines)
+    console.log(type_id);
+    console.log(storeLines)
     if(storeLines.length>0){
 
       console.log([(storeLines[storeLines.length - 1].points[1].x + storeLines[storeLines.length - 1].points[0].x) / 2,
@@ -132,7 +134,7 @@ export const App = () => {
               dimension={{ width: line.width, height: line.height }}
               widthchange={line.widthchange}
               widthchangetype={line.widthchangetype}
-              type={line.type}
+              typeId={line.typeId}
               isSelected={selectedLines.includes(line.id)}
               onClick={() => handleLineClick(line.id)}
             />
@@ -166,14 +168,7 @@ export const App = () => {
                 fontWeight="bold"
               >
                 {`${distance.toFixed(2)} ${measured}`}
-                <Html  position={[
-                  (points[points.length - 1].x + currentMousePosition.x) / 2,
-                  (points[points.length - 1].y + currentMousePosition.y) / 2 + 10,
-                  0,
-                ]}anchorX="center"
-                anchorY="middle" style={{ width: '300px', height: 'auto', pointerEvents: 'auto' }}>
-              <ContextualMenu />
-            </Html>
+               
               </Text>
             </>
           )}
@@ -191,12 +186,7 @@ export const App = () => {
             fadeFrom={1}
           />
 
-          {/* {storeLines.length > 0 && (
-            
-            // <Html position={[0,0,0]} style={{ width: '300px', height: 'auto', pointerEvents: 'auto' }}>
-            //   <ContextualMenu />
-            // </Html>
-          )} */}
+          
         </Canvas>
       </div>
 
@@ -252,7 +242,9 @@ export const App = () => {
       </div>
      
       <div style={{ position: "relative" }}>
-        <DrawtoolHeader />
+     
+        <DrawtoolHeader deleteLastPoint={deleteLastPoint} />
+        <ContextualMenu />
         <div className="perspective-canvas" style={{ position: "absolute", right: "20px", top: "20px", backgroundColor: "#ffffff", height: "232px", width: "252px", borderRadius: "16px",boxShadow: "0px 4px 14px -3px #0C0C0D21" }}>
           <Canvas
             style={{ height: "100%", width: "100%", borderRadius: "12px" }}
@@ -291,8 +283,9 @@ export const App = () => {
             <OrbitControls />
           </Canvas>
         </div>
-        {/* <WindowPropertiesPopup /> */}
-        <ButtonComponent/>
+        <WindowPropertiesPopup />
+        <WallPropertiesPopup />
+        <ButtonComponent  setNewLine={() => setNewLine(!newLine)}/>
       </div>
     </div>
   );

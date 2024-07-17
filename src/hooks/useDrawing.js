@@ -30,10 +30,10 @@ export const useDrawing = () => {
     perpendicularLine,
     factor,
     measured,
-    information,roomSelect,roomSelectors, type,
+    information,roomSelect,roomSelectors,
   } = useSelector((state) => state.drawing);
-
-  const [selectionMode, setSelectionMode] = useState(false);
+  const typeId=useSelector((state)=>state.Drawing.type_id)
+  const [selectionMode, setSelectionMode] = useState(true);
   const [selectedLines, setSelectedLines] = useState([]);
   const [firstTime, setFirstTime] = useState(true);
   const [newLine, setNewLine] = useState(false);
@@ -124,6 +124,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
         widthchangetype: "between",
         widthchange: 0,
         type: "wall",
+        typeId:1,
       };
       const line2 = {
         id: uniqueId(),
@@ -140,6 +141,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
         widthchangetype: "between",
         widthchange: 0,
         type: "wall",
+        typeId:1,
       };
       const line3 = {
         id: uniqueId(),
@@ -156,6 +158,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
         widthchangetype: "between",
         widthchange: 0,
         type: "door",
+        typeId:2,
       };
       
       const updatedLine = [...storeLines];
@@ -196,7 +199,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
         .to("mm"),
       widthchangetype: "between",
       widthchange: 0,
-      type:type,
+      typeId:typeId,
     };
 
     let updatedStoreLines = [...storeLines];
@@ -311,7 +314,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     dispatch(setPoints(newPoints));
 
     dispatch(setStoreLines(updatedStoreLines));
-    // console.log(storeLines)
+  
   };
 
   const deleteLastPoint = () => {
@@ -463,6 +466,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
         widthchangetype: "between",
         widthchange: 0,
         type: "wall",
+        typeId:1,
       };
       dispatch(setStoreLines([newLine]));
     }

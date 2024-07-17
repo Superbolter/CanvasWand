@@ -11,7 +11,24 @@
     border-radius: 16px;
     border: 1px solid #ECECEC;
     background-color: white;
-    
+    transition:all 0.2s ease-in-out
+
+}
+.popup-container-hidden{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    height:273px;
+    width: 240px;
+    top: 262px;
+    right:20px;
+    padding: 12px;
+    gap:16px;
+    border-radius: 16px;
+    border: 1px solid #ECECEC;
+    background-color: white;
+    translate: 275px 0px;
+    transition:all 0.2s ease-in-out
 
 }
 .header-container{
