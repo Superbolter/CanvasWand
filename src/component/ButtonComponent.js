@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 
 
 const ButtonComponent = ({ setNewLine }) => {
-  const typeId=useSelector((state)=>state.Drawing.type_id)
+  const typeId=useSelector((state)=>state.Drawing.typeId)
   return (
     <div>
       <div className={typeId>0?"scrollable-container-hidden":"scrollable-container"}>

@@ -7,19 +7,29 @@ import RailingIcon from "../assets/RailingIcon.svg"
 import "./ContextualMenu.css"
 import { useDispatch, useSelector } from "react-redux";
 import { setTypeId } from '../Actions/DrawingActions.js';
+import {updateLineTypeId} from "../features/drawing/drwingSlice.js"
 const ContextualMenu = () => {
     const dispatch=useDispatch();
+    const newLineId=useSelector((state)=>state.Drawing.lineId)
     const handleWallClick=()=>{
-      dispatch(setTypeId(1))
+      console.log( newLineId)
+      dispatch(updateLineTypeId({ id: newLineId, typeId:1 }));
+      dispatch(setTypeId(1)); 
     }
     const handleDoorClick=()=>{
-      dispatch(setTypeId(2))
+      console.log( newLineId)
+      dispatch(updateLineTypeId({ id: newLineId, typeId:2 }));
+      dispatch(setTypeId(2)); 
     }
     const handleWindowClick=()=>{
-      dispatch(setTypeId(3))
+      console.log( newLineId)
+      dispatch(updateLineTypeId({ id: newLineId, typeId:3 }));
+      dispatch(setTypeId(3)); 
     }
     const handleRailingClick=()=>{
-      dispatch(setTypeId(4))
+      console.log( newLineId)
+      dispatch(updateLineTypeId({ id: newLineId, typeId:4 }));
+      dispatch(setTypeId(4)); 
     }
     
   return (

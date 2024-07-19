@@ -52,6 +52,13 @@ export const drawingSlice = createSlice({
     setType: (state, action) => {
       state.type = action.payload;
     },
+    updateLineTypeId: (state, action) => {
+      const { id, typeId } = action.payload;
+      const lineIndex = state.storeLines.findIndex(line => line.id === id);
+      if (lineIndex !== -1) {
+        state.storeLines[lineIndex].typeId = typeId;
+      }
+    },
   },
 });
 
@@ -70,6 +77,7 @@ export const {
   setRoomSelectors,
   type,
   setType,
+  updateLineTypeId      
 } = drawingSlice.actions;
 
 export default drawingSlice.reducer;

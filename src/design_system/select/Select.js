@@ -1,4 +1,4 @@
-import { Button, Icon } from '@material-ui/core';
+import { Button, Icon } from '@mui/material/Button';
 import React from 'react';
 // import { Button } from '../StyledComponents/components/Button';
 import "./Select.css";

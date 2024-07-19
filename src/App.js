@@ -74,12 +74,45 @@ export const App = () => {
     setShowSnapLine,
     setSnappingPoint,
   } = useDrawing();
+  const [cookies, setCookies] = useState([]);
 
-  const type_id=useSelector((state)=>state.Drawing.type_id);
-
+  // Function to fetch cookies
+  // const fetchCookies = async () => {
+  //   try {
+  //     const cookies = await cookieStore.getAll();
+  //     setCookies(cookies);
+  //   } catch (error) {
+  //     console.error('Error fetching cookies:', error);
+  //   }
+  // };
+  const {contextualMenuStatus,type_id}=useSelector((state)=>state.Drawing);
+  const parseCookies = () => {
+    const cookieString = document.cookie;
+    const cookies = cookieString.split('; ').reduce((acc, cookie) => {
+      const [name, ...valueParts] = cookie.split('=');
+      const value = valueParts.join('=');
+      acc[name] = decodeURIComponent(value);
+      return acc;
+    }, {});
+    return cookies;
+  };
   useEffect(() => {
     console.log(type_id);
-    console.log(storeLines)
+    console.log(storeLines);
+    // const data=cookieStore.getAll();
+    // console.log(cookieStore)
+     const curentUserSessionCookie = parseCookies();
+     if (curentUserSessionCookie) {
+      //  console.log(curentUserSessionCookie['LOGIN-RESPONSE']);
+      if(curentUserSessionCookie['LOGIN-RESPONSE']){
+
+        const parsedData = JSON.parse(curentUserSessionCookie['LOGIN-RESPONSE']);
+        console.log(parsedData)
+      }
+     } else {
+       console.log('No curentUserSession cookie found');
+     }
+    //  fetchCookies()
     if(storeLines.length>0){
 
       console.log([(storeLines[storeLines.length - 1].points[1].x + storeLines[storeLines.length - 1].points[0].x) / 2,
@@ -90,7 +123,7 @@ export const App = () => {
       //   0,
       // ])
     }
-  }, [storeLines,type_id]);
+  }, [storeLines]);
 
   return (
     <div className="container">
@@ -244,7 +277,7 @@ export const App = () => {
       <div style={{ position: "relative" }}>
      
         <DrawtoolHeader deleteLastPoint={deleteLastPoint} />
-        <ContextualMenu />
+        {contextualMenuStatus&&<ContextualMenu />}
         <div className="perspective-canvas" style={{ position: "absolute", right: "20px", top: "20px", backgroundColor: "#ffffff", height: "232px", width: "252px", borderRadius: "16px",boxShadow: "0px 4px 14px -3px #0C0C0D21" }}>
           <Canvas
             style={{ height: "100%", width: "100%", borderRadius: "12px" }}

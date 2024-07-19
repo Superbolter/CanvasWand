@@ -1,7 +1,6 @@
 import React from 'react'
 import { Typography } from "../design_system/StyledComponents/components/Typography.js";
-import { InputAdornment, InputBase, Paper } from "@material-ui/core";
-import TextField from '@material-ui/core/TextField';
+import TextField from '@mui/material/TextField';
 import split from "../assets/split.png"
 import merge from "../assets/merge.png"
 import Unlocked from "../assets/Unlocked.png"
@@ -12,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setTypeId } from '../Actions/DrawingActions.js';
 
 const WindowPropertiesPopup = () => {
-  const typeId=useSelector((state)=>state.Drawing.type_id);
+  const typeId=useSelector((state)=>state.Drawing.typeId);
   const dispatch=useDispatch();
   const handleCloseClick=()=>{
     dispatch(setTypeId(0));

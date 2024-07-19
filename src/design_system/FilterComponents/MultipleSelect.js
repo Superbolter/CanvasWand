@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types';
-import Collapse from '@material-ui/core/Collapse';
+import Collapse from '@mui/material/Collapse';
 import { Typography } from '../StyledComponents/components/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import Checkbox from '@material-ui/core/Checkbox';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import Checkbox from '@mui/material/Checkbox';
 import _ from 'lodash';
 import { onAddToFilter, onRemoveFromFilter } from '../../Actions/ProductsCatalogActions';
 import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 require('./MultipleSelect.css')
 
 const useStyles = makeStyles({
