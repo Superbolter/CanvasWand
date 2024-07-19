@@ -24,8 +24,11 @@ import WallPropertiesPopup from "./component/WallPropertiesPopup.js";
 import WindowPropertiesPopup from "./component/WindowPropertiesPopup.js";
 import ContextualMenu from "./component/ContextualMenu.js";
 import { Provider, useSelector } from "react-redux";
+import Cookies from "universal-cookie";
 
 export const App = () => {
+  const cookies=new Cookies();
+  
   const {
     handleClick,
     handleMouseMove,
@@ -74,7 +77,7 @@ export const App = () => {
     setShowSnapLine,
     setSnappingPoint,
   } = useDrawing();
-  const [cookies, setCookies] = useState([]);
+  // const [cookies, setCookies] = useState([]);
 
   // Function to fetch cookies
   // const fetchCookies = async () => {
@@ -86,32 +89,32 @@ export const App = () => {
   //   }
   // };
   const {contextualMenuStatus,type_id}=useSelector((state)=>state.Drawing);
-  const parseCookies = () => {
-    const cookieString = document.cookie;
-    const cookies = cookieString.split('; ').reduce((acc, cookie) => {
-      const [name, ...valueParts] = cookie.split('=');
-      const value = valueParts.join('=');
-      acc[name] = decodeURIComponent(value);
-      return acc;
-    }, {});
-    return cookies;
-  };
+  // const parseCookies = () => {
+  //   const cookieString = document.cookie;
+  //   const cookies = cookieString.split('; ').reduce((acc, cookie) => {
+  //     const [name, ...valueParts] = cookie.split('=');
+  //     const value = valueParts.join('=');
+  //     acc[name] = decodeURIComponent(value);
+  //     return acc;
+  //   }, {});
+  //   return cookies;
+  // };
   useEffect(() => {
     console.log(type_id);
     console.log(storeLines);
     // const data=cookieStore.getAll();
     // console.log(cookieStore)
-     const curentUserSessionCookie = parseCookies();
-     if (curentUserSessionCookie) {
-      //  console.log(curentUserSessionCookie['LOGIN-RESPONSE']);
-      if(curentUserSessionCookie['LOGIN-RESPONSE']){
+    //  const curentUserSessionCookie = parseCookies();
+    //  if (curentUserSessionCookie) {
+    //   //  console.log(curentUserSessionCookie['LOGIN-RESPONSE']);
+    //   if(curentUserSessionCookie['LOGIN-RESPONSE']){
 
-        const parsedData = JSON.parse(curentUserSessionCookie['LOGIN-RESPONSE']);
-        console.log(parsedData)
-      }
-     } else {
-       console.log('No curentUserSession cookie found');
-     }
+    //     const parsedData = JSON.parse(curentUserSessionCookie['LOGIN-RESPONSE']);
+    //     console.log(parsedData)
+    //   }
+    //  } else {
+    //    console.log('No curentUserSession cookie found');
+    //  }
     //  fetchCookies()
     if(storeLines.length>0){
 
@@ -122,6 +125,14 @@ export const App = () => {
       //   (points[points.length - 1].y + currentMousePosition.y) / 2 + 10,
       //   0,
       // ])
+    }
+
+    if (cookies.get('USER-SESSION', { path: "/" }) !== undefined) {
+
+			const result = cookies.get('LOGIN-RESPONSE', { path: "/" })
+			console.log(result)
+			
+			window.curentUserSession = result;
     }
   }, [storeLines]);
 
