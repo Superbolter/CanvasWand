@@ -6,7 +6,7 @@ import Redo from "../assets/Redo.png"
 import  './ButtonComponent.css'
 const DrawtoolHeader = ({deleteLastPoint}) => {
   return (
-    <div style={{position:"fixed", top:"20px", left:"20px", backgroundColor:"white",borderRadius:"12px", width:"79vw", padding:"12px", display:"flex", alignItems:"center", justifyContent:"space-between",boxShadow: "0px 4px 14px -3px #0C0C0D21"
+    <div style={{position:"fixed", top:"20px", left:"20px", backgroundColor:"white",borderRadius:"12px", width:"79vw", padding:"12px", display:"flex", alignItems:"center", justifyContent:"space-between",boxShadow: "0px 4px 14px -3px #0C0C0D21", zIndex:"2"
         }}>
   
       <Typography className='header-text'>Create your own 3D home</Typography>

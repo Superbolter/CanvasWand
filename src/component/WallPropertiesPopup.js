@@ -8,12 +8,13 @@ import Delete from "../assets/Delete.png"
 import "./WallPropertiesPopup.css";
 import Close from "../assets/Close.png"
 import { useDispatch, useSelector } from 'react-redux';
-import { setTypeId } from '../Actions/DrawingActions.js';
+import { setContextualMenuStatus, setTypeId } from '../Actions/DrawingActions.js';
 const WallPropertiesPopup = () => {
   const typeId=useSelector((state)=>state.Drawing.typeId);
   const dispatch=useDispatch();
   const handleCloseClick=()=>{
     dispatch(setTypeId(0));
+    dispatch(setContextualMenuStatus(false))
   }
   return (
     <div>

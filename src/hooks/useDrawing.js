@@ -33,7 +33,7 @@ export const useDrawing = () => {
     information,roomSelect,roomSelectors,
   } = useSelector((state) => state.drawing);
   const {typeId, contextualMenuStatus}=useSelector((state)=>state.Drawing)
-  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(true);
   const [selectedLines, setSelectedLines] = useState([]);
   const [firstTime, setFirstTime] = useState(true);
   const [newLine, setNewLine] = useState(false);
@@ -202,7 +202,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       widthchange: 0,
       typeId:typeId,
     };
-    dispatch(setLineId(newLine.id));
+    
     let updatedStoreLines = [...storeLines];
     let intersections = [];
     let newPoints = [...points];
@@ -387,7 +387,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   }, [storeLines, selectionMode, selectedLines, points, stop]);
 
   const handleClick = (event) => {
-    if (selectionMode || dragMode || doorWindowMode) return; // Prevent drawing new lines in selection mode
+    if ( dragMode || doorWindowMode) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
