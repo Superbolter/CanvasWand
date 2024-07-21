@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import Skeleton from '@material-ui/lab/Skeleton';
+import Skeleton from '@mui/material/Skeleton';
 
 
 export default class FloorplanSkeleton extends Component {

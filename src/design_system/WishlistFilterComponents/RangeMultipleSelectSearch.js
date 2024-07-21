@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import MenuItem from '@material-ui/core/MenuItem';
-import Checkbox from '@material-ui/core/Checkbox';
+import MenuItem from '@mui/material/MenuItem';
+import Checkbox from '@mui/material/Checkbox';
 import _ from 'lodash';
 import { onAddToSearchFilter, onRemoveFromSearchFilter } from '../../Actions/HomeSetupActions';
-import Menu from '@material-ui/core/Menu';
+import Menu from '@mui/material/Menu';
 import { Button } from '../StyledComponents/components/Button';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 class RangeMultipleSelectSearch extends Component {
 

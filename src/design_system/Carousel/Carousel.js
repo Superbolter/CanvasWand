@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react'
-import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { SwitchTransition, CSSTransition } from "react-transition-group";
 import { Typography } from '../StyledComponents/components/Typography';
 

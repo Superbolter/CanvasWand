@@ -1,13 +1,25 @@
 const initialState = {
-    type_id: 0,
+    typeId: 0,
+    contextualMenuStatus:false,
+    lineId:null,
   };
   
   const DrawingReducer = (state = initialState, action) => {
     switch (action.type) {
-      case "SET_MODE":
+      case "SET_TYPE_ID":
         return {
           ...state,
-          type_id: action.payload,
+          typeId: action.payload,
+        };
+      case "SET_CONTEXTUAL_MENU_STATUS":
+        return {
+          ...state,
+          contextualMenuStatus: action.payload,
+        };
+      case "SET_LINE_ID":
+        return {
+          ...state,
+          lineId: action.payload,
         };
       default:
         return state;

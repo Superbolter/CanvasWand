@@ -10,7 +10,7 @@ import Close from "../assets/Close.png"
 import { useDispatch, useSelector } from 'react-redux';
 import { setContextualMenuStatus, setTypeId } from '../Actions/DrawingActions.js';
 
-const WindowPropertiesPopup = () => {
+const RailingPropertiesPopup = () => {
   const typeId=useSelector((state)=>state.Drawing.typeId);
   const dispatch=useDispatch();
   const handleCloseClick=()=>{
@@ -19,10 +19,10 @@ const WindowPropertiesPopup = () => {
   }
   return (
     <div>
-  <div className={typeId===3?'popup-container':"popup-container-hidden"} style={{height:"346px"}}>
+  <div className={typeId===4?'popup-container':"popup-container-hidden"} >
 
 <div className='header-container'>
- <Typography  modifiers={["header6", "medium"]} style={{fontSize: "16px",lineHeight:" 18px",textAlign: "left"}}>Window Properties</Typography>
+ <Typography  modifiers={["header6", "medium"]} style={{fontSize: "16px",lineHeight:" 18px",textAlign: "left"}}>Railing Properties</Typography>
  <img onClick={handleCloseClick} style={{width:"28px", height:"28px"}} src={Close} alt="" />
 </div>
 <div className='input-container'>
@@ -53,19 +53,7 @@ const WindowPropertiesPopup = () => {
       type="tel"
   />
  </div>
- <div className='thickness-input-container'>
- <Typography className='thickness-text'>Distance from floor</Typography>
- <TextField
-      style={{width:"100%", height:"34px"}}
-      id="outlined-required"
-      placeholder="inch"
-      label="inch"
-      variant="outlined"
-      size="small"
-      required={true}
-      type="tel"
-  />
- </div>
+
  <div className='divider'>
 
  </div>
@@ -89,4 +77,4 @@ const WindowPropertiesPopup = () => {
   )
 }
 
-export default WindowPropertiesPopup
+export default RailingPropertiesPopup

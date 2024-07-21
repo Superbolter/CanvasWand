@@ -20,7 +20,7 @@ import {
 import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
-
+import { setContextualMenuStatus, setLineId } from "../Actions/DrawingActions.js";
 export const useDrawing = () => {
   const dispatch = useDispatch();
   const {
@@ -32,7 +32,7 @@ export const useDrawing = () => {
     measured,
     information,roomSelect,roomSelectors,
   } = useSelector((state) => state.drawing);
-  const typeId=useSelector((state)=>state.Drawing.type_id)
+  const {typeId, contextualMenuStatus}=useSelector((state)=>state.Drawing)
   const [selectionMode, setSelectionMode] = useState(true);
   const [selectedLines, setSelectedLines] = useState([]);
   const [firstTime, setFirstTime] = useState(true);
@@ -185,6 +185,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   );
 
   const addPoint = (newPoint, startPoint) => {
+    
     let newLine = {
       id: uniqueId(),
       points: [startPoint, newPoint],
@@ -201,7 +202,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       widthchange: 0,
       typeId:typeId,
     };
-
+    
     let updatedStoreLines = [...storeLines];
     let intersections = [];
     let newPoints = [...points];
@@ -386,7 +387,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   }, [storeLines, selectionMode, selectedLines, points, stop]);
 
   const handleClick = (event) => {
-    if (selectionMode || dragMode || doorWindowMode) return; // Prevent drawing new lines in selection mode
+    if ( dragMode || doorWindowMode) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
@@ -405,6 +406,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     
     if (newLine) {
       setNewLine(false);
+      dispatch(setContextualMenuStatus(true))
       point = snapToPoint(point, points, storeLines);
 
 
@@ -429,6 +431,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
 
 
     if (newPoints.length >= 2) {
+      dispatch(setContextualMenuStatus(true))
       addPoint(point, newPoints[newPoints.length - 2]);
     }
 

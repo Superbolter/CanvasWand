@@ -1,7 +1,6 @@
 import React from 'react'
 import { Typography } from "../design_system/StyledComponents/components/Typography.js";
-import { InputAdornment, InputBase, Paper } from "@material-ui/core";
-import TextField from '@material-ui/core/TextField';
+import TextField from '@mui/material/TextField';
 import split from "../assets/split.png"
 import merge from "../assets/merge.png"
 import Unlocked from "../assets/Unlocked.png"
@@ -9,12 +8,13 @@ import Delete from "../assets/Delete.png"
 import "./WallPropertiesPopup.css";
 import Close from "../assets/Close.png"
 import { useDispatch, useSelector } from 'react-redux';
-import { setTypeId } from '../Actions/DrawingActions.js';
+import { setContextualMenuStatus, setTypeId } from '../Actions/DrawingActions.js';
 const WallPropertiesPopup = () => {
-  const typeId=useSelector((state)=>state.Drawing.type_id);
+  const typeId=useSelector((state)=>state.Drawing.typeId);
   const dispatch=useDispatch();
   const handleCloseClick=()=>{
     dispatch(setTypeId(0));
+    dispatch(setContextualMenuStatus(false))
   }
   return (
     <div>
