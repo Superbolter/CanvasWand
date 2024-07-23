@@ -1,37 +1,38 @@
 import React, { useEffect, useState } from "react";
-import "./App.css";
+import "../App.css";
 import { Canvas } from "@react-three/fiber";
 import { Grid, Line, Text, OrbitControls, Html, Lathe } from "@react-three/drei";
-import BoxGeometry from "./component/BoxGeometry";
-import WallGeometry from "./component/WallGeometry";
+import BoxGeometry from "./BoxGeometry";
+import WallGeometry from "./WallGeometry";
 // import DownloadJSONButton from "./component/ConvertToJson";
-import LengthConverter from "./component/LengthConverter";
-import LineEditForm from "./component/LineEditForm";
-import BackgroundImage from "./component/background";
-import { useDrawing } from "./hooks/useDrawing";
+import LengthConverter from "./LengthConverter";
+import LineEditForm from "./LineEditForm";
+import BackgroundImage from "./background";
+import { useDrawing } from "../hooks/useDrawing.js"
 import {
-
+  setPoints,
+  setStoreLines,
   setPerpendicularLine,
   setFactor,
   setInformation,
   setIdSelection,
-} from "./features/drawing/drwingSlice.js";
-import { DraggableDoor } from "./component/DragDrop";
-import ButtonComponent from "./component/ButtonComponent.js";
-import DrawtoolHeader from "./component/DrawtoolHeader.js";
-import WallPropertiesPopup from "./component/WallPropertiesPopup.js";
-import WindowPropertiesPopup from "./component/WindowPropertiesPopup.js";
-import ContextualMenu from "./component/ContextualMenu.js";
+} from "../features/drawing/drwingSlice.js";
+import { DraggableDoor } from "./DragDrop";
+import ButtonComponent from "./ButtonComponent.js";
+import DrawtoolHeader from "./DrawtoolHeader.js";
+import WallPropertiesPopup from "./WallPropertiesPopup.js";
+import WindowPropertiesPopup from "./WindowPropertiesPopup.js";
+import ContextualMenu from "./ContextualMenu.js";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import Cookies from "universal-cookie";
-import DoorPropertiesPopup from "./component/DoorPropertiesPopup.js";
-import RailingPropertiesPopup from "./component/RailingPropertiesPopup.js";
-import { setLineId } from "./Actions/DrawingActions.js";
-import { drawToolData, setStoreLines } from "./Actions/ApplicationStateAction.js";
-import RomeDataManager from "./app/RomeDataManager.js";
+import DoorPropertiesPopup from "./DoorPropertiesPopup.js";
+import RailingPropertiesPopup from "./RailingPropertiesPopup.js";
+import { setLineId } from "../Actions/DrawingActions.js";
+import { drawToolData } from "../Actions/ApplicationStateAction.js";
+import RomeDataManager from "../app/RomeDataManager.js";
 
 export const cookies=new Cookies();
-export const App = () => {
+export const Drawtool = () => {
   
   const {
     handleClick,
@@ -57,8 +58,8 @@ export const App = () => {
     currentMousePosition,
     distance,
     stop,
-    
-    // storeLines,
+    points,
+    storeLines,
     roomSelect,
     perpendicularLine,
     measured,
@@ -83,34 +84,37 @@ export const App = () => {
   } = useDrawing();
   
   const {contextualMenuStatus,type_id,lineId}=useSelector((state)=>state.Drawing);
-  const {floorplanId,drawData,storeLines,points}=useSelector((state)=>state.ApplicationState);
+  const {floorplanId,drawData}=useSelector((state)=>state.ApplicationState);
   const dispatch=useDispatch()
   useEffect(() => {
-    // console.log(type_id);
-    console.log(storeLines);
-    console.log(points);
-    // console.log(lineId);
-    // console.log(cookies);
-    // console.log(floorplanId)
-    RomeDataManager.instantiate();
-    if (cookies.get('USER-SESSION', { path: "/" }) !== undefined) {
-
-      const result = cookies.get('LOGIN-RESPONSE', { path: "/" })
     
-      RomeDataManager.setUserEmail(result.email, result.persistence_token)
-      window.curentUserSession = result;
-    }
-    dispatch(drawToolData(63514));
-    // if(storeLines.length>0){
-    //   dispatch(setLineId(storeLines[storeLines.length-1].id));
-    //   console.log([(storeLines[storeLines.length - 1].points[1].x + storeLines[storeLines.length - 1].points[0].x) / 2,
-    //   (storeLines[storeLines.length - 1].points[1].y+storeLines[storeLines.length - 1].points[0].y) / 2,0])
+   
+    console.log(drawData)
+    if(storeLines.length>0){
+      dispatch(setLineId(storeLines[storeLines.length-1].id));
+      console.log([(storeLines[storeLines.length - 1].points[1].x + storeLines[storeLines.length - 1].points[0].x) / 2,
+      (storeLines[storeLines.length - 1].points[1].y+storeLines[storeLines.length - 1].points[0].y) / 2,0])
       
-    // }
+    }
+    const lines = drawData&&drawData.lines&&drawData.lines.map(line => ({
+      id: line.id,
+      points: [
+          { x: line.startPoint.x, y: line.startPoint.y, z: line.startPoint.z },
+          { x: line.endPoint.x, y: line.endPoint.y, z: line.endPoint.z }
+      ],
+      length: line.length,
+      width: line.width,
+      height: line.height,
+      widthchangetype: line.widthchangetype,
+      widthchange: line.widthchange,
+      type: line.type,
+      typeId:line.typeId
+  }));
+  console.log(lines)
+     if(lines)
+     dispatch(setStoreLines(lines))
   
-     
-  
-  }, []);
+  }, [storeLines]);
 
   return (
     <div className="container">
@@ -146,7 +150,7 @@ export const App = () => {
           )}
           <BackgroundImage />
           {/* Render lines in 2D view */}
-          {storeLines&&storeLines.map((line) => (
+          {storeLines.map((line) => (
             <BoxGeometry
               key={line.id}
               start={line.points[0]}
@@ -273,7 +277,7 @@ export const App = () => {
             camera={{ position: [0, 0, 800], fov: 75 }}
           >
             {/* Render lines in 3D view */}
-            {storeLines&&storeLines.map((line) => (
+            {storeLines.map((line) => (
               <WallGeometry
                 key={line.id}
                 start={line.points[0]}
@@ -315,4 +319,4 @@ export const App = () => {
   );
 };
 
-export default App;
+export default Drawtool;

@@ -33,6 +33,7 @@ export default class RomeDataManager        {
 
    static _targetApiURL = process.env.REACT_APP_SERVER_URL
 
+
    static _targetWebApiURL = process.env.REACT_APP_SERVER_URL_WEB
 
    static _targetVsApiURL = process.env.REACT_APP_SERVER_URL_VS
@@ -68,8 +69,8 @@ export default class RomeDataManager        {
       window.env_demo_design = process.env.REACT_APP_DEMO_DESIGN;
       window.env_playground_design = process.env.REACT_APP_PLAYGROUND_DESIGN;
       window.env_beat_playground = process.env.REACT_APP_BEAT_PLAYGROUND;
-      window.env_beat_site = window.bool(process.env.REACT_APP_BETA_SITE)
-      window.assetCdnUrls.push(window.env_asset_url);
+      // window.env_beat_site = window.bool(process.env.REACT_APP_BETA_SITE)
+      // window.assetCdnUrls.push(window.env_asset_url);
 
       // * Initilizing Device Type
       if (isMobile) {

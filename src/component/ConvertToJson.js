@@ -1,6 +1,6 @@
 import React from 'react';
 
-const convertToJSON = (lines, points,roomSelectors) => {
+ export const convertToJSON = (lines, points,roomSelectors) => {
     console.log("roomSelectors",roomSelectors);
     const jsonData = {
         points: points.map(point => ({ id:point.id,x: point.x, y: point.y,  z: point.z})),
@@ -14,6 +14,7 @@ const convertToJSON = (lines, points,roomSelectors) => {
             widthchangetype:line.widthchangetype,
             widthchange:line.widthchange,
             type:line.type,
+            typeId:line.typeId
         })),
         rooms: roomSelectors.map(room => ({
             roomId: room.roomId,
@@ -21,31 +22,22 @@ const convertToJSON = (lines, points,roomSelectors) => {
             wallIds: room.wallIds,
         })),
     };
-    return JSON.stringify(jsonData);
+    return jsonData;
 };
 
 
-const DownloadJSONButton = ({ lines, points,roomSelectors }) => {
+
    
-    const handleDownload = () => {
+ export   const handleDownload = (lines,points,roomSelectors) => {
+    console.log(lines);
         console.log("roomSelectors",roomSelectors,lines);
-        const jsonData = convertToJSON(lines, points,roomSelectors);
-        const blob = new Blob([jsonData], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'data.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const data = convertToJSON(lines, points,roomSelectors);
+       
+       
+        return data;
     };
 
-    return (
-        <button onClick={handleDownload}>Download JSON</button>
-    );
-};
 
-export default DownloadJSONButton;
 
 
 

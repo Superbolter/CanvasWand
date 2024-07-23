@@ -2,12 +2,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  points: [],
-  storeLines: [],
+ 
+ 
   roomSelect: false,
   roomSelectors: [],
   perpendicularLine: false,
-  factor: [1, 1, 1],
+ 
   measured: "in",
   information: false,
   idSelection: [],
@@ -19,12 +19,8 @@ export const drawingSlice = createSlice({
   name: "drawing",
   initialState,
   reducers: {
-    setPoints: (state, action) => {
-      state.points = action.payload;
-    },
-    setStoreLines: (state, action) => {
-      state.storeLines = action.payload;
-    },
+    
+   
     setRoomSelectors: (state, action) => {
       state.roomSelectors = action.payload;
     },
@@ -37,9 +33,7 @@ export const drawingSlice = createSlice({
     setRoomSelect: (state, action) => {
       state.roomSelect = action.payload;
     },
-    setFactor: (state, action) => {
-      state.factor = action.payload;
-    },
+  
     setMeasured: (state, action) => {
       state.measured = action.payload;
     },
@@ -54,7 +48,8 @@ export const drawingSlice = createSlice({
     },
     updateLineTypeId: (state, action) => {
       const { id, typeId } = action.payload;
-      const lineIndex = state.storeLines.findIndex(line => line.id === id);
+      console.log(state.ApplicationState.storeLines);
+      const lineIndex = state.ApplicationState.storeLines.findIndex(line => line.id === id);
       if (lineIndex !== -1) {
         state.storeLines[lineIndex].typeId = typeId;
       }
@@ -63,11 +58,9 @@ export const drawingSlice = createSlice({
 });
 
 export const {
-  setPoints,
-  setStoreLines,
+
   setIdSelection,
   setPerpendicularLine,
-  setFactor,
   setMeasured,
   setInformation,
   setWidthChangeType,

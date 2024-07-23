@@ -19,8 +19,8 @@ const BoxGeometry = ({
   newPointMode,
   opacity = 0.5,
 }) => {
-  const { measured,factor,roomSelect } = useSelector((state) => state.drawing);
-  
+  const { measured,roomSelect } = useSelector((state) => state.drawing);
+  const {factor}=useSelector((state)=>state.ApplicationState)
   if (!start || !end) return null;
 
   const length = start.distanceTo(end);

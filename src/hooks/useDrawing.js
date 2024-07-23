@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import convert from "convert-units";
 import { Vector3 } from "three";
 import {
-  setPoints,
-  setStoreLines,
+
+ 
   setPerpendicularLine,
-  setFactor,
+ 
   setInformation,
   setRoomSelect,setRoomSelectors,
   setType,
@@ -21,18 +21,20 @@ import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import { setContextualMenuStatus, setLineId } from "../Actions/DrawingActions.js";
+import { setStoreLines, setFactor,setPoints } from "../Actions/ApplicationStateAction.js";
 export const useDrawing = () => {
   const dispatch = useDispatch();
   const {
-    points,
-    storeLines,
+  
+    
     idSelection,
     perpendicularLine,
-    factor,
+   
     measured,
     information,roomSelect,roomSelectors,
   } = useSelector((state) => state.drawing);
   const {typeId, contextualMenuStatus}=useSelector((state)=>state.Drawing)
+  const {storeLines,points,factor}=useSelector((state)=>state.ApplicationState)
   const [selectionMode, setSelectionMode] = useState(true);
   const [selectedLines, setSelectedLines] = useState([]);
   const [firstTime, setFirstTime] = useState(true);
@@ -162,7 +164,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       };
       
       const updatedLine = [...storeLines];
-      
+     
       updatedLine.splice(idx, 1, line1, line3, line2);
       
 
@@ -315,6 +317,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     dispatch(setPoints(newPoints));
 
     dispatch(setStoreLines(updatedStoreLines));
+    console.log(storeLines)
   
   };
 
@@ -451,7 +454,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       const wfactor = INITIAL_BREADTH / userWidth;
       const hfactor = INITIAL_HEIGHT / userHeight;
       dispatch(setFactor([lfactor, wfactor, hfactor]));
-
+      console.log([lfactor, wfactor, hfactor]);
       let newLine = {
         id: uniqueId(),
         points: [newPoints[newPoints.length - 2], point],
@@ -478,152 +481,130 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   };
 
   const handleMouseMove = (event) => {
-    if ((points.length === 0 || stop || newLine || doorWindowMode) && !dragMode)
-      return; // No point to start from or not in perpendicular mode
-
+    if ((points.length === 0 || stop || newLine || doorWindowMode) && !dragMode) return; // No point to start from or not in perpendicular mode
+  
     const canvasContainer = document.querySelector(".canvas-container");
     const rect = canvasContainer.getBoundingClientRect();
-
+  
     let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
+  
     const cameraWidth = rect.width;
     const cameraHeight = rect.height;
-
+  
     const posX = x * (cameraWidth / 2);
     const posY = y * (cameraHeight / 2);
-
+  
     let point = new Vector3(posX, posY, 0);
-
-    if (perpendicularLine && draggingPointIndex === null) {
+    if (perpendicularLine && points.length > 0 && draggingPointIndex === null) {
       point = calculateAlignedPoint(points[points.length - 1], point);
     }
-
+    
     setCurrentMousePosition(point);
-    let cuuPoint =point;
+    let cuuPoint = point;
+    
+    
     // Check for snapping
-  let snapFound = false;
-  for (let i = 0; i < points.length; i++) {
-    if (Math.abs(points[i].x - point.x)< 10  && (points[points.length-1].y!==points[i].y && points[points.length-1].x!==points[i].x)) {
-      cuuPoint.x = points[i].x;
-      let newarr = [cuuPoint,points[i]];
-      setSnappingPoint([...newarr]);
-      snapFound = true;
-      break;
-    } else if (Math.abs(points[i].y - point.y) < 10  && (points[points.length-1].y!==points[i].y && points[points.length-1].x!==points[i].x)) {
-      cuuPoint.y = points[i].y;
-      let newarr = [cuuPoint,points[i]];
-      setSnappingPoint([...newarr]);
-      snapFound = true;
-      break;
+    let snapFound = false;
+    for (let i = 0; i < points.length; i++) {
+      if (Math.abs(points[i].x - point.x) < 10 && (points[points.length - 1].y !== points[i].y && points[points.length - 1].x !== points[i].x)) {
+        cuuPoint.x = points[i].x;
+        let newarr = [cuuPoint, points[i]];
+        setSnappingPoint([...newarr]);
+        snapFound = true;
+        break;
+      } else if (Math.abs(points[i].y - point.y) < 10 && (points[points.length - 1].y !== points[i].y && points[points.length - 1].x !== points[i].x)) {
+        cuuPoint.y = points[i].y;
+        let newarr = [cuuPoint, points[i]];
+        setSnappingPoint([...newarr]);
+        snapFound = true;
+        break;
+      }
     }
-  }
-
-  if (!snapFound) {
-    setSnappingPoint([]);
-  }
-
-  setShowSnapLine(snapFound);
-  //setCurrentMousePosition(point);
-
-    const lastPoint = points[points.length - 1];
-    const currentDistance = lastPoint.distanceTo(point);
-    setDistance(currentDistance * factor[0]);
-
+  
+    if (!snapFound) {
+      setSnappingPoint([]);
+    }
+  
+    setShowSnapLine(snapFound);
+  
+    if (points.length > 0) {
+      const lastPoint = points[points.length - 1];
+      const currentDistance = lastPoint.distanceTo(point);
+      setDistance(currentDistance * factor[0]);
+    }
+  
     if (draggingPointIndex !== null) {
-      let beforeUpdation = points[draggingPointIndex];
-      
-
-      let prevPoint = points[draggingPointIndex - 1];
-      
-      let nextPoint = points[draggingPointIndex + 1];
-      if(perpendicularLine){
-        if (prevPoint && nextPoint) {
-          // Check if all coordinates are different
-         
-          if (point.x !== prevPoint.x && point.y !== prevPoint.y && point.x !== nextPoint.x && point.y !== nextPoint.y) {
-            // Calculate the direction vector of the line (prevPoint to nextPoint)
-            const dx = nextPoint.x - prevPoint.x;
-            const dy = nextPoint.y - prevPoint.y;
-        
-            // Normalize the direction vector
-            const length = Math.sqrt(dx * dx + dy * dy);
-            const dirX = dx / length;
-            const dirY = dy / length;
-        
-            // Calculate the vector from prevPoint to point
-            const px = point.x - prevPoint.x;
-            const py = point.y - prevPoint.y;
-        
-            // Project the point onto the line
-            const dotProduct = px * dirX + py * dirY;
-            point.x = prevPoint.x + dotProduct * dirX;
-            point.y = prevPoint.y + dotProduct * dirY;
-           } else {
-            // Align with the previous point
-            if (Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)) {
-              point.y = prevPoint.y; // Align horizontally
+      if (draggingPointIndex >= 0 && draggingPointIndex < points.length) {
+        let beforeUpdation = points[draggingPointIndex];
+        let prevPoint = points[draggingPointIndex - 1];
+        let nextPoint = points[draggingPointIndex + 1];
+  
+        if (perpendicularLine) {
+          if (prevPoint && nextPoint) {
+            if (point.x !== prevPoint.x && point.y !== prevPoint.y && point.x !== nextPoint.x && point.y !== nextPoint.y) {
+              const dx = nextPoint.x - prevPoint.x;
+              const dy = nextPoint.y - prevPoint.y;
+              const length = Math.sqrt(dx * dx + dy * dy);
+              const dirX = dx / length;
+              const dirY = dy / length;
+              const px = point.x - prevPoint.x;
+              const py = point.y - prevPoint.y;
+              const dotProduct = px * dirX + py * dirY;
+              point.x = prevPoint.x + dotProduct * dirX;
+              point.y = prevPoint.y + dotProduct * dirY;
             } else {
-              point.x = prevPoint.x; // Align vertically
+              if (Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)) {
+                point.y = prevPoint.y;
+              } else {
+                point.x = prevPoint.x;
+              }
+            }
+          } else if (prevPoint) {
+            if (Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)) {
+              point.y = prevPoint.y;
+            } else {
+              point.x = prevPoint.x;
+            }
+          } else if (nextPoint) {
+            if (Math.abs(point.x - nextPoint.x) > Math.abs(point.y - nextPoint.y)) {
+              point.y = nextPoint.y;
+            } else {
+              point.x = nextPoint.x;
             }
           }
         }
-         else if (prevPoint) {
-          if (Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)) {
-            
-            point.y = prevPoint.y; // Align horizontally
-          } else {
-            
-            point.x = prevPoint.x; // Align vertically
+  
+        let updatedPoints = [...points];
+        const updated = replaceValue(updatedPoints, beforeUpdation, point);
+        dispatch(setPoints(updated));
+  
+        const updatedLines = storeLines.map((line) => {
+          let updatedLine = { ...line };
+          if (updatedLine.points[0].equals(beforeUpdation)) {
+            updatedLine = {
+              ...updatedLine,
+              points: [point, updatedLine.points[1]],
+              length: convert(point.distanceTo(updatedLine.points[1]) * factor[0]).from(measured).to("mm"),
+            };
           }
-         } else if (nextPoint) {
-          // Align with the next point if there's no previous point
-          if (Math.abs(point.x - nextPoint.x) > Math.abs(point.y - nextPoint.y)) {
-            point.y = nextPoint.y; // Align horizontally
-          } else {
-            point.x = nextPoint.x; // Align vertically
+  
+          if (updatedLine.points[1].equals(beforeUpdation)) {
+            updatedLine = {
+              ...updatedLine,
+              points: [updatedLine.points[0], point],
+              length: convert(updatedLine.points[0].distanceTo(point) * factor[0]).from(measured).to("mm"),
+            };
           }
-        }
+          return updatedLine;
+        });
+  
+        dispatch(setStoreLines(updatedLines));
       }
-
-
-      let updatedPoints = [...points];
-      const updated = replaceValue(updatedPoints, beforeUpdation, point);
-      dispatch(setPoints(updated));
-
-      const updatedLines = storeLines.map((line) => {
-        let updatedLine = { ...line }; // Shallow copy of the line object
-        if (updatedLine.points[0].equals(beforeUpdation)) {
-         
-          updatedLine = {
-            ...updatedLine,
-            points: [point, updatedLine.points[1]],
-            length: convert(point.distanceTo(updatedLine.points[1]) * factor[0])
-              .from(measured)
-              .to("mm"),
-          };
-        }
-
-        if (updatedLine.points[1].equals(beforeUpdation)) {
-          
-          updatedLine = {
-            ...updatedLine,
-            points: [updatedLine.points[0], point],
-            length: convert(updatedLine.points[0].distanceTo(point) * factor[0])
-              .from(measured)
-              .to("mm"),
-          };
-        }
-        return updatedLine;
-      });
-
-     
-      dispatch(setStoreLines(updatedLines));
     }
-
-    
   };
-
+  
+  
   const handleMouseDown = (event) => {
     if (!dragMode) return;
 
@@ -769,7 +750,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     currentMousePosition,
     distance,
     stop,
-    points,
+    
     storeLines,
     perpendicularLine,
     measured,

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { setStoreLines,setInformation,information, setIdSelection, setWidthChangeType } from "../features/drawing/drwingSlice";
+import { setInformation,information, setIdSelection, setWidthChangeType } from "../features/drawing/drwingSlice";
 import convert from 'convert-units';
-
+import { setStoreLines } from '../Actions/ApplicationStateAction';
 const LineEditForm = ({selectedLines,setSelectedLines,setSelectionMode}) => {
-  const { storeLines, idSelection, measured, widthChangeType,information } = useSelector((state) => state.drawing);
+  const {  idSelection, measured, widthChangeType,information } = useSelector((state) => state.drawing);
+  const {  storeLines} = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch();
 
   const selectedLine = storeLines.find(line => line.id === selectedLines[selectedLines.length-1]);
