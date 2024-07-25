@@ -48,11 +48,14 @@ export const useDrawing = () => {
   const [doorWindowMode, setDoorWindowMode] = useState(false);
   const [hoveredLine, setHoveredLine] = useState([]);
   const [addOn, setaddOn] = useState(null);
+  const [redoLines, setRedoLines] = useState([]);   // Holds the lines that have been undone and can be redone
+  const [redoPoints, setRedoPoints] = useState([]); // Holds the points that have been undone and can be redone
   const [isDraggingDoor, setIsDraggingDoor] = useState(false);
   const [doorPosition, setDoorPosition] = useState([]);
   const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
   const [check,setCheck]= useState(true);
-
+  const [undoStack, setUndoStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
   const [doorPoint, setdoorPoint] = useState([]);
 
 
@@ -322,22 +325,68 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   };
 
   const deleteLastPoint = () => {
+    // Check if there are any lines or points to undo
+    if (storeLines.length === 0 || points.length === 0) return;
+  
+    // Remove the last line and update the storeLines state
     const updatedLines = storeLines.slice(0, -1);
+  
+    // Remove the last point and update the points state
     let updatedPoints = points.slice(0, -1);
-    const lastPoint = updatedPoints[updatedPoints.length - 1];
-
+    const lastPoint = points[points.length - 1];
+  
+    // Check if the last point is a breakpoint
     const hasBreakPoint = breakPoint.includes(lastPoint);
     if (hasBreakPoint) {
       updatedPoints = updatedPoints.slice(0, -1);
     }
+    
+    // Ensure that the updatedPoints array does not end with a single point
     if (updatedPoints.length === 1) {
       updatedPoints = updatedPoints.slice(0, -1);
     }
+  
+    // Store the undone line and point in the redo stacks
+    const redoLine = storeLines[storeLines.length - 1];
+    const redoPoint = points[points.length - 1];
+  
+    setRedoLines((prevRedoLines) => [...prevRedoLines, redoLine]);
+    setRedoPoints((prevRedoPoints) => [...prevRedoPoints, redoPoint]);
+  
+    // Update the state with the new lines and points
     dispatch(setStoreLines(updatedLines));
     dispatch(setPoints(updatedPoints));
   };
+  const redo = () => {
+    // Check if there are any lines or points to redo
+    if (redoLines.length === 0 || redoPoints.length === 0) return;
+  
+    // Get the last undone line and point
+    const lastRedoLine = redoLines[redoLines.length - 1];
+    const lastRedoPoint = redoPoints[redoPoints.length - 1];
+  
+    // Remove these elements from the redo stacks
+    const updatedRedoLines = redoLines.slice(0, -1);
+    const updatedRedoPoints = redoPoints.slice(0, -1);
+  
+    // Update the redo stacks with the new values
+    setRedoLines(updatedRedoLines);
+    setRedoPoints(updatedRedoPoints);
+  
+    const updatedStoreLines = storeLines;
+  const updatedPoints = points;
 
+  updatedStoreLines.push(lastRedoLine);
+  updatedPoints.push(lastRedoPoint);
+
+  // Set the updated state
+  setStoreLines(updatedStoreLines);
+  setPoints(updatedPoints);
+  };
+  
+ 
   const deleteSelectedLines = () => {
+    
     const updatedLines = storeLines.filter(
       (line) => !selectedLines.includes(line.id)
     );
@@ -383,7 +432,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
-
+    console.log(storeLines);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
@@ -775,6 +824,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     setdoorPoint,
     handleInformtion,
     deleteLastPoint,
+    redo,
     setSelectedLines,
     setSelectionMode,
     toggleDragMode,

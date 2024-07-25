@@ -58,7 +58,7 @@ export const drawToolData = (floorplan_id) => {
                 dispatch(setPoints(point));
                 if(response.data.scale!==null){
                     console.log(response.data.scale)
-                    dispatch(setFactor(response.data.scale))
+                    // dispatch(setFactor(response.data.scale))
                 }
             })
             .catch(error => {
@@ -125,14 +125,23 @@ export const updateLineTypeId = (lineId, typeId, storeLines) => {
       
         // Find the index of the line with the given lineId
         const lineIndex = updatedLines.findIndex(line => line.id === lineId);
-      
+        console.log(lineIndex)
         // If the line is found, update the typeId
         if (lineIndex !== -1) {
           updatedLines[lineIndex] = { 
             ...updatedLines[lineIndex], // Create a copy of the line object
             typeId // Update the typeId
           };
-      
+          dispatch({
+
+            type:"SET_HEIGHT",
+            payload:storeLines[lineIndex].height,
+        })
+          dispatch({
+
+            type:"SET_WIDTH",
+            payload:storeLines[lineIndex].width,
+        })
           // Dispatch an action to update the state in the Redux store
           dispatch(setStoreLines(updatedLines));
         }

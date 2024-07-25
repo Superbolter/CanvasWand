@@ -10,8 +10,12 @@ import { setTypeId } from '../Actions/DrawingActions.js';
 import {updateLineTypeId} from "../Actions/ApplicationStateAction.js"
 const ContextualMenu = () => {
     const dispatch=useDispatch();
-    const newLineId=useSelector((state)=>state.Drawing.lineId)
+    let newLineId=null;
     const storeLines=useSelector((state)=>state.ApplicationState.storeLines)
+    if(storeLines.length>0){
+
+       newLineId=storeLines[storeLines.length-1].id
+    }
     const handleWallClick=()=>{
       console.log( newLineId)
       dispatch(updateLineTypeId( newLineId, 1,storeLines ));

@@ -15,6 +15,10 @@
     box-shadow: 0px 4px 14px -3px #0C0C0D21;
     transition:all 0.2s ease-in
   }
+  .drawtool-btn.selected {
+     background-color: #EDF1FD;
+     border: 1.5px solid #4B73EC;
+  }
 .scrollable-container-hidden{
     position: absolute;
     right: 20px;

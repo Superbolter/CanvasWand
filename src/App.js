@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import { Canvas } from "@react-three/fiber";
-import { Grid, Line, Text, OrbitControls, Html, Lathe } from "@react-three/drei";
+import { Grid, Line, Text, OrbitControls } from "@react-three/drei";
 import BoxGeometry from "./component/BoxGeometry";
 import WallGeometry from "./component/WallGeometry";
-// import DownloadJSONButton from "./component/ConvertToJson";
 import LengthConverter from "./component/LengthConverter";
 import LineEditForm from "./component/LineEditForm";
 import BackgroundImage from "./component/background";
 import { useDrawing } from "./hooks/useDrawing";
 import {
-
   setPerpendicularLine,
   setFactor,
   setInformation,
@@ -29,10 +27,10 @@ import RailingPropertiesPopup from "./component/RailingPropertiesPopup.js";
 import { setLineId } from "./Actions/DrawingActions.js";
 import { drawToolData, setStoreLines } from "./Actions/ApplicationStateAction.js";
 import RomeDataManager from "./app/RomeDataManager.js";
-
-export const cookies=new Cookies();
+import Drawtool from "./component/Drawtool.js";
+import { BrowserRouter as Router, Route, Switch, Routes, useLocation } from 'react-router-dom';
+export const cookies = new Cookies();
 export const App = () => {
-  
   const {
     handleClick,
     handleMouseMove,
@@ -46,6 +44,7 @@ export const App = () => {
     perpendicularHandler,
     newLine,
     setNewLine,
+    redo,
     selectionMode,
     selectedLines,
     setSelectedLines,
@@ -57,8 +56,6 @@ export const App = () => {
     currentMousePosition,
     distance,
     stop,
-    
-    // storeLines,
     roomSelect,
     perpendicularLine,
     measured,
@@ -75,41 +72,39 @@ export const App = () => {
     roomSelectors,
     handlemode,
     type,
-
     snappingPoint,
     showSnapLine,
     setShowSnapLine,
     setSnappingPoint,
   } = useDrawing();
-  
-  const {contextualMenuStatus,type_id,lineId}=useSelector((state)=>state.Drawing);
-  const {floorplanId,drawData,storeLines,points}=useSelector((state)=>state.ApplicationState);
-  const dispatch=useDispatch()
+  const getUrlParameter = (name) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+  };
+  const { contextualMenuStatus, type_id, lineId } = useSelector(
+    (state) => state.Drawing
+  );
+  const { floorplanId, drawData, storeLines, points } = useSelector(
+    (state) => state.ApplicationState
+  );
+  // const location = useLocation();
+  const dispatch = useDispatch();
   useEffect(() => {
     // console.log(type_id);
     console.log(storeLines);
     console.log(points);
-    // console.log(lineId);
+    console.log(lineId);
     // console.log(cookies);
-    // console.log(floorplanId)
+    const floorplanId = getUrlParameter('floorplanId');
+    console.log(floorplanId)
     RomeDataManager.instantiate();
-    if (cookies.get('USER-SESSION', { path: "/" }) !== undefined) {
+    if (cookies.get("USER-SESSION", { path: "/" }) !== undefined) {
+      const result = cookies.get("LOGIN-RESPONSE", { path: "/" });
 
-      const result = cookies.get('LOGIN-RESPONSE', { path: "/" })
-    
-      RomeDataManager.setUserEmail(result.email, result.persistence_token)
+      RomeDataManager.setUserEmail(result.email, result.persistence_token);
       window.curentUserSession = result;
     }
-    dispatch(drawToolData(63514));
-    // if(storeLines.length>0){
-    //   dispatch(setLineId(storeLines[storeLines.length-1].id));
-    //   console.log([(storeLines[storeLines.length - 1].points[1].x + storeLines[storeLines.length - 1].points[0].x) / 2,
-    //   (storeLines[storeLines.length - 1].points[1].y+storeLines[storeLines.length - 1].points[0].y) / 2,0])
-      
-    // }
-  
-     
-  
+    dispatch(drawToolData(floorplanId));
   }, []);
 
   return (
@@ -146,25 +141,28 @@ export const App = () => {
           )}
           <BackgroundImage />
           {/* Render lines in 2D view */}
-          {storeLines&&storeLines.map((line) => (
-            <BoxGeometry
-              key={line.id}
-              start={line.points[0]}
-              end={line.points[1]}
-              dimension={{ width: line.width, height: line.height }}
-              widthchange={line.widthchange}
-              widthchangetype={line.widthchangetype}
-              typeId={line.typeId}
-              isSelected={selectedLines.includes(line.id)}
-              onClick={() => handleLineClick(line.id)}
-            />
-          ))}
+          {storeLines &&
+            storeLines.map((line) => (
+              <BoxGeometry
+                key={line.id}
+                start={line.points[0]}
+                end={line.points[1]}
+                dimension={{ width: line.width, height: line.height }}
+                widthchange={line.widthchange}
+                widthchangetype={line.widthchangetype}
+                typeId={line.typeId}
+                isSelected={selectedLines.includes(line.id)}
+                onClick={() => handleLineClick(line.id)}
+              />
+            ))}
 
           {showSnapLine && snappingPoint && (
             <Line
               points={[snappingPoint[1], snappingPoint[0]]}
               color="green"
-              lineWidth={5}
+                lineWidth={17} // Border line width
+                transparent
+                opacity={0.5} // Border line opacity
             />
           )}
 
@@ -172,13 +170,21 @@ export const App = () => {
             <>
               <Line
                 points={[points[points.length - 1], currentMousePosition]}
-                color="blue"
-                lineWidth={5}
+                color="#6388F8"
+                lineWidth={17} // Border line width
+                transparent
+                opacity={0.5} // Border line opacity
+              />
+              <Line
+                points={[points[points.length - 1], currentMousePosition]}
+                color="#6698D6"
+                lineWidth={15} // Main line width
               />
               <Text
                 position={[
                   (points[points.length - 1].x + currentMousePosition.x) / 2,
-                  (points[points.length - 1].y + currentMousePosition.y) / 2 + 10,
+                  (points[points.length - 1].y + currentMousePosition.y) / 2 +
+                    10,
                   0,
                 ]}
                 color="black"
@@ -188,7 +194,6 @@ export const App = () => {
                 fontWeight="bold"
               >
                 {`${distance.toFixed(2)} ${measured}`}
-               
               </Text>
             </>
           )}
@@ -205,8 +210,6 @@ export const App = () => {
             fadeStrength={1}
             fadeFrom={1}
           />
-
-          
         </Canvas>
       </div>
 
@@ -245,11 +248,6 @@ export const App = () => {
               ? "Place Door"
               : "Door Mode"}
           </button>
-          {/* <DownloadJSONButton
-            lines={storeLines}
-            points={points}
-            roomSelectors={roomSelectors}
-          /> */}
           <LengthConverter />
           {information && (
             <LineEditForm
@@ -260,33 +258,49 @@ export const App = () => {
           )}
         </div>
       </div>
-     
+
       <div style={{ position: "relative" }}>
-     
-        <DrawtoolHeader deleteLastPoint={deleteLastPoint} lines={storeLines}
-            points={points}
-            roomSelectors={roomSelectors}/>
-        {contextualMenuStatus&&<ContextualMenu />}
-        <div className="perspective-canvas" style={{ position: "absolute", right: "20px", top: "20px", backgroundColor: "#ffffff", height: "232px", width: "252px", borderRadius: "16px",boxShadow: "0px 4px 14px -3px #0C0C0D21" }}>
+        <DrawtoolHeader
+          deleteLastPoint={deleteLastPoint}
+          redo={redo}
+          lines={storeLines}
+          points={points}
+          roomSelectors={roomSelectors}
+        />
+        {contextualMenuStatus && <ContextualMenu />}
+        <div
+          className="perspective-canvas"
+          style={{
+            position: "absolute",
+            right: "20px",
+            top: "20px",
+            backgroundColor: "#ffffff",
+            height: "232px",
+            width: "252px",
+            borderRadius: "16px",
+            boxShadow: "0px 4px 14px -3px #0C0C0D21",
+          }}
+        >
           <Canvas
             style={{ height: "100%", width: "100%", borderRadius: "12px" }}
             camera={{ position: [0, 0, 800], fov: 75 }}
           >
             {/* Render lines in 3D view */}
-            {storeLines&&storeLines.map((line) => (
-              <WallGeometry
-                key={line.id}
-                start={line.points[0]}
-                end={line.points[1]}
-                dimension={{ width: line.width, height: line.height }}
-                widthchange={line.widthchange}
-                widthchangetype={line.widthchangetype}
-                type={line.type}
-                isSelected={selectedLines.includes(line.id)}
-                isChoose={idSelection.includes(line.id)}
-                onClick={() => handleLineClick(line.id)}
-              />
-            ))}
+            {storeLines &&
+              storeLines.map((line) => (
+                <WallGeometry
+                  key={line.id}
+                  start={line.points[0]}
+                  end={line.points[1]}
+                  dimension={{ width: line.width, height: line.height }}
+                  widthchange={line.widthchange}
+                  widthchangetype={line.widthchangetype}
+                  type={line.type}
+                  isSelected={selectedLines.includes(line.id)}
+                  isChoose={idSelection.includes(line.id)}
+                  onClick={() => handleLineClick(line.id)}
+                />
+              ))}
 
             {/* 3D grid */}
             <Grid
@@ -307,9 +321,9 @@ export const App = () => {
         </div>
         <WindowPropertiesPopup />
         <WallPropertiesPopup />
-        <DoorPropertiesPopup/>
-        <RailingPropertiesPopup/>
-        <ButtonComponent  setNewLine={() => setNewLine(!newLine)}/>
+        <DoorPropertiesPopup />
+        <RailingPropertiesPopup />
+        <ButtonComponent setNewLine={() => setNewLine(!newLine)} />
       </div>
     </div>
   );

@@ -6,8 +6,9 @@ const initialState = {
  
   roomSelect: false,
   roomSelectors: [],
-  perpendicularLine: false,
- 
+  perpendicularLine: true,
+  height:0,
+  width:0,
   measured: "in",
   information: false,
   idSelection: [],
@@ -52,6 +53,9 @@ export const drawingSlice = createSlice({
       const lineIndex = state.ApplicationState.storeLines.findIndex(line => line.id === id);
       if (lineIndex !== -1) {
         state.storeLines[lineIndex].typeId = typeId;
+        state.height=state.ApplicationState.storeLines[lineIndex].height;
+        state.width=state.ApplicationState.storeLines[lineIndex].width;
+        console.log(state.ApplicationState.storeLines)
       }
     },
   },

@@ -1,9 +1,12 @@
-// BoxGeometry.js
-import React from "react";
-import { Vector3 } from "three";
+import React, { useMemo } from "react";
+import { Vector3, TextureLoader } from "three";
 import convert from "convert-units";
 import { useSelector } from "react-redux";
-
+import Window from "../assets/Window.png"
+import Door from "../assets/Door.png"
+import Railing from "../assets/Railing.png"
+import New from "../assets/New.png"
+import Wall from "../assets/Walll.png"
 const BoxGeometry = ({
   start,
   end,
@@ -14,39 +17,56 @@ const BoxGeometry = ({
   typeId,
   isChoose,
   onClick,
-  //handlePointClick,
   currentPoint,
   newPointMode,
   opacity = 0.5,
 }) => {
-  const { measured,roomSelect } = useSelector((state) => state.drawing);
-  const {factor}=useSelector((state)=>state.ApplicationState)
+  const { measured, roomSelect } = useSelector((state) => state.drawing);
+  const { factor } = useSelector((state) => state.ApplicationState);
+
+  const textureLoader = useMemo(() => new TextureLoader(), []);
+  const windowTexture = useMemo(
+    () => textureLoader.load(Window), // Replace with the path to your window image
+    [textureLoader]
+  );
+  const wallTexture = useMemo(
+    () => textureLoader.load(Wall), // Replace with the path to your window image
+    [textureLoader]
+  );
+  const railingTexture = useMemo(
+    () => textureLoader.load(Railing), // Replace with the path to your window image
+    [textureLoader]
+  );
+  const doorTexture = useMemo(
+    () => textureLoader.load(Door), // Replace with the path to your window image
+    [textureLoader]
+  );
+  const newTexture = useMemo(
+    () => textureLoader.load(New), // Replace with the path to your window image
+    [textureLoader]
+  );
+
   if (!start || !end) return null;
 
   const length = start.distanceTo(end);
-  const width = convert(dimension.width*factor[1]).from("mm").to(measured)
+  const width = convert(dimension.width * factor[1]).from("mm").to(measured);
   const midpoint = new Vector3().addVectors(start, end).multiplyScalar(0.5);
 
-  if(end.y === start.y){
-    if (widthchangetype === 'inside') {
+  if (end.y === start.y) {
+    if (widthchangetype === "inside") {
       // Adjust the width to inside (keeping the horizontal level unchanged)
-      midpoint.y += widthchange ;
-    } else if (widthchangetype === 'outside') {
+      midpoint.y += widthchange;
+    } else if (widthchangetype === "outside") {
       // Adjust the width to outside (keeping the horizontal level unchanged)
-      midpoint.y -= widthchange ;
-     
+      midpoint.y -= widthchange;
     }
-  }
-  else{
-    if (widthchangetype === 'inside') {
+  } else {
+    if (widthchangetype === "inside") {
       // Adjust the width to inside (keeping the vertical level unchanged)
-      midpoint.x -= widthchange ;
-     
-    } else if (widthchangetype === 'outside') {
+      midpoint.x -= widthchange;
+    } else if (widthchangetype === "outside") {
       // Adjust the width to outside (keeping the vertical level unchanged)
-
-      midpoint.x += widthchange ;
-      
+      midpoint.x += widthchange;
     }
   }
 
@@ -56,40 +76,48 @@ const BoxGeometry = ({
   return (
     <>
       <mesh position={midpoint} rotation={[0, 0, angle]} onClick={onClick}>
-        <boxGeometry
-          args={[length, width, 0]}
-        />
+        <boxGeometry args={[length, width, 0]} />
         <meshBasicMaterial
-          color={typeId===1?"grey": typeId === 2 ? "#EE918E" : typeId===3?"#BEE7FE":typeId===4?"#6360FB":(isSelected && roomSelect) ? "blue" : (isSelected && !roomSelect) ?'green': isChoose ? "pink" : "#787878"}
-
+          // map={typeId === 3 ? windowTexture : null} // Apply the texture for windows
+          map={
+            typeId === 1
+              ? wallTexture
+              : typeId === 2
+              ? doorTexture
+              : typeId === 3
+              ? windowTexture
+              : typeId === 4
+              ? railingTexture
+              : newTexture
+          }
+          width={typeId===4?"10px":"20px"}
           transparent={true}
-          //opacity={opacity}
         />
       </mesh>
-      <mesh
-        position={start}
-       // onClick={(e) => {
-          //e.stopPropagation();
-          //handlePointClick(start);
-        //}}
-      >
+      <mesh position={start}>
         <sphereGeometry args={[4, 16, 16]} />
         <meshBasicMaterial
-          color={typeId === 2 ? "brown" : newPointMode && start.equals(currentPoint) ? "yellow" : "black"}
+          color={
+            typeId === 2
+              ? "brown"
+              : newPointMode && start.equals(currentPoint)
+              ? "yellow"
+              : "black"
+          }
           transparent={true}
           opacity={opacity}
         />
       </mesh>
-      <mesh
-        position={end}
-        //onClick={(e) => {
-          //e.stopPropagation();
-          //handlePointClick(end);
-        //}}
-      >
+      <mesh position={end}>
         <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial
-          color={typeId === 2 ? "brown" : newPointMode && end.equals(currentPoint) ? "yellow" : "black"}
+          color={
+            typeId === 2
+              ? "brown"
+              : newPointMode && end.equals(currentPoint)
+              ? "yellow"
+              : "black"
+          }
           transparent={true}
           opacity={opacity}
         />

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Typography } from "../design_system/StyledComponents/components/Typography.js";
 import TextField from '@mui/material/TextField';
 import split from "../assets/split.png"
@@ -17,6 +17,11 @@ const DoorPropertiesPopup = () => {
     dispatch(setTypeId(0));
     dispatch(setContextualMenuStatus(false))
   }
+  useEffect(() => {
+    
+    console.log(typeId);
+      
+    }, [typeId])
   return (
     <div>
   <div className={typeId===2?'popup-container':"popup-container-hidden"} >

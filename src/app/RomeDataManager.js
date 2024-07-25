@@ -34,7 +34,7 @@ export default class RomeDataManager        {
    static _targetApiURL = process.env.REACT_APP_SERVER_URL
 
 
-   static _targetWebApiURL = process.env.REACT_APP_SERVER_URL_WEB
+   
 
    static _targetVsApiURL = process.env.REACT_APP_SERVER_URL_VS
 
