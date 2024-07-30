@@ -68,6 +68,10 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     [selectionMode, dragMode]
   );
 
+  function arePointsSimilar(point1, point2) {
+    return point1.x === point2.x && point1.y === point2.y;
+  }
+
   const handlePointerUp = useCallback(
     (event, line, right, left) => {
       
@@ -250,20 +254,23 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     });
 
     // Add the final segment of the new line
-    const finalNewLineSegment = {
-      ...newLine,
-      id: uniqueId(),
-      points: [currentStartPoint, newPoint],
-    };
-    finalNewLineSegment.length = convert(
-      finalNewLineSegment.points[0].distanceTo(finalNewLineSegment.points[1]) *
-        factor[0]
-    )
-      .from(measured)
-      .to("mm");
-
-    updatedStoreLines.push(finalNewLineSegment);
-    newPoints.push(newPoint);
+    if(!arePointsSimilar(currentStartPoint, newPoint)){
+      console.log("hello",currentStartPoint, newPoint);
+      const finalNewLineSegment = {
+        ...newLine,
+        id: uniqueId(),
+        points: [currentStartPoint, newPoint],
+      };
+      finalNewLineSegment.length = convert(
+        finalNewLineSegment.points[0].distanceTo(finalNewLineSegment.points[1]) *
+          factor[0]
+      )
+        .from(measured)
+        .to("mm");
+  
+      updatedStoreLines.push(finalNewLineSegment);
+      newPoints.push(newPoint);
+    }
 
     // Also handle splitting the existing lines at the intersection points
     intersections.forEach(({ line, intersection }) => {

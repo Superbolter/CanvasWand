@@ -9,6 +9,8 @@ import LengthConverter from "./component/LengthConverter";
 import LineEditForm from "./component/LineEditForm";
 import BackgroundImage from "./component/background";
 import { useDrawing } from "./hooks/useDrawing";
+import CreateFiller from "./component/filler.js";
+
 import {
   setPoints,
   setStoreLines,
@@ -152,6 +154,8 @@ export const App = () => {
             </>
           )}
 
+          <CreateFiller/>
+
           {/* 2D grid */}
           <Grid
             rotation={[Math.PI / 2, 0, 0]}
@@ -166,7 +170,9 @@ export const App = () => {
             fadeStrength={1}
             fadeFrom={1}
           />
+          
         </Canvas>
+        
       </div>
 
       <div className="button-container">
