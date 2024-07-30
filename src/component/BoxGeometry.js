@@ -90,8 +90,9 @@ const BoxGeometry = ({
               ? railingTexture
               : newTexture
           }
+          color={isSelected&&"blue"}
           width={typeId===4?"10px":"20px"}
-          transparent={true}
+          transparent={false}
         />
       </mesh>
       <mesh position={start}>

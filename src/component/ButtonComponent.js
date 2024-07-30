@@ -7,12 +7,14 @@ import { useSelector } from 'react-redux';
 
 const ButtonComponent = ({ setNewLine }) => {
   const typeId = useSelector((state) => state.Drawing.typeId);
+  const roomPopup = useSelector((state) => state.ApplicationState.roomPopup);
   const [selectedButton, setSelectedButton] = useState(null);
   useEffect(() => {
     
   console.log(typeId);
+  console.log(roomPopup);
     
-  }, [typeId])
+  }, [typeId, roomPopup])
   
   const handleButtonClick = (buttonName) => {
     setSelectedButton(buttonName);
@@ -23,7 +25,7 @@ const ButtonComponent = ({ setNewLine }) => {
 
   return (
     <div>
-      <div className={typeId > 0 ? "scrollable-container-hidden" : "scrollable-container"}>
+      <div className={(roomPopup||typeId > 0) ? "scrollable-container-hidden" : "scrollable-container"}>
         <div className="scrollable-content">
           <Typography className='btn-heading-text' modifiers={['medium']}>Structures</Typography>
           <div className="grid-container">

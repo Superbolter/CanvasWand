@@ -148,3 +148,12 @@ export const updateLineTypeId = (lineId, typeId, storeLines) => {
     }
   
   };
+  export const showRoomNamePopup=(value)=>{
+    return(dispatch)=>{
+        dispatch({
+
+            type:"SHOW_ROOM_NAME_POPUP",
+            payload:value,
+        })
+    }
+  }

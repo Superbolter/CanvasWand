@@ -21,7 +21,7 @@ import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import { setContextualMenuStatus, setLineId } from "../Actions/DrawingActions.js";
-import { setStoreLines, setFactor,setPoints } from "../Actions/ApplicationStateAction.js";
+import { setStoreLines, setFactor,setPoints, showRoomNamePopup } from "../Actions/ApplicationStateAction.js";
 export const useDrawing = () => {
   const dispatch = useDispatch();
   const {
@@ -35,7 +35,7 @@ export const useDrawing = () => {
   } = useSelector((state) => state.drawing);
   const {typeId, contextualMenuStatus}=useSelector((state)=>state.Drawing)
   const {storeLines,points,factor}=useSelector((state)=>state.ApplicationState)
-  const [selectionMode, setSelectionMode] = useState(true);
+  const [selectionMode, setSelectionMode] = useState(false);
   const [selectedLines, setSelectedLines] = useState([]);
   const [firstTime, setFirstTime] = useState(true);
   const [newLine, setNewLine] = useState(false);
@@ -190,7 +190,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   );
 
   const addPoint = (newPoint, startPoint) => {
-    
+    // if(selectionMode)return;
     let newLine = {
       id: uniqueId(),
       points: [startPoint, newPoint],
@@ -326,7 +326,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
 
   const deleteLastPoint = () => {
     // Check if there are any lines or points to undo
-    if (storeLines.length === 0 || points.length === 0) return;
+    if (storeLines.length === 0 ||selectionMode|| points.length === 0) return;
   
     // Remove the last line and update the storeLines state
     const updatedLines = storeLines.slice(0, -1);
@@ -421,8 +421,13 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     if (event.key === "s" || event.key === "S") {
       setStop(!stop);
     }
-    if(event.key === "r" || event.key === "R"){
-      room();
+    if(event.ctrlKey&&(event.key === "q" || event.key === "Q")){
+      dispatch(showRoomNamePopup(true));
+      // room();
+      
+    }
+    if(event.ctrlKey&&(event.key === "b" || event.key === "B")){
+      toggleSelectionroomMood();
 
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
@@ -432,14 +437,14 @@ const [showSnapLine, setShowSnapLine] = useState(false);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
-    console.log(storeLines);
+    // console.log(storeLines);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [storeLines, selectionMode, selectedLines, points, stop]);
 
   const handleClick = (event) => {
-    if ( dragMode || doorWindowMode) return; // Prevent drawing new lines in selection mode
+    if ( dragMode ||selectionMode|| doorWindowMode) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
@@ -693,16 +698,16 @@ const [showSnapLine, setShowSnapLine] = useState(false);
 
 
 
-  const room =()=>{
-    const roomName = prompt("Enter the room Name:");
+  const room =(roomName, selectedLines)=>{
     
+    console.log(selectedLines)
     const room = {
       roomId: uniqueId(),
       roomName: roomName,
       wallIds: [...selectedLines],
     }
 
-
+    console.log(room)
     dispatch(setRoomSelectors([...roomSelectors,room]));
     setSelectedLines([]);
     dispatch(setRoomSelect(false));
@@ -733,7 +738,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
 
     if(selectionMode && roomSelect){
 
-
+    console.log("heloo")
       
       setSelectedLines((prev) =>
         prev.includes(id)
@@ -749,6 +754,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
           : [...prev, id]
       );
     }
+    console.log(selectedLines)
     // if(type ==='door'){
     //   setaddOn(!addOn);
     //   setdoorPoint(...points);
@@ -757,7 +763,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     //   setDoorPosition(midpoint);
     //   setDimensions({l:length,W:10,h:50});
 
-    //dispatch(setIdSelection([...selectedLines]));
+    // dispatch(setIdSelection([...selectedLines]));
   };
 
   const handleInformtion = () => {
@@ -840,6 +846,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     setDimensions,
     toggleSelectionroomMood,
     handlemode,
+    room
     
   };
 };

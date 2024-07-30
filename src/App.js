@@ -29,6 +29,7 @@ import { drawToolData, setStoreLines } from "./Actions/ApplicationStateAction.js
 import RomeDataManager from "./app/RomeDataManager.js";
 import Drawtool from "./component/Drawtool.js";
 import { BrowserRouter as Router, Route, Switch, Routes, useLocation } from 'react-router-dom';
+import RoomNamePopup from "./component/RoomNamePopup.js";
 export const cookies = new Cookies();
 export const App = () => {
   const {
@@ -104,6 +105,7 @@ export const App = () => {
       RomeDataManager.setUserEmail(result.email, result.persistence_token);
       window.curentUserSession = result;
     }
+    
     dispatch(drawToolData(floorplanId));
   }, []);
 
@@ -323,6 +325,7 @@ export const App = () => {
         <WallPropertiesPopup />
         <DoorPropertiesPopup />
         <RailingPropertiesPopup />
+        <RoomNamePopup />
         <ButtonComponent setNewLine={() => setNewLine(!newLine)} />
       </div>
     </div>

@@ -24,6 +24,7 @@ export const drawingSlice = createSlice({
    
     setRoomSelectors: (state, action) => {
       state.roomSelectors = action.payload;
+      console.log(state.roomSelectors)
     },
     setIdSelection: (state, action) => {
       state.idSelection = action.payload;

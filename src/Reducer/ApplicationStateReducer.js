@@ -1,3 +1,5 @@
+import { showRoomNamePopup } from "../Actions/ApplicationStateAction";
+
 const initialState = {
     floorplanId:null,
     drawnBy:null,
@@ -8,7 +10,8 @@ const initialState = {
     drawData:null,
     storeLines:[],
     points:[],
-    factor:[1,1,1]
+    factor:[1,1,1],
+    roomPopup:false,
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {
@@ -59,6 +62,14 @@ const initialState = {
 
           
         };
+      case "SHOW_ROOM_NAME_POPUP":
+        return {
+          ...state,
+          roomPopup:action.payload,
+
+          
+        };
+
 
     //   case "UPDATE_DRAW_DATA":
     //     return {
