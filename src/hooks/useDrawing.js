@@ -20,6 +20,7 @@ import {
 import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
+import {findLineForPoint }from "../utils/coolinear.js"
 
 export const useDrawing = () => {
   const dispatch = useDispatch();
@@ -50,6 +51,9 @@ export const useDrawing = () => {
   const [doorPosition, setDoorPosition] = useState([]);
   const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
   const [check,setCheck]= useState(true);
+  const[lineBreak, setLineBreak] = useState(false);
+  const[breakPointLocation, setBreakPointLocation] = useState(null);
+  const [selectId,setId] = useState(null);
 
   const [doorPoint, setdoorPoint] = useState([]);
 
@@ -372,6 +376,10 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       room();
 
     }
+    if(event.key === "escape" || event.key === "Escape"){
+      setNewLine(!newLine)
+      setStop(!stop);
+    }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
       deleteSelectedLines();
     }
@@ -402,8 +410,17 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     const posY = y * (cameraHeight / 2);
 
     let point = new Vector3(posX, posY, 0);
+    if(lineBreak){
+      console.log("point: ", point);
+      let{closestPointOnLine}=findLineForPoint(point,storeLines);
+      breakingLine(closestPointOnLine);
+      setBreakPointLocation(closestPointOnLine);
+      
+      return;
+    }
     
     if (newLine) {
+      setStop(!stop);
       setNewLine(false);
       point = snapToPoint(point, points, storeLines);
 
@@ -694,9 +711,11 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   
 
   const handleLineClick = (id) => {
+
+    if(lineBreak){
+       setId(id);
+    }
     
-
-
     if(selectionMode && roomSelect){
 
 
@@ -754,6 +773,60 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     }
   };
 
+
+  const breakingLine = (point) => {
+    const idx = storeLines.findIndex((line) => line.id === selectId);
+    if (idx === -1) return; // Line not found
+  
+    let updatedLine = storeLines[idx];
+    console.log("updatedLine: ", updatedLine);
+    console.log("breakPointLocation: ", breakPointLocation);
+   
+  
+    let store = [...storeLines];
+    let pointsVal = [...points];
+  
+    // Create the first split line
+    const splitNewLine = {
+      ...updatedLine,
+      id: uniqueId(),
+      points: [updatedLine.points[0], point],
+    };
+    splitNewLine.length = convert(
+      splitNewLine.points[0].distanceTo(splitNewLine.points[1]) * factor[0]
+    )
+      .from(measured)
+      .to("mm");
+  
+    // Create the second split line
+    const splitNewLine1 = {
+      ...updatedLine,
+      id: uniqueId(),
+      points: [point, updatedLine.points[1]],
+    };
+    splitNewLine1.length = convert(
+      splitNewLine1.points[0].distanceTo(splitNewLine1.points[1]) * factor[0]
+    )
+      .from(measured)
+      .to("mm");
+  
+    // Replace the original line with the two new split lines
+    store.splice(idx, 1, splitNewLine, splitNewLine1);
+  
+    // Update the points list by inserting the break point
+    const startindex = points.findIndex((p) => p.equals(updatedLine.points[0]));
+    const endIndex = points.findIndex((p) => p.equals(updatedLine.points[1]));
+  
+    if (startindex !== -1 && endIndex !== -1 && startindex < endIndex) {
+      pointsVal.splice(startindex + 1, 0, point);
+    }
+  
+    // Dispatch the updated store and points
+    dispatch(setStoreLines(store));
+    dispatch(setPoints(pointsVal));
+  };
+  
+
   return {
     doorWindowMode,
     newLine,
@@ -780,8 +853,11 @@ const [showSnapLine, setShowSnapLine] = useState(false);
 
     snappingPoint, 
     showSnapLine,
+    lineBreak,
+    setLineBreak,
     setShowSnapLine,
     setSnappingPoint,
+    setStop,
 
     handleClick,
     handleMouseMove,

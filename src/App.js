@@ -11,6 +11,7 @@ import BackgroundImage from "./component/background";
 import { useDrawing } from "./hooks/useDrawing";
 import CreateFiller from "./component/filler.js";
 
+
 import {
   setPoints,
   setStoreLines,
@@ -64,6 +65,9 @@ export const App = () => {
     roomSelectors,
     handlemode,
     type,
+    setStop,
+    lineBreak,
+    setLineBreak,
 
     snappingPoint,
     showSnapLine,
@@ -222,8 +226,15 @@ export const App = () => {
           <button onClick={toggleSelectionroomMood}>
             {roomSelect ? "selectingRoom" : "roomSelecter"}
           </button>
-          <button onClick={() => setNewLine(!newLine)}>
+          <button onClick={() => {setNewLine(!newLine)
+            setStop(!stop);
+          }}>
             {newLine ? "NewLineAdded" : "Add New Line"}
+          </button>
+          <button onClick={() =>{ setLineBreak(!lineBreak)
+            setStop(!stop);
+          }}>
+            {lineBreak ? "breaking start" : "Break"}
           </button>
           {/*check setNewLine(true); */}
           <button onClick={perpendicularHandler}>
