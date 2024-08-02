@@ -8,6 +8,7 @@ body, html {
 .container {
   display: flex;
   height: 100%; /* Full height of viewport */
+  width: 100vw;
 }
 
 .canvas-container {
@@ -45,7 +46,7 @@ body, html {
 }
 
 .button-container1 {
-//flex: 1;
+/* //flex: 1; */
   display: grid;
   grid-template-columns: repeat(3, 1fr); 
   /* display: flex;
