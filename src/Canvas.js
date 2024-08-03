@@ -55,6 +55,7 @@ export const CanvasComponent = () => {
     information,
     idSelection,
     doorPosition,
+    merge,setMerge,
     setDoorPosition,
     isDraggingDoor,
     setIsDraggingDoor,

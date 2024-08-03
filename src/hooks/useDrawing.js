@@ -54,6 +54,8 @@ export const useDrawing = () => {
   const[lineBreak, setLineBreak] = useState(false);
   const[breakPointLocation, setBreakPointLocation] = useState(null);
   const [selectId,setId] = useState(null);
+  const [ merge,setMerge]=useState(false);
+  const [mergeLine, setMergeLine] = useState([]);
 
   const [doorPoint, setdoorPoint] = useState([]);
 
@@ -394,7 +396,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   }, [storeLines, selectionMode, selectedLines, points, stop]);
 
   const handleClick = (event) => {
-    if (selectionMode || dragMode || doorWindowMode) return; // Prevent drawing new lines in selection mode
+    if (selectionMode || dragMode || doorWindowMode|| merge) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
@@ -711,10 +713,47 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   
 
   const handleLineClick = (id) => {
+    let storeid = null;
+    if(merge){
+      storeid = [...mergeLine,id];
+      setMergeLine([...mergeLine,id]);
+    }
+    
+    console.log("hello mergeLine",storeid);
+    
 
+    console.log("Ia am inside")
     if(lineBreak){
        setId(id);
     }
+
+    if(merge && storeid.length ===2){
+      let idx1 = storeLines.findIndex((line)=>line.id ===storeid[0]);
+      let idx2 = storeLines.findIndex((line)=> line.id === storeid[1]);
+      let arr = [idx1,idx2];
+      
+      arr.sort();
+      let updatedLine = [...storeLines];
+      if(Math.abs(idx1-idx2)===1&& storeLines[arr[0]].points[1].equals(storeLines[arr[1]].points[0])){
+        if((storeLines[arr[0]].points[0].x === storeLines[arr[1]].points[1].x)||(storeLines[arr[0]].points[0].y === storeLines[arr[1]].points[1].y) ){
+          let line = updatedLine[arr[0]];
+          const newline = {
+            ...line,
+            points: [storeLines[arr[0]].points[0], storeLines[arr[1]].points[1]],
+            length: convert(storeLines[arr[0]].points[0].distanceTo(storeLines[arr[1]].points[1]) * factor[0])
+                 .from(measured)
+                 .to("mm"),
+          }
+
+          updatedLine.splice(arr[0],2,newline);
+        }
+        dispatch(setStoreLines(updatedLine));
+        setMergeLine([]);
+
+
+      }
+    }
+    
     
     if(selectionMode && roomSelect){
 
@@ -733,6 +772,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
           ? prev.filter((lineId) => lineId !== id)
           : [...prev, id]
       );
+
     }
     // if(type ==='door'){
     //   setaddOn(!addOn);
@@ -854,6 +894,8 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     snappingPoint, 
     showSnapLine,
     lineBreak,
+    merge,
+    setMerge,
     setLineBreak,
     setShowSnapLine,
     setSnappingPoint,
