@@ -25,7 +25,8 @@ export const useDrawing = () => {
       idSelection,
       perpendicularLine,
       measured,
-      information,roomSelect,roomSelectors,
+      scale,
+    information,roomSelect,roomSelectors,
   } = useSelector((state) => state.drawing);
   const {typeId, contextualMenuStatus}=useSelector((state)=>state.Drawing)
   const {storeLines,points,factor}=useSelector((state)=>state.ApplicationState)
@@ -52,6 +53,8 @@ export const useDrawing = () => {
   const[lineBreak, setLineBreak] = useState(false);
   const[breakPointLocation, setBreakPointLocation] = useState(null);
   const [selectId,setId] = useState(null);
+  const [ merge,setMerge]=useState(false);
+  const [mergeLine, setMergeLine] = useState([]);
 
   const [doorPoint, setdoorPoint] = useState([]);
 
@@ -436,7 +439,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   }, [storeLines, selectionMode, selectedLines, points, stop]);
 
   const handleClick = (event) => {
-    if (selectionMode || dragMode || doorWindowMode) return; // Prevent drawing new lines in selection mode
+    if (selectionMode || dragMode || doorWindowMode|| merge|| scale) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
@@ -487,54 +490,63 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     }
 
 
-    if (newPoints.length >= 2) {
+    if (points.length >= 1) {
       addPoint(point, newPoints[newPoints.length - 2]);
     }
 
-    if (newPoints.length === 2 && firstTime) {
-      setFirstTime(false);
-      const userHeight = parseFloat(
-        prompt("Enter the height of the first line:")
-      );
-      const userLength = parseFloat(
-        prompt("Enter the length of the first line:")
-      );
-      const userWidth = parseFloat(
-        prompt("Enter the thickness of the first line:")
-      );
-      const lfactor =
-        userLength / point.distanceTo(newPoints[newPoints.length - 2]);
-      const wfactor = INITIAL_BREADTH / userWidth;
-      const hfactor = INITIAL_HEIGHT / userHeight;
-      dispatch(setFactor([lfactor, wfactor, hfactor]));
 
-      let newLine = {
-        id: uniqueId(),
-        points: [newPoints[newPoints.length - 2], point],
-        length: convert(
-          newPoints[newPoints.length - 2].distanceTo(point) * lfactor
-        )
-          .from(measured)
-          .to("mm"),
-        width: convert(INITIAL_BREADTH / wfactor)
-          .from(measured)
-          .to("mm"),
-        height: convert(INITIAL_HEIGHT / hfactor)
-          .from(measured)
-          .to("mm"),
-        widthchangetype: "between",
-        widthchange: 0,
-        type: "wall",
-        type: 1,
-      };
-      dispatch(setStoreLines([newLine]));
-    }
+
+
+
+
+
+
+
+
+
+    // if (newPoints.length === 2 && firstTime) {
+    //   setFirstTime(false);
+    //   const userHeight = parseFloat(
+    //     prompt("Enter the height of the first line:")
+    //   );
+    //   const userLength = parseFloat(
+    //     prompt("Enter the length of the first line:")
+    //   );
+    //   const userWidth = parseFloat(
+    //     prompt("Enter the thickness of the first line:")
+    //   );
+    //   const lfactor =
+    //     userLength / point.distanceTo(newPoints[newPoints.length - 2]);
+    //   const wfactor = INITIAL_BREADTH / userWidth;
+    //   const hfactor = INITIAL_HEIGHT / userHeight;
+    //   dispatch(setFactor([lfactor, wfactor, hfactor]));
+
+    //   let newLine = {
+    //     id: uniqueId(),
+    //     points: [newPoints[newPoints.length - 2], point],
+    //     length: convert(
+    //       newPoints[newPoints.length - 2].distanceTo(point) * lfactor
+    //     )
+    //       .from(measured)
+    //       .to("mm"),
+    //     width: convert(INITIAL_BREADTH / wfactor)
+    //       .from(measured)
+    //       .to("mm"),
+    //     height: convert(INITIAL_HEIGHT / hfactor)
+    //       .from(measured)
+    //       .to("mm"),
+    //     widthchangetype: "between",
+    //     widthchange: 0,
+    //     type: "wall",
+    //   };
+    //   dispatch(setStoreLines([newLine]));
+    // }
     setCurrentMousePosition(null); // Clear the temporary line on click
     setDistance(0); // Reset distance display
   };
 
   const handleMouseMove = (event) => {
-    if ((points.length === 0 || stop || newLine || doorWindowMode) && !dragMode)
+    if ((points.length === 0 || stop || newLine || doorWindowMode||scale) && !dragMode)
       return; // No point to start from or not in perpendicular mode
 
     const canvasContainer = document.querySelector(".canvas-container");
@@ -754,10 +766,47 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   
 
   const handleLineClick = (id) => {
+    let storeid = null;
+    if(merge){
+      storeid = [...mergeLine,id];
+      setMergeLine([...mergeLine,id]);
+    }
+    
+    console.log("hello mergeLine",storeid);
+    
 
+    console.log("Ia am inside")
     if(lineBreak){
        setId(id);
     }
+
+    if(merge && storeid.length ===2){
+      let idx1 = storeLines.findIndex((line)=>line.id ===storeid[0]);
+      let idx2 = storeLines.findIndex((line)=> line.id === storeid[1]);
+      let arr = [idx1,idx2];
+      
+      arr.sort();
+      let updatedLine = [...storeLines];
+      if(Math.abs(idx1-idx2)===1&& storeLines[arr[0]].points[1].equals(storeLines[arr[1]].points[0])){
+        if((storeLines[arr[0]].points[0].x === storeLines[arr[1]].points[1].x)||(storeLines[arr[0]].points[0].y === storeLines[arr[1]].points[1].y) ){
+          let line = updatedLine[arr[0]];
+          const newline = {
+            ...line,
+            points: [storeLines[arr[0]].points[0], storeLines[arr[1]].points[1]],
+            length: convert(storeLines[arr[0]].points[0].distanceTo(storeLines[arr[1]].points[1]) * factor[0])
+                 .from(measured)
+                 .to("mm"),
+          }
+
+          updatedLine.splice(arr[0],2,newline);
+        }
+        dispatch(setStoreLines(updatedLine));
+        setMergeLine([]);
+
+
+      }
+    }
+    
     
     if(selectionMode && roomSelect){
 
@@ -776,6 +825,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
           ? prev.filter((lineId) => lineId !== id)
           : [...prev, id]
       );
+
     }
     // if(type ==='door'){
     //   setaddOn(!addOn);
@@ -897,6 +947,8 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     snappingPoint, 
     showSnapLine,
     lineBreak,
+    merge,
+    setMerge,
     setLineBreak,
     setShowSnapLine,
     setSnappingPoint,

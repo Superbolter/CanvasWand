@@ -90,7 +90,7 @@ const BoxGeometry = ({
   opacity = 0.5,
 }) => {
 
-  const { storeLines, measured, factor, roomSelect } = useSelector((state) => state.drawing);
+  const { storeLines, measured, factor, roomSelect,newline } = useSelector((state) => state.drawing);
 
   if (!start || !end) return null;
 
@@ -113,7 +113,7 @@ let p1,p2,p3,p4,mid1,mid2,prevAngle;
 let idx = storeLines.findIndex((line) => line.points[0] === start&& line.points[1]=== end );
 //console.log("index",idx)
 
-if(idx>=2){
+if(idx>=1){
   //console.log("shubham")
 
     
@@ -127,6 +127,7 @@ if(idx>=2){
 
     //console.log("prevAdjustedMidpoint:", prevAdjustedMidpoint);
 
+   if(line.points[1]===start){
     if (line.points[0].x === line.points[1].x) {
       mid1 = new Vector3(prevAdjustedMidpoint.x, line.points[1].y, 0);
       p4 = line.points[1];
@@ -149,6 +150,7 @@ if(idx>=2){
       mid1 = p4.clone().add(prevoffset);
       p1 = mid1.clone().add(prevoffset)
     }
+   }
   }
 
 if(start.x === end.x){
@@ -175,7 +177,7 @@ if(start.x === end.x){
 }
 
 
-if(mid1 && mid2){
+if(mid1 && mid2 && !newline){
   if(mid1!== mid2 && p1!==p2){
     //console.log("intersection point found between mid1 and mid2")
     p3 = calculateIntersection(p1, prevAngle, p2, angle);

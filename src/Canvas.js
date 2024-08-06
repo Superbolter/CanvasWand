@@ -15,17 +15,21 @@ import {cookies} from "./App"
 import {
   setPoints,
   setStoreLines,
+  setScale,
   setPerpendicularLine,
   setFactor,
   setInformation,
   setIdSelection,
 } from "./features/drawing/drwingSlice.js";
 import { DraggableDoor } from "./component/DragDrop.js";
+import { Scale } from "./component/Scale.js";
 import DrawtoolHeader from "./component/DrawtoolHeader.js";
 import { useDispatch, useSelector } from "react-redux";
 import { drawToolData } from "./Actions/ApplicationStateAction.js";
 
 export const CanvasComponent = () => {
+  const dispatch = useDispatch();
+  const {scale} = useSelector((state) => state.drawing);
   const {
     handleClick,
     handleMouseMove,
@@ -57,6 +61,7 @@ export const CanvasComponent = () => {
     information,
     idSelection,
     doorPosition,
+    merge,setMerge,
     setDoorPosition,
     isDraggingDoor,
     setIsDraggingDoor,
@@ -75,9 +80,8 @@ export const CanvasComponent = () => {
     showSnapLine,
     setShowSnapLine,
     setSnappingPoint,
+    
   } = useDrawing();
-
-  const dispatch = useDispatch();
 
   const getUrlParameter = (name) => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -130,6 +134,8 @@ export const CanvasComponent = () => {
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
         >
+
+          {scale && (<Scale/>)}
           {addOn && (
             <DraggableDoor
               doorPosition={doorPosition}
@@ -285,7 +291,11 @@ export const CanvasComponent = () => {
           <button onClick={toggleDragMode}>
             {dragMode ? "Disable Drag Mode" : "Enable Drag Mode"}
           </button>
+          <button onClick={() =>{ setMerge(!merge)
+            setStop(!stop);
+          }}>{merge?"merge active":"merge"}</button>
           <button onClick={handleInformtion}>Information</button>
+          <button onClick={() => dispatch(setScale(!scale))}>Scale</button>
           <button onClick={handlemode}>
             {type === "imaginary" ? "imaginary line" : "real line"}
           </button>
