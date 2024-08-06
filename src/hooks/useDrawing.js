@@ -452,22 +452,6 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       addPoint(point, newPoints[newPoints.length - 2]);
     }
 
-    if (newPoints.length === 2 && firstTime) {
-      setFirstTime(false);
-      const userHeight = parseFloat(
-        prompt("Enter the height of the first line:")
-      );
-      const userLength = parseFloat(
-        prompt("Enter the length of the first line:")
-      );
-      const userWidth = parseFloat(
-        prompt("Enter the thickness of the first line:")
-      );
-      const lfactor =
-        userLength / point.distanceTo(newPoints[newPoints.length - 2]);
-      const wfactor = INITIAL_BREADTH / userWidth;
-      const hfactor = INITIAL_HEIGHT / userHeight;
-      dispatch(setFactor([lfactor, wfactor, hfactor]));
 
 
 
