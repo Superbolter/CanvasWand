@@ -4,6 +4,7 @@ import { Vector3, Matrix4 } from "three";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant";
 import {
   setFactor,
+  setScale,
 } from "../features/drawing/drwingSlice.js";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -145,6 +146,7 @@ export const Scale = () => {
     const wfactor = INITIAL_BREADTH / userWidth;
     const hfactor = INITIAL_HEIGHT / userHeight;
     dispatch(setFactor([lfactor, wfactor, hfactor]));
+    dispatch(setScale(false))
   };
 
   return (
