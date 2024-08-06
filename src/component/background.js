@@ -2,17 +2,19 @@ import React, { Suspense } from "react";
 import { Canvas, useThree, useLoader } from "@react-three/fiber";
 import { TextureLoader } from "three";
 import Image from "../assets/img.jpg";
+import { useSelector } from "react-redux";
 
 const BackgroundImage = () => {
-  const { viewport } = useThree();
-
+  const fixedWidth = 900; // Set the desired fixed width
+  const fixedHeight = 520; // Set the desired fixed height, or calculate based on the image aspect ratio
   // Use TextureLoader to load the image texture asynchronously
-  const texture = useLoader(TextureLoader, Image);
+  const image=useSelector((state)=>state.ApplicationState.img);
+  const texture = useLoader(TextureLoader, image? `https://${image}`: Image);
 
 
   return (
     <mesh position={[0, 0, 0]}>
-      <planeGeometry args={[viewport.width, viewport.height]}  />
+      <planeGeometry args={[fixedWidth, fixedHeight]}  />
       <meshBasicMaterial map={texture}  transparent = {0.3} opacity={0.2}/>
     </mesh>
   );

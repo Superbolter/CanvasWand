@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import { Canvas } from "@react-three/fiber";
 import { Grid, Line, Text, OrbitControls } from "@react-three/drei";
@@ -10,8 +10,8 @@ import LineEditForm from "./component/LineEditForm.js";
 import BackgroundImage from "./component/background.js";
 import { useDrawing } from "./hooks/useDrawing.js";
 import CreateFiller from "./component/filler.js";
-
-
+import RomeDataManager from "./app/RomeDataManager.js";
+import {cookies} from "./App"
 import {
   setPoints,
   setStoreLines,
@@ -21,6 +21,9 @@ import {
   setIdSelection,
 } from "./features/drawing/drwingSlice.js";
 import { DraggableDoor } from "./component/DragDrop.js";
+import DrawtoolHeader from "./component/DrawtoolHeader.js";
+import { useDispatch, useSelector } from "react-redux";
+import { drawToolData } from "./Actions/ApplicationStateAction.js";
 
 export const CanvasComponent = () => {
   const {
@@ -36,6 +39,7 @@ export const CanvasComponent = () => {
     perpendicularHandler,
     newLine,
     setNewLine,
+    redo,
     selectionMode,
     selectedLines,
     setSelectedLines,
@@ -47,8 +51,6 @@ export const CanvasComponent = () => {
     currentMousePosition,
     distance,
     stop,
-    points,
-    storeLines,
     roomSelect,
     perpendicularLine,
     measured,
@@ -74,6 +76,39 @@ export const CanvasComponent = () => {
     setShowSnapLine,
     setSnappingPoint,
   } = useDrawing();
+
+  const dispatch = useDispatch();
+
+  const getUrlParameter = (name) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+  };
+
+  const { contextualMenuStatus, type_id, lineId } = useSelector(
+    (state) => state.Drawing
+  );
+  const { floorplanId, drawData, storeLines, points } = useSelector(
+    (state) => state.ApplicationState
+  );
+
+  useEffect(() => {
+    // console.log(type_id);
+    console.log(storeLines);
+    console.log(points);
+    console.log(lineId);
+    // console.log(cookies);
+    const floorplanId = getUrlParameter('floorplanId');
+    console.log(floorplanId)
+    RomeDataManager.instantiate();
+    if (cookies.get("USER-SESSION", { path: "/" }) !== undefined) {
+      const result = cookies.get("LOGIN-RESPONSE", { path: "/" });
+
+      RomeDataManager.setUserEmail(result.email, result.persistence_token);
+      window.curentUserSession = result;
+    }
+    
+    dispatch(drawToolData(floorplanId));
+  }, []);
 
   return (
     <div className="container">
@@ -168,7 +203,7 @@ export const CanvasComponent = () => {
             //cellColor="gray"
             sectionSize={40}
             //sectionThickness={1.5}
-            sectionColor="gray"
+            sectionColor="white"
             fadeDistance={10000}
             infiniteGrid
             fadeStrength={1}
@@ -274,6 +309,15 @@ export const CanvasComponent = () => {
               setSelectionMode={setSelectionMode}
             />
           )}
+        </div>
+        <div style={{ position: "relative" }}>
+          <DrawtoolHeader
+            deleteLastPoint={deleteLastPoint}
+            redo={redo}
+            lines={storeLines}
+            points={points}
+            roomSelectors={roomSelectors}
+          />
         </div>
       </div>
     </div>

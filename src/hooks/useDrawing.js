@@ -3,14 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import convert from "convert-units";
 import { Vector3 } from "three";
 import {
-  setPoints,
-  setStoreLines,
   setPerpendicularLine,
-  setFactor,
   setInformation,
   setRoomSelect,setRoomSelectors,
   setType,
-  
 } from "../features/drawing/drwingSlice.js";
 import {
   uniqueId,
@@ -21,18 +17,18 @@ import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import {findLineForPoint }from "../utils/coolinear.js"
+import { setPoints,setStoreLines,setFactor, showRoomNamePopup } from "../Actions/ApplicationStateAction.js";
 
 export const useDrawing = () => {
   const dispatch = useDispatch();
-  const {
-    points,
-    storeLines,
-    idSelection,
-    perpendicularLine,
-    factor,
-    measured,
-    information,roomSelect,roomSelectors, type,
+  const {  
+      idSelection,
+      perpendicularLine,
+      measured,
+      information,roomSelect,roomSelectors,
   } = useSelector((state) => state.drawing);
+  const {typeId, contextualMenuStatus}=useSelector((state)=>state.Drawing)
+  const {storeLines,points,factor}=useSelector((state)=>state.ApplicationState)
 
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedLines, setSelectedLines] = useState([]);
@@ -47,6 +43,8 @@ export const useDrawing = () => {
   const [doorWindowMode, setDoorWindowMode] = useState(false);
   const [hoveredLine, setHoveredLine] = useState([]);
   const [addOn, setaddOn] = useState(null);
+  const [redoLines, setRedoLines] = useState([]);   // Holds the lines that have been undone and can be redone
+  const [redoPoints, setRedoPoints] = useState([]); // Holds the points that have been undone and can be redone
   const [isDraggingDoor, setIsDraggingDoor] = useState(false);
   const [doorPosition, setDoorPosition] = useState([]);
   const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
@@ -132,6 +130,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
         widthchangetype: "between",
         widthchange: 0,
         type: "wall",
+        typeId: 1,
       };
       const line2 = {
         id: uniqueId(),
@@ -148,6 +147,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
         widthchangetype: "between",
         widthchange: 0,
         type: "wall",
+        typeId: 1,
       };
       const line3 = {
         id: uniqueId(),
@@ -164,6 +164,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
         widthchangetype: "between",
         widthchange: 0,
         type: "door",
+        typeId: 2,
       };
       
       const updatedLine = [...storeLines];
@@ -204,7 +205,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
         .to("mm"),
       widthchangetype: "between",
       widthchange: 0,
-      type:type,
+      typeId:typeId,
     };
 
     let updatedStoreLines = [...storeLines];
@@ -333,8 +334,43 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     if (updatedPoints.length === 1) {
       updatedPoints = updatedPoints.slice(0, -1);
     }
+    // Store the undone line and point in the redo stacks
+    const redoLine = storeLines[storeLines.length - 1];
+    const redoPoint = points[points.length - 1];
+  
+    setRedoLines((prevRedoLines) => [...prevRedoLines, redoLine]);
+    setRedoPoints((prevRedoPoints) => [...prevRedoPoints, redoPoint]);
+    
+    // Update the state with the new lines and points
     dispatch(setStoreLines(updatedLines));
     dispatch(setPoints(updatedPoints));
+  };
+
+  const redo = () => {
+    // Check if there are any lines or points to redo
+    if (redoLines.length === 0 || redoPoints.length === 0) return;
+
+    // Get the last undone line and point
+    const lastRedoLine = redoLines[redoLines.length - 1];
+    const lastRedoPoint = redoPoints[redoPoints.length - 1];
+
+    // Remove these elements from the redo stacks
+    const updatedRedoLines = redoLines.slice(0, -1);
+    const updatedRedoPoints = redoPoints.slice(0, -1);
+
+    // Update the redo stacks with the new values
+    setRedoLines(updatedRedoLines);
+    setRedoPoints(updatedRedoPoints);
+
+    const updatedStoreLines = storeLines;
+    const updatedPoints = points;
+
+    updatedStoreLines.push(lastRedoLine);
+    updatedPoints.push(lastRedoPoint);
+
+    // Set the updated state
+    setStoreLines(updatedStoreLines);
+    setPoints(updatedPoints);
   };
 
   const deleteSelectedLines = () => {
@@ -372,12 +408,18 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     if (event.key === "s" || event.key === "S") {
       setStop(!stop);
     }
-    if(event.key === "r" || event.key === "R"){
-      room();
+    // if(event.key === "r" || event.key === "R"){
+    //   room();
 
+    // }
+    if(event.ctrlKey&&(event.key === "q" || event.key === "Q")){
+      dispatch(showRoomNamePopup(true));
+      // room();
+      
     }
     if(event.key === "escape" || event.key === "Escape"){
-      setNewLine(!newLine)
+      setNewLine(!newLine);
+      setShowSnapLine(false)
       setStop(!stop);
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
@@ -483,6 +525,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
         widthchangetype: "between",
         widthchange: 0,
         type: "wall",
+        type: 1,
       };
       dispatch(setStoreLines([newLine]));
     }
@@ -866,6 +909,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     setdoorPoint,
     handleInformtion,
     deleteLastPoint,
+    redo,
     setSelectedLines,
     setSelectionMode,
     toggleDragMode,
@@ -881,6 +925,6 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     setDimensions,
     toggleSelectionroomMood,
     handlemode,
-    
+    room
   };
 };

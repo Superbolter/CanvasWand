@@ -1,0 +1,19 @@
+.size1 {
+  display: flex;
+  flex-direction: "row";
+  font-family: Poppins;
+  font-style: normal;
+  font-weight: normal;
+}
+.icon-size { 
+  width: auto;
+  height: 20px; 
+  display: block;
+}
+.button-icon-margin {
+}
+.button-icon-text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

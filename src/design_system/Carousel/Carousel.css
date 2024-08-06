@@ -1,0 +1,111 @@
+.sb-carousel {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 40% 60%;
+  position: relative;
+  background: #f5f5f5;
+}
+@media screen and (max-width: 767px) {
+  .sb-carousel {
+    grid-template-columns: 1fr;
+  }
+}
+.sb-carousel__icon {
+  background: black;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.sb-carousel .icon__pos--left {
+  position: absolute;
+  left: 0px;
+  top: 50%;
+  z-index: 2;
+  transform: translate(-25px, -25px);
+}
+@media screen and (max-width: 479px) {
+  .sb-carousel .icon__pos--left {
+    transform: translate(-10px, -25px);
+  }
+}
+.sb-carousel .icon__pos--right {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  z-index: 2;
+  transform: translate(25px, -25px);
+}
+@media screen and (max-width: 479px) {
+  .sb-carousel .icon__pos--right {
+    transform: translate(10px, -25px);
+  }
+}
+.sb-carousel__left {
+  width: 100%;
+  height: 100%;
+  -webkit-clip-path: polygon(0 0, 100% 0, 86% 100%, 0% 100%);
+          clip-path: polygon(0 0, 100% 0, 86% 100%, 0% 100%);
+  overflow: hidden;
+}
+@media screen and (max-width: 767px) {
+  .sb-carousel__left {
+    -webkit-clip-path: none;
+            clip-path: none;
+    height: 350px;
+  }
+}
+.sb-carousel__left img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.sb-carousel__right {
+  width: 100%;
+  height: 100%;
+  padding: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 350px;
+}
+
+.carousel-sb--enter {
+  transform: scale(1);
+}
+
+.carousel-sb--enter-active {
+  transform: scale(1.2);
+  transition: transform 5s linear;
+}
+
+.carousel-sb--enter-done {
+  transform: scale(1.2);
+}
+
+.carousel-sb--exit {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.carousel-sb--exit-active {
+  opacity: 0.8;
+  transform: scale(1);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.carousel-sb-text-enter {
+  transform: translateY(40px);
+  opacity: 0;
+}
+
+.carousel-sb-text-enter-active {
+  opacity: 1;
+  transform: translateY(0px);
+  transition: transform 0.5s ease-in, opacity 0.1s ease-out;
+}/*# sourceMappingURL=Carousel.css.map */

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { setStoreLines,setInformation,information, setIdSelection, setWidthChangeType } from "../features/drawing/drwingSlice";
+import { setInformation,information, setIdSelection, setWidthChangeType } from "../features/drawing/drwingSlice";
+import { setStoreLines } from '../Actions/ApplicationStateAction';
 import convert from 'convert-units';
 
 const LineEditForm = ({selectedLines,setSelectedLines,setSelectionMode}) => {

@@ -16,6 +16,7 @@ body, html {
   height: 100%; /* Full height of viewport */
   background-color: #f0f0f0; /* Optional: Background color for clarity */
   overflow: hidden; /* Ensure content doesn't overflow */
+  cursor: crosshair;
 }
 
 .button-container {
