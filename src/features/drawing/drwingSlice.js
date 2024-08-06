@@ -10,6 +10,7 @@ const initialState = {
   factor: [1, 1, 1],
   measured: "in",
   information: false,
+  scale:true,
   idSelection: [],
   widthChangeType: "between",
   type:"wall",
@@ -25,6 +26,10 @@ export const drawingSlice = createSlice({
     setStoreLines: (state, action) => {
       state.storeLines = action.payload;
     },
+    setScale: (state, action) => {
+      state.scale = action.payload;
+    },
+
     setRoomSelectors: (state, action) => {
       state.roomSelectors = action.payload;
     },
@@ -70,6 +75,8 @@ export const {
   setRoomSelectors,
   type,
   setType,
+  scale,
+  setScale,
 } = drawingSlice.actions;
 
 export default drawingSlice.reducer;

@@ -10,19 +10,24 @@ import LineEditForm from "./component/LineEditForm.js";
 import BackgroundImage from "./component/background.js";
 import { useDrawing } from "./hooks/useDrawing.js";
 import CreateFiller from "./component/filler.js";
+import { useSelector, useDispatch } from "react-redux";
 
 
 import {
   setPoints,
   setStoreLines,
+  setScale,
   setPerpendicularLine,
   setFactor,
   setInformation,
   setIdSelection,
 } from "./features/drawing/drwingSlice.js";
 import { DraggableDoor } from "./component/DragDrop.js";
+import { Scale } from "./component/Scale.js";
 
 export const CanvasComponent = () => {
+  const dispatch = useDispatch();
+  const {scale} = useSelector((state) => state.drawing);
   const {
     handleClick,
     handleMouseMove,
@@ -74,6 +79,7 @@ export const CanvasComponent = () => {
     showSnapLine,
     setShowSnapLine,
     setSnappingPoint,
+    
   } = useDrawing();
 
   return (
@@ -96,6 +102,8 @@ export const CanvasComponent = () => {
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
         >
+
+          {scale && (<Scale/>)}
           {addOn && (
             <DraggableDoor
               doorPosition={doorPosition}
@@ -251,7 +259,11 @@ export const CanvasComponent = () => {
           <button onClick={toggleDragMode}>
             {dragMode ? "Disable Drag Mode" : "Enable Drag Mode"}
           </button>
+          <button onClick={() =>{ setMerge(!merge)
+            setStop(!stop);
+          }}>{merge?"merge active":"merge"}</button>
           <button onClick={handleInformtion}>Information</button>
+          <button onClick={() => dispatch(setScale(!scale))}>Scale</button>
           <button onClick={handlemode}>
             {type === "imaginary" ? "imaginary line" : "real line"}
           </button>

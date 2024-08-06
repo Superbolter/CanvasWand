@@ -31,6 +31,7 @@ export const useDrawing = () => {
     perpendicularLine,
     factor,
     measured,
+    scale,
     information,roomSelect,roomSelectors, type,
   } = useSelector((state) => state.drawing);
 
@@ -396,7 +397,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
   }, [storeLines, selectionMode, selectedLines, points, stop]);
 
   const handleClick = (event) => {
-    if (selectionMode || dragMode || doorWindowMode|| merge) return; // Prevent drawing new lines in selection mode
+    if (selectionMode || dragMode || doorWindowMode|| merge|| scale) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
@@ -447,7 +448,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     }
 
 
-    if (newPoints.length >= 2) {
+    if (points.length >= 1) {
       addPoint(point, newPoints[newPoints.length - 2]);
     }
 
@@ -468,32 +469,58 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       const hfactor = INITIAL_HEIGHT / userHeight;
       dispatch(setFactor([lfactor, wfactor, hfactor]));
 
-      let newLine = {
-        id: uniqueId(),
-        points: [newPoints[newPoints.length - 2], point],
-        length: convert(
-          newPoints[newPoints.length - 2].distanceTo(point) * lfactor
-        )
-          .from(measured)
-          .to("mm"),
-        width: convert(INITIAL_BREADTH / wfactor)
-          .from(measured)
-          .to("mm"),
-        height: convert(INITIAL_HEIGHT / hfactor)
-          .from(measured)
-          .to("mm"),
-        widthchangetype: "between",
-        widthchange: 0,
-        type: "wall",
-      };
-      dispatch(setStoreLines([newLine]));
-    }
+
+
+
+
+
+
+
+
+
+    // if (newPoints.length === 2 && firstTime) {
+    //   setFirstTime(false);
+    //   const userHeight = parseFloat(
+    //     prompt("Enter the height of the first line:")
+    //   );
+    //   const userLength = parseFloat(
+    //     prompt("Enter the length of the first line:")
+    //   );
+    //   const userWidth = parseFloat(
+    //     prompt("Enter the thickness of the first line:")
+    //   );
+    //   const lfactor =
+    //     userLength / point.distanceTo(newPoints[newPoints.length - 2]);
+    //   const wfactor = INITIAL_BREADTH / userWidth;
+    //   const hfactor = INITIAL_HEIGHT / userHeight;
+    //   dispatch(setFactor([lfactor, wfactor, hfactor]));
+
+    //   let newLine = {
+    //     id: uniqueId(),
+    //     points: [newPoints[newPoints.length - 2], point],
+    //     length: convert(
+    //       newPoints[newPoints.length - 2].distanceTo(point) * lfactor
+    //     )
+    //       .from(measured)
+    //       .to("mm"),
+    //     width: convert(INITIAL_BREADTH / wfactor)
+    //       .from(measured)
+    //       .to("mm"),
+    //     height: convert(INITIAL_HEIGHT / hfactor)
+    //       .from(measured)
+    //       .to("mm"),
+    //     widthchangetype: "between",
+    //     widthchange: 0,
+    //     type: "wall",
+    //   };
+    //   dispatch(setStoreLines([newLine]));
+    // }
     setCurrentMousePosition(null); // Clear the temporary line on click
     setDistance(0); // Reset distance display
   };
 
   const handleMouseMove = (event) => {
-    if ((points.length === 0 || stop || newLine || doorWindowMode) && !dragMode)
+    if ((points.length === 0 || stop || newLine || doorWindowMode||scale) && !dragMode)
       return; // No point to start from or not in perpendicular mode
 
     const canvasContainer = document.querySelector(".canvas-container");
