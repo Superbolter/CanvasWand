@@ -1,9 +1,14 @@
-import React from "react";
+import React, {useMemo} from "react";
 import { Canvas, extend } from "@react-three/fiber";
-import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial } from "three";
+import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
 import { useSelector } from "react-redux";
 import convert from "convert-units";
 import CreateFiller from "./filler";
+import Window from "../assets/Window.png"
+import Door from "../assets/Door.png"
+import Railing from "../assets/Railing.png"
+import New from "../assets/New.png"
+import Wall from "../assets/Walll.png"
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -83,6 +88,7 @@ const BoxGeometry = ({
   widthchangetype,
   isSelected,
   type,
+  typeId,
   isChoose,
   onClick,
   currentPoint,
@@ -92,7 +98,29 @@ const BoxGeometry = ({
 
   const { measured, roomSelect,newline } = useSelector((state) => state.drawing);
   const { storeLines, factor} = useSelector((state) => state.ApplicationState);
-  console.log(storeLines)
+
+  const textureLoader = useMemo(() => new TextureLoader(), []);
+  const windowTexture = useMemo(
+    () => textureLoader.load(Window), // Replace with the path to your window image
+    [textureLoader]
+  );
+  const wallTexture = useMemo(
+    () => textureLoader.load(Wall), // Replace with the path to your window image
+    [textureLoader]
+  );
+  const railingTexture = useMemo(
+    () => textureLoader.load(Railing), // Replace with the path to your window image
+    [textureLoader]
+  );
+  const doorTexture = useMemo(
+    () => textureLoader.load(Door), // Replace with the path to your window image
+    [textureLoader]
+  );
+  const newTexture = useMemo(
+    () => textureLoader.load(New), // Replace with the path to your window image
+    [textureLoader]
+  );
+
   if (!start || !end) return null;
 
   const length = start.distanceTo(end);
@@ -210,14 +238,20 @@ if(mid1 && mid2 && !newline){
       <mesh position={adjustedMidpoint} rotation={[0, 0, angle]} onClick={onClick}>
         <boxGeometry args={[length, width, 0.1]} />
         <meshBasicMaterial
-          color={
-            type === "imaginary" ? "grey" :
-            type === "door" ? "#EE918E" :
-            (isSelected && roomSelect) ? "blue" :
-            (isSelected && !roomSelect) ? 'green' :
-            isChoose ? "pink" : "#787878"
+           map={
+            typeId === 1
+              ? wallTexture
+              : typeId === 2
+              ? doorTexture
+              : typeId === 3
+              ? windowTexture
+              : typeId === 4
+              ? railingTexture
+              : newTexture
           }
-          transparent={true}
+          color={isSelected&&"blue"}
+          width={typeId===4?"10px":"20px"}
+          transparent={false}
         />
       </mesh>
 

@@ -160,6 +160,7 @@ export const CanvasComponent = () => {
               widthchange={line.widthchange}
               widthchangetype={line.widthchangetype}
               type={line.type}
+              typeId={line.typeId}
               isSelected={selectedLines.includes(line.id)}
               onClick={() => handleLineClick(line.id)}
             />
