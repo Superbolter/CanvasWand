@@ -24,8 +24,8 @@ const WallGeometry = ({
   type,
 }) => {
   const texture = useLoader(TextureLoader, Brick1);
-  const { measured,factor } = useSelector((state) => state.drawing);
-
+  const { measured } = useSelector((state) => state.drawing);
+  const {factor}=useSelector((state)=>state.ApplicationState)
   if (!start || !end) return null;
 
   const length = start.distanceTo(end);
