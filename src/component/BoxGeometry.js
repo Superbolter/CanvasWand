@@ -90,8 +90,9 @@ const BoxGeometry = ({
   opacity = 0.5,
 }) => {
 
-  const { storeLines, measured, factor, roomSelect,newline } = useSelector((state) => state.drawing);
-
+  const { measured, roomSelect,newline } = useSelector((state) => state.drawing);
+  const { storeLines, factor} = useSelector((state) => state.ApplicationState);
+  console.log(storeLines)
   if (!start || !end) return null;
 
   const length = start.distanceTo(end);

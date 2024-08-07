@@ -56,7 +56,7 @@ const DrawtoolHeader = ({deleteLastPoint,lines,points, roomSelectors,redo}) => {
       <img style={{width:"24px", height:"24px"}}src={Redo} alt="" />
       <Typography>Redo</Typography>
       </Button>
-      <Button className='save-btn' onClick={handleSaveClick}>Save & next</Button>
+      <Button className='save-btn' modifiers={["blue"]} onClick={handleSaveClick}>Save & next</Button>
       </div>
     </div>
   )

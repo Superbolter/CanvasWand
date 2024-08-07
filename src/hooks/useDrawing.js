@@ -18,6 +18,7 @@ import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import {findLineForPoint }from "../utils/coolinear.js"
 import { setPoints,setStoreLines,setFactor, showRoomNamePopup } from "../Actions/ApplicationStateAction.js";
+import { setContextualMenuStatus } from "../Actions/DrawingActions.js";
 
 export const useDrawing = () => {
   const dispatch = useDispatch();
@@ -420,9 +421,16 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       // room();
       
     }
+    if(event.ctrlKey&&(event.key === "z" || event.key === "Z")){
+      deleteLastPoint();
+    }
+    if(event.ctrlKey&&(event.key === "y" || event.key === "Y")){
+      redo();
+    }
     if(event.key === "escape" || event.key === "Escape"){
       setNewLine(!newLine);
-      setShowSnapLine(false)
+      setShowSnapLine(false);
+      dispatch(setContextualMenuStatus(false))
       setStop(!stop);
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
@@ -466,6 +474,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     
     if (newLine) {
       setStop(!stop);
+      dispatch(setContextualMenuStatus(true))
       setNewLine(false);
       point = snapToPoint(point, points, storeLines);
 
@@ -491,6 +500,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
 
 
     if (points.length >= 1) {
+      dispatch(setContextualMenuStatus(true))
       addPoint(point, newPoints[newPoints.length - 2]);
     }
 

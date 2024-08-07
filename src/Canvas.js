@@ -26,6 +26,7 @@ import { Scale } from "./component/Scale.js";
 import DrawtoolHeader from "./component/DrawtoolHeader.js";
 import { useDispatch, useSelector } from "react-redux";
 import { drawToolData } from "./Actions/ApplicationStateAction.js";
+import ContextualMenu from "./component/ContextualMenu.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -247,14 +248,14 @@ export const CanvasComponent = () => {
             <Grid
               rotation={[Math.PI / 2, 0, 0]}
               cellSize={100}
-              cellThickness={2}
-              cellColor="red"
-              sectionSize={20}
+              cellThickness={0}
+              cellColor="black"
+              sectionSize={80}
               sectionThickness={1.5}
               sectionColor="lightgray"
               fadeDistance={10000}
               infiniteGrid
-            />
+            /> 
 
             {/* Orbit controls for 3D view */}
             <OrbitControls />
@@ -328,6 +329,7 @@ export const CanvasComponent = () => {
             points={points}
             roomSelectors={roomSelectors}
           />
+          {contextualMenuStatus && <ContextualMenu/>}
         </div>
       </div>
     </div>
