@@ -5,7 +5,8 @@ import { setStoreLines } from '../Actions/ApplicationStateAction';
 import convert from 'convert-units';
 
 const LineEditForm = ({selectedLines,setSelectedLines,setSelectionMode}) => {
-  const { storeLines, idSelection, measured, widthChangeType,information } = useSelector((state) => state.drawing);
+  const { idSelection, measured, widthChangeType,information } = useSelector((state) => state.drawing);
+  const { storeLines} = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch();
 
   const selectedLine = storeLines.find(line => line.id === selectedLines[selectedLines.length-1]);

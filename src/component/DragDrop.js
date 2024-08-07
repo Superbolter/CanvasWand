@@ -27,7 +27,7 @@ export const DraggableDoor = ({
   const dispatch = useDispatch();
   const {
     storeLines,
-  } = useSelector((state) => state.drawing);
+  } = useSelector((state) => state.ApplicationState);
 
   useEffect(() => {
     const canvasContainer = document.querySelector(".canvas-container");

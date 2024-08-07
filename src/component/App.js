@@ -2,41 +2,36 @@ import React, { useEffect } from "react";
 import "./App.css";
 import { Canvas } from "@react-three/fiber";
 import { Grid, Line, Text, OrbitControls } from "@react-three/drei";
-import BoxGeometry from "./component/BoxGeometry.js";
-import WallGeometry from "./component/WallGeometry.js";
-import DownloadJSONButton from "./component/ConvertToJson.js";
-import LengthConverter from "./component/LengthConverter.js";
-import LineEditForm from "./component/LineEditForm.js";
-import BackgroundImage from "./component/background.js";
-import { useDrawing } from "./hooks/useDrawing.js";
-import CreateFiller from "./component/filler.js";
-import RomeDataManager from "./app/RomeDataManager.js";
-import {cookies} from "./App"
+import BoxGeometry from "./component/BoxGeometry";
+import WallGeometry from "./component/WallGeometry";
+import LengthConverter from "./component/LengthConverter";
+import LineEditForm from "./component/LineEditForm";
+import BackgroundImage from "./component/background";
+import { useDrawing } from "./hooks/useDrawing";
 import {
-  setPoints,
-  setStoreLines,
-  setScale,
   setPerpendicularLine,
   setFactor,
   setInformation,
   setIdSelection,
 } from "./features/drawing/drwingSlice.js";
-import { DraggableDoor } from "./component/DragDrop.js";
-import { Scale } from "./component/Scale.js";
-import DrawtoolHeader from "./component/DrawtoolHeader.js";
-import { useDispatch, useSelector } from "react-redux";
-import { drawToolData } from "./Actions/ApplicationStateAction.js";
-import ContextualMenu from "./component/ContextualMenu.js";
+import { DraggableDoor } from "./component/DragDrop";
 import ButtonComponent from "./component/ButtonComponent.js";
+import DrawtoolHeader from "./component/DrawtoolHeader.js";
 import WallPropertiesPopup from "./component/WallPropertiesPopup.js";
 import WindowPropertiesPopup from "./component/WindowPropertiesPopup.js";
+import ContextualMenu from "./component/ContextualMenu.js";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import Cookies from "universal-cookie";
 import DoorPropertiesPopup from "./component/DoorPropertiesPopup.js";
 import RailingPropertiesPopup from "./component/RailingPropertiesPopup.js";
+import { setLineId } from "./Actions/DrawingActions.js";
+import { drawToolData, setStoreLines } from "./Actions/ApplicationStateAction.js";
+import RomeDataManager from "./app/RomeDataManager.js";
+import Drawtool from "./component/Drawtool.js";
+import { BrowserRouter as Router, Route, Switch, Routes, useLocation } from 'react-router-dom';
 import RoomNamePopup from "./component/RoomNamePopup.js";
-
-export const CanvasComponent = () => {
-  const dispatch = useDispatch();
-  const {scale} = useSelector((state) => state.drawing);
+export const cookies = new Cookies();
+export const App = () => {
   const {
     handleClick,
     handleMouseMove,
@@ -68,7 +63,6 @@ export const CanvasComponent = () => {
     information,
     idSelection,
     doorPosition,
-    merge,setMerge,
     setDoorPosition,
     isDraggingDoor,
     setIsDraggingDoor,
@@ -79,29 +73,23 @@ export const CanvasComponent = () => {
     roomSelectors,
     handlemode,
     type,
-    setStop,
-    lineBreak,
-    setLineBreak,
-
     snappingPoint,
     showSnapLine,
     setShowSnapLine,
     setSnappingPoint,
-    
   } = useDrawing();
-
   const getUrlParameter = (name) => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(name);
   };
-
   const { contextualMenuStatus, type_id, lineId } = useSelector(
     (state) => state.Drawing
   );
   const { floorplanId, drawData, storeLines, points } = useSelector(
     (state) => state.ApplicationState
   );
-
+  // const location = useLocation();
+  const dispatch = useDispatch();
   useEffect(() => {
     // console.log(type_id);
     console.log(storeLines);
@@ -134,15 +122,13 @@ export const CanvasComponent = () => {
           style={{
             height: window.innerHeight,
             width: "100%",
-            background: "#f0f0f0",
+            background: "#FAFAFA",
           }}
           orthographic
           raycaster={{ params: { Line: { threshold: 5 } } }}
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
         >
-
-          {scale && (<Scale/>)}
           {addOn && (
             <DraggableDoor
               doorPosition={doorPosition}
@@ -157,37 +143,44 @@ export const CanvasComponent = () => {
           )}
           <BackgroundImage />
           {/* Render lines in 2D view */}
-          {storeLines.map((line) => (
-            <BoxGeometry
-              key={line.id}
-              start={line.points[0]}
-              end={line.points[1]}
-              dimension={{ width: line.width, height: line.height }}
-              widthchange={line.widthchange}
-              widthchangetype={line.widthchangetype}
-              type={line.type}
-              typeId={line.typeId}
-              isSelected={selectedLines.includes(line.id)}
-              onClick={() => handleLineClick(line.id)}
-            />
-          ))}
+          {storeLines &&
+            storeLines.map((line) => (
+              <BoxGeometry
+                key={line.id}
+                start={line.points[0]}
+                end={line.points[1]}
+                dimension={{ width: line.width, height: line.height }}
+                widthchange={line.widthchange}
+                widthchangetype={line.widthchangetype}
+                typeId={line.typeId}
+                isSelected={selectedLines.includes(line.id)}
+                onClick={() => handleLineClick(line.id)}
+              />
+            ))}
 
-          
-            {showSnapLine && snappingPoint && (
-              <Line
+          {showSnapLine && snappingPoint && (
+            <Line
               points={[snappingPoint[1], snappingPoint[0]]}
               color="green"
-              lineWidth={5}
+                lineWidth={17} // Border line width
+                transparent
+                opacity={0.5} // Border line opacity
             />
-            )}
-             
+          )}
 
           {currentMousePosition && points.length > 0 && !stop && (
             <>
               <Line
                 points={[points[points.length - 1], currentMousePosition]}
-                color="blue"
-                lineWidth={5}
+                color="#6388F8"
+                lineWidth={17} // Border line width
+                transparent
+                opacity={0.5} // Border line opacity
+              />
+              <Line
+                points={[points[points.length - 1], currentMousePosition]}
+                color="#6698D6"
+                lineWidth={15} // Main line width
               />
               <Text
                 position={[
@@ -207,50 +200,32 @@ export const CanvasComponent = () => {
             </>
           )}
 
-          <CreateFiller/>
-
           {/* 2D grid */}
           <Grid
             rotation={[Math.PI / 2, 0, 0]}
             cellSize={100}
             cellThickness={0}
-            //cellColor="gray"
             sectionSize={40}
-            //sectionThickness={1.5}
-            sectionColor="white"
+            sectionColor="lightgrey"
             fadeDistance={10000}
             infiniteGrid
             fadeStrength={1}
             fadeFrom={1}
           />
-          
         </Canvas>
-        
       </div>
-      {!scale &&
+
       <div className="button-container">
         {/* 3D (Perspective) Canvas */}
-        {/* <div className="perspective-canvas">
-          
-        </div> */}
-
         {/* Buttons for interaction */}
-        {/* <div className="button-container1">
+        <div className="button-container1">
           <button onClick={deleteLastPoint}>Delete Last Point</button>
           <button onClick={toggleSelectionroomMood}>
             {roomSelect ? "selectingRoom" : "roomSelecter"}
           </button>
-          <button onClick={() => {setNewLine(!newLine)
-            setStop(!stop);
-          }}>
+          <button onClick={() => setNewLine(!newLine)}>
             {newLine ? "NewLineAdded" : "Add New Line"}
           </button>
-          <button onClick={() =>{ setLineBreak(!lineBreak)
-            setStop(!stop);
-          }}>
-            {lineBreak ? "breaking start" : "Break"}
-          </button>
-          {/*check setNewLine(true); *
           <button onClick={perpendicularHandler}>
             {perpendicularLine
               ? "Perpendicular Line"
@@ -264,11 +239,7 @@ export const CanvasComponent = () => {
           <button onClick={toggleDragMode}>
             {dragMode ? "Disable Drag Mode" : "Enable Drag Mode"}
           </button>
-          <button onClick={() =>{ setMerge(!merge)
-            setStop(!stop);
-          }}>{merge?"merge active":"merge"}</button>
           <button onClick={handleInformtion}>Information</button>
-          <button onClick={() => dispatch(setScale(!scale))}>Scale</button>
           <button onClick={handlemode}>
             {type === "imaginary" ? "imaginary line" : "real line"}
           </button>
@@ -279,11 +250,6 @@ export const CanvasComponent = () => {
               ? "Place Door"
               : "Door Mode"}
           </button>
-          <DownloadJSONButton
-            lines={storeLines}
-            points={points}
-            roomSelectors={roomSelectors}
-          />
           <LengthConverter />
           {information && (
             <LineEditForm
@@ -292,17 +258,19 @@ export const CanvasComponent = () => {
               setSelectionMode={setSelectionMode}
             />
           )}
-        </div> */}
-        <div style={{ position: "relative" }}>
-          <DrawtoolHeader
-            deleteLastPoint={deleteLastPoint}
-            redo={redo}
-            lines={storeLines}
-            points={points}
-            roomSelectors={roomSelectors}
-          />
-          {contextualMenuStatus && <ContextualMenu/>}
-          <div
+        </div>
+      </div>
+
+      <div style={{ position: "relative" }}>
+        <DrawtoolHeader
+          deleteLastPoint={deleteLastPoint}
+          redo={redo}
+          lines={storeLines}
+          points={points}
+          roomSelectors={roomSelectors}
+        />
+        {contextualMenuStatus && <ContextualMenu />}
+        <div
           className="perspective-canvas"
           style={{
             position: "absolute",
@@ -316,53 +284,52 @@ export const CanvasComponent = () => {
           }}
         >
           <Canvas
-            style={{ height: 400, width: "100%" }}
+            style={{ height: "100%", width: "100%", borderRadius: "12px" }}
             camera={{ position: [0, 0, 800], fov: 75 }}
           >
             {/* Render lines in 3D view */}
-            {storeLines.map((line) => (
-              <WallGeometry
-                key={line.id}
-                start={line.points[0]}
-                end={line.points[1]}
-                dimension={{ width: line.width, height: line.height }}
-                widthchange={line.widthchange}
-                widthchangetype={line.widthchangetype}
-                type={line.type}
-                isSelected={selectedLines.includes(line.id)}
-                isChoose={idSelection.includes(line.id)}
-                onClick={() => handleLineClick(line.id)}
-              />
-            ))}
+            {storeLines &&
+              storeLines.map((line) => (
+                <WallGeometry
+                  key={line.id}
+                  start={line.points[0]}
+                  end={line.points[1]}
+                  dimension={{ width: line.width, height: line.height }}
+                  widthchange={line.widthchange}
+                  widthchangetype={line.widthchangetype}
+                  type={line.type}
+                  isSelected={selectedLines.includes(line.id)}
+                  isChoose={idSelection.includes(line.id)}
+                  onClick={() => handleLineClick(line.id)}
+                />
+              ))}
 
             {/* 3D grid */}
             <Grid
               rotation={[Math.PI / 2, 0, 0]}
               cellSize={100}
               cellThickness={0}
-              cellColor="black"
               sectionSize={80}
-              sectionThickness={1.5}
-              sectionColor="lightgray"
+              sectionColor="lightgrey"
               fadeDistance={10000}
               infiniteGrid
-            /> 
+              fadeStrength={1}
+              fadeFrom={10}
+            />
 
             {/* Orbit controls for 3D view */}
             <OrbitControls />
           </Canvas>
         </div>
-          <WindowPropertiesPopup />
-          <WallPropertiesPopup />
-          <DoorPropertiesPopup />
-          <RailingPropertiesPopup />
-          <RoomNamePopup />
-          <ButtonComponent setNewLine={() => setNewLine(!newLine)} />
-        </div>
+        <WindowPropertiesPopup />
+        <WallPropertiesPopup />
+        <DoorPropertiesPopup />
+        <RailingPropertiesPopup />
+        <RoomNamePopup />
+        <ButtonComponent setNewLine={() => setNewLine(!newLine)} />
       </div>
-      }
     </div>
   );
 };
 
-export default CanvasComponent;
+export default App;
