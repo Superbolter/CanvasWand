@@ -87,7 +87,7 @@ export const CanvasComponent = () => {
     showSnapLine,
     setShowSnapLine,
     setSnappingPoint,
-    
+    escape
   } = useDrawing();
 
   const getUrlParameter = (name) => {
@@ -357,7 +357,7 @@ export const CanvasComponent = () => {
           <DoorPropertiesPopup />
           <RailingPropertiesPopup />
           <RoomNamePopup />
-          <ButtonComponent setNewLine={() => setNewLine(!newLine)} />
+          <ButtonComponent setNewLine={escape} />
         </div>
       </div>
       }

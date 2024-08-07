@@ -3,12 +3,14 @@ import { Typography } from "../design_system/StyledComponents/components/Typogra
 import wallIcon from "../assets/wallIcon.png";
 import SelectedWall from "../assets/SelectedWall.png";
 import "./ButtonComponent.css";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTypeId } from '../Actions/DrawingActions.js';
 
 const ButtonComponent = ({ setNewLine }) => {
   const typeId = useSelector((state) => state.Drawing.typeId);
   const roomPopup = useSelector((state) => state.ApplicationState.roomPopup);
   const [selectedButton, setSelectedButton] = useState(null);
+  const dispatch = useDispatch()
   useEffect(() => {
     
   console.log(typeId);
@@ -18,8 +20,16 @@ const ButtonComponent = ({ setNewLine }) => {
   
   const handleButtonClick = (buttonName) => {
     setSelectedButton(buttonName);
+    setNewLine();
     if (buttonName === 'Walls') {
-      setNewLine();
+      dispatch(setTypeId(1))
+    }
+    else if (buttonName === "Door"){
+      dispatch(setTypeId(2))
+    }else if(buttonName === "Window"){
+      dispatch(setTypeId(3))
+    }else{
+      dispatch(setTypeId(4))
     }
   };
 
@@ -69,20 +79,20 @@ const ButtonComponent = ({ setNewLine }) => {
               <img src={selectedButton==="Door"?SelectedWall:wallIcon} alt="" style={{ width: "20px", height: "15px" }} />
               <Typography className='btn-text' style={{color:selectedButton==="Door"&&"#4B73EC" }}>Door</Typography>
             </div>
-            <div
+            {/* <div
               className={`drawtool-btn ${selectedButton === 'Door opening' ? 'selected' : ''}`}
-              onClick={() => handleButtonClick('Door opening')}
+              onClick={() => handleButtonClick('Door')}
             >
               <img src={selectedButton==="Door opening"?SelectedWall:wallIcon} alt="" style={{ width: "20px", height: "15px" }} />
               <Typography className='btn-text' style={{color:selectedButton==="Door opening"&&"#4B73EC" }}>Door opening</Typography>
             </div>
             <div
               className={`drawtool-btn ${selectedButton === 'Sliding Door' ? 'selected' : ''}`}
-              onClick={() => handleButtonClick('Sliding Door')}
+              onClick={() => handleButtonClick('Door')}
             >
               <img src={selectedButton==="Sliding Door"?SelectedWall:wallIcon} alt="" style={{ width: "20px", height: "15px" }} />
               <Typography className='btn-text'style={{color:selectedButton==="Sliding Door"&&"#4B73EC" }}>Sliding Door</Typography>
-            </div>
+            </div> */}
             <div
               className={`drawtool-btn ${selectedButton === 'Window' ? 'selected' : ''}`}
               onClick={() => handleButtonClick('Window')}

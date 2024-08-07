@@ -428,10 +428,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       redo();
     }
     if(event.key === "escape" || event.key === "Escape"){
-      setNewLine(!newLine);
-      setShowSnapLine(false);
-      dispatch(setContextualMenuStatus(false))
-      setStop(!stop);
+      escape();
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
       deleteSelectedLines();
@@ -445,6 +442,13 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [storeLines, selectionMode, selectedLines, points, stop]);
+
+  const escape = () =>{
+    setNewLine(!newLine);
+    setShowSnapLine(false);
+    dispatch(setContextualMenuStatus(false))
+    setStop(!stop);
+  }
 
   const handleClick = (event) => {
     if (selectionMode || dragMode || doorWindowMode|| merge|| scale) return; // Prevent drawing new lines in selection mode
@@ -987,6 +991,7 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     setDimensions,
     toggleSelectionroomMood,
     handlemode,
-    room
+    room,
+    escape
   };
 };
