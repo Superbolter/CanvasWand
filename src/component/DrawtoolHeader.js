@@ -9,7 +9,7 @@ import {handleDownload} from "./ConvertToJson.js"
 import { useDispatch, useSelector } from 'react-redux'
 import { drawData, updateDrawData } from '../Actions/ApplicationStateAction.js'
 
-const DrawtoolHeader = ({deleteLastPoint,lines,points, roomSelectors,redo}) => {
+const DrawtoolHeader = ({deleteLastPoint,lines,points, roomSelectors,redo,toggleSelectionroomMood}) => {
   const dispatch=useDispatch()
   const {factor,floorplanId}=useSelector((state)=>state.ApplicationState)
   const handleSaveClick =()=>{
@@ -56,6 +56,12 @@ const DrawtoolHeader = ({deleteLastPoint,lines,points, roomSelectors,redo}) => {
       <img style={{width:"24px", height:"24px"}}src={Redo} alt="" />
       <Typography>Redo</Typography>
       </Button>
+      
+      <Button modifiers={["outlineBlack","sm"]} className='undo-redo-btn' onClick={toggleSelectionroomMood}>
+      {/* <img style={{width:"24px", height:"24px"}}src={Redo} alt="" /> */}
+      <Typography>roomSelect</Typography>
+      </Button>
+      
       <Button className='save-btn' modifiers={["blue"]} onClick={handleSaveClick}>Save & next</Button>
       </div>
     </div>

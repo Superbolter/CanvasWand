@@ -330,9 +330,23 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
   };
 
   const deleteLastPoint = () => {
+    const deleteLine = storeLines[storeLines.length - 1];
     const updatedLines = storeLines.slice(0, -1);
     let updatedPoints = points.slice(0, -1);
     const lastPoint = updatedPoints[updatedPoints.length - 1];
+    const lastPointId = deleteLine.id;
+
+
+    const roomToRemove = roomSelectors.find(room => room.wallIds.includes(lastPointId));
+   
+    
+    if (roomToRemove) {
+        const updatedRoomSelectors = roomSelectors.filter(room => room.roomId !== roomToRemove.roomId);
+       
+        dispatch(setRoomSelectors(updatedRoomSelectors));
+    }
+
+     
 
     const hasBreakPoint = breakPoint.includes(lastPoint);
     if (hasBreakPoint) {
@@ -381,6 +395,9 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
   };
 
   const deleteSelectedLines = () => {
+
+    const roomupdate = roomSelectors.filter(room =>!room.wallIds.some(lineId => selectedLines.includes(lineId)));
+    dispatch(setRoomSelectors(roomupdate));
     const updatedLines = storeLines.filter(
       (line) => !selectedLines.includes(line.id)
     );
@@ -415,10 +432,10 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
     if (event.key === "s" || event.key === "S") {
       setStop(!stop);
     }
-    // if(event.key === "r" || event.key === "R"){
-    //   room();
+    if(event.key === "r" || event.key === "R"){
+      room();
 
-    // }
+    }
     if(event.ctrlKey&&(event.key === "q" || event.key === "Q")){
       dispatch(showRoomNamePopup(true));
       // room();
@@ -790,6 +807,7 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
 
 
   const toggleSelectionroomMood= () => {
+    escape();
     setSelectionMode(!selectionMode);
     dispatch(setRoomSelect(true));
     setSelectedLines([]);
