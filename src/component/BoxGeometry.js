@@ -231,14 +231,15 @@ if(mid1 && mid2 && !newline){
 // console.log(p3);
 // console.log(p4);
   
-
-  console.log(length,width, dimension.width, factor)
   return (
     <>
       <mesh position={adjustedMidpoint} rotation={[0, 0, angle]} onClick={onClick}>
         <boxGeometry args={[length, width, 0.1]} />
         <meshBasicMaterial
            map={
+            isSelected?
+            newTexture
+            :
             typeId === 1
               ? wallTexture
               : typeId === 2
@@ -249,7 +250,6 @@ if(mid1 && mid2 && !newline){
               ? railingTexture
               : wallTexture
           }
-          color={isSelected&&"blue"}
           width={typeId===4?"10px":"20px"}
           transparent={false}
         />

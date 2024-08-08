@@ -851,8 +851,6 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
     
     if(selectionMode && roomSelect){
 
-
-      
       setSelectedLines((prev) =>
         prev.includes(id)
           ? prev.filter((lineId) => lineId !== id)
