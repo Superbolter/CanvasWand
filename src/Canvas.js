@@ -128,6 +128,7 @@ export const CanvasComponent = () => {
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
+        style={selectionMode?{ cursor: "move"}:{cursor:"crosshair"}}
       >
         {/* 2D (Orthographic) Canvas */}
         <Canvas

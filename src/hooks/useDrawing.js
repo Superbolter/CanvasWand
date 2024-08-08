@@ -428,7 +428,8 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       redo();
     }
     if(event.key === "escape" || event.key === "Escape"){
-      escape();
+      // escape();
+      toggleSelectionMode();
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
       deleteSelectedLines();
