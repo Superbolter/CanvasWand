@@ -15,11 +15,11 @@ export const Scale = () => {
   const left = useRef();
   const right = useRef();
   const [dragging, setDragging] = useState(null);
-  const [dimensions, setDimensions] = useState({ l: 100, w: 15, h: 0 });
+  const [dimensions, setDimensions] = useState({ l: 10, w: 15, h: 0 });
   const [isDraggingBox, setIsDraggingBox] = useState(false);
   const [position, setPosition] = useState(new Vector3(0, 0, 0));
-  const [leftPos, setLeftPos] = useState(new Vector3(-50, 0, 0));
-  const [rightPos, setRightPos] = useState(new Vector3(50, 0, 0));
+  const [leftPos, setLeftPos] = useState(new Vector3(-5, 0, 0));
+  const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
   const [lineAngle, setLineAngle] = useState(0);
   const [isPointerMoving, setIsPointerMoving] = useState(false);
 
@@ -132,15 +132,17 @@ export const Scale = () => {
   };
 
   const handleDoubleClick = () => {
-    const userHeight = parseFloat(
-      prompt("Enter the height of the first line:")
-    );
+    // const userHeight = parseFloat(
+    //   prompt("Enter the height of the first line:")
+    // );
+    const userHeight = 10;
     const userLength = parseFloat(
       prompt("Enter the length of the first line:")
     );
-    const userWidth = parseFloat(
-      prompt("Enter the thickness of the first line:")
-    );
+    // const userWidth = parseFloat(
+    //   prompt("Enter the thickness of the first line:")
+    // );
+    const userWidth = 2;
     const lfactor =
       userLength / leftPos.distanceTo(rightPos);
     const wfactor = INITIAL_BREADTH / userWidth;

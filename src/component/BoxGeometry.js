@@ -247,7 +247,7 @@ if(mid1 && mid2 && !newline){
               ? windowTexture
               : typeId === 4
               ? railingTexture
-              : newTexture
+              : wallTexture
           }
           color={isSelected&&"blue"}
           width={typeId===4?"10px":"20px"}
