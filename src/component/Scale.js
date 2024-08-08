@@ -7,6 +7,7 @@ import {
   setScale,
 } from "../features/drawing/drwingSlice.js";
 import { useDispatch, useSelector } from "react-redux";
+import { useDrawing } from "../hooks/useDrawing.js";
 
 export const Scale = () => {
 
@@ -18,10 +19,9 @@ export const Scale = () => {
   const [dimensions, setDimensions] = useState({ l: 10, w: 15, h: 0 });
   const [isDraggingBox, setIsDraggingBox] = useState(false);
   const [position, setPosition] = useState(new Vector3(0, 0, 0));
-  const [leftPos, setLeftPos] = useState(new Vector3(-5, 0, 0));
-  const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
   const [lineAngle, setLineAngle] = useState(0);
   const [isPointerMoving, setIsPointerMoving] = useState(false);
+  const { handleDoubleClick, leftPos, rightPos, setLeftPos, setRightPos} = useDrawing();
 
   useEffect(() => {
     const canvasContainer = document.querySelector(".canvas-container");
@@ -129,26 +129,6 @@ export const Scale = () => {
     setDragging(null);
     setIsDraggingBox(false);
     event.stopPropagation();
-  };
-
-  const handleDoubleClick = () => {
-    // const userHeight = parseFloat(
-    //   prompt("Enter the height of the first line:")
-    // );
-    const userHeight = 10;
-    const userLength = parseFloat(
-      prompt("Enter the length of the first line:")
-    );
-    // const userWidth = parseFloat(
-    //   prompt("Enter the thickness of the first line:")
-    // );
-    const userWidth = 2;
-    const lfactor =
-      userLength / leftPos.distanceTo(rightPos);
-    const wfactor = INITIAL_BREADTH / userWidth;
-    const hfactor = INITIAL_HEIGHT / userHeight;
-    dispatch(setFactor([lfactor, wfactor, hfactor]));
-    dispatch(setScale(false))
   };
 
   return (

@@ -232,7 +232,7 @@ if(mid1 && mid2 && !newline){
 // console.log(p4);
   
 
-
+  console.log(length,width, dimension.width, factor)
   return (
     <>
       <mesh position={adjustedMidpoint} rotation={[0, 0, angle]} onClick={onClick}>

@@ -1,6 +1,7 @@
 import { useDispatch } from "react-redux";
 import RomeDataManager , {fetchWrapper} from "../app/RomeDataManager";
 import * as THREE from 'three';
+import { setScale } from "../features/drawing/drwingSlice";
 
 export const drawToolData = (floorplan_id) => {
     return (dispatch) => {
@@ -19,8 +20,8 @@ export const drawToolData = (floorplan_id) => {
                     type: "GET_DRAW_DATA",
                     payload: response.data // assuming the response contains some data you might need
                 });
-                console.log(response);
-                const drawData=response.data.draw_data;
+                console.log(JSON.parse(response.data.draw_data));
+                const drawData=JSON.parse(response.data.draw_data);
                 let lines=[];
                 let point=[]
                 if(drawData&&drawData.lines&&drawData.lines.length>0){
@@ -54,11 +55,12 @@ export const drawToolData = (floorplan_id) => {
                     
                     console.log(point)
                 }
+                console.log(lines)
                 dispatch(setStoreLines(lines));
                 dispatch(setPoints(point));
                 if(response.data.scale!==null){
-                    console.log(response.data.scale)
-                    // dispatch(setFactor(response.data.scale))
+                    dispatch(setFactor(JSON.parse(response.data.scale)))
+                    dispatch(setScale(false))
                 }
             })
             .catch(error => {
@@ -89,7 +91,7 @@ export const updateDrawData = (data,floorplanId) => {
     };
 };
 export const setStoreLines=(lines)=>{
- 
+
     
     return (dispatch)=>{
 
@@ -109,7 +111,6 @@ export const setPoints=(points)=>{
 }
 export const setFactor=(factor)=>{
     return (dispatch)=>{
-        console.log(factor)
         dispatch({
 
             type:"SET_FACTOR",

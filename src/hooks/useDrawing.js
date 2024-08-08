@@ -7,6 +7,7 @@ import {
   setInformation,
   setRoomSelect,setRoomSelectors,
   setType,
+  setScale,
 } from "../features/drawing/drwingSlice.js";
 import {
   uniqueId,
@@ -63,6 +64,8 @@ export const useDrawing = () => {
 
 const [snappingPoint, setSnappingPoint] = useState([]);
 const [showSnapLine, setShowSnapLine] = useState(false);
+const [leftPos, setLeftPos] = useState(new Vector3(-5, 0, 0));
+const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
 
 
   const handlePointerDown = useCallback(
@@ -428,9 +431,12 @@ const [showSnapLine, setShowSnapLine] = useState(false);
       redo();
     }
     if(event.key === "escape" || event.key === "Escape"){
-      // escape();
+      escape();
       toggleSelectionMode();
     }
+    // if(event.key === "Enter" && scale){
+    //   handleDoubleClick();
+    // }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
       deleteSelectedLines();
     }
@@ -450,6 +456,26 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     dispatch(setContextualMenuStatus(false))
     setStop(!stop);
   }
+
+  const handleDoubleClick = () => {
+    // const userHeight = parseFloat(
+    //   prompt("Enter the height of the first line:")
+    // );
+    const userHeight = 10;
+    const userLength = parseFloat(
+      prompt("Enter the length of the first line:")
+    );
+    // const userWidth = parseFloat(
+    //   prompt("Enter the thickness of the first line:")
+    // );
+    const userWidth = 2;
+    const lfactor =
+      userLength / leftPos.distanceTo(rightPos);
+    const wfactor = INITIAL_BREADTH / userWidth;
+    const hfactor = INITIAL_HEIGHT / userHeight;
+    dispatch(setFactor([lfactor, wfactor, hfactor]));
+    dispatch(setScale(false))
+  };
 
   const handleClick = (event) => {
     if (selectionMode || dragMode || doorWindowMode|| merge|| scale) return; // Prevent drawing new lines in selection mode
@@ -993,6 +1019,11 @@ const [showSnapLine, setShowSnapLine] = useState(false);
     toggleSelectionroomMood,
     handlemode,
     room,
-    escape
+    escape,
+    handleDoubleClick, 
+    leftPos,
+    rightPos,
+    setLeftPos,
+    setRightPos
   };
 };
