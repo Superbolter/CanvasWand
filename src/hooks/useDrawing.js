@@ -8,6 +8,7 @@ import {
   setRoomSelect,setRoomSelectors,
   setType,
   setScale,
+  setSelectedButton,
 } from "../features/drawing/drwingSlice.js";
 import {
   uniqueId,
@@ -19,7 +20,7 @@ import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import {findLineForPoint }from "../utils/coolinear.js"
 import { setPoints,setStoreLines,setFactor, showRoomNamePopup } from "../Actions/ApplicationStateAction.js";
-import { setContextualMenuStatus } from "../Actions/DrawingActions.js";
+import { setContextualMenuStatus, setShowPopup, setTypeId } from "../Actions/DrawingActions.js";
 
 export const useDrawing = () => {
   const dispatch = useDispatch();
@@ -421,8 +422,20 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
   };
 
   const toggleSelectionMode = () => {
+    if(selectionMode){
+      setSelectedLines([]);
+      setNewLine(false);
+      dispatch(setContextualMenuStatus(false))
+      setShowSnapLine(false);
+      setStop(false);
+    }else{
+      setNewLine(true);
+      setShowSnapLine(false);
+      dispatch(setContextualMenuStatus(false))
+      setStop(true);
+      dispatch(setSelectedButton([]))
+    }
     setSelectionMode(!selectionMode);
-    setSelectedLines([]);
   };
 
   const handleKeyDown = (event) => {
@@ -448,7 +461,7 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
       redo();
     }
     if(event.key === "escape" || event.key === "Escape"){
-      escape();
+      // escape();
       toggleSelectionMode();
     }
     // if(event.key === "Enter" && scale){
@@ -865,15 +878,22 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
 
       }
     }
-    
-    
+    const selectedLine = storeLines.find((line)=> line.id === id);
+    console.log(selectedLine.typeId)
     if(selectionMode && roomSelect){
-
+      
       setSelectedLines((prev) =>
         prev.includes(id)
           ? prev.filter((lineId) => lineId !== id)
           : [...prev, id]);
-
+      if(!selectedLine.includes(id)) { 
+        dispatch(setShowPopup(true));
+        dispatch(setTypeId(selectedLine.typeId || 1)) 
+      }else{
+        dispatch(setShowPopup(false))
+        dispatch(setTypeId(1)) 
+      } 
+      
 
     }
     else if (selectionMode) {
@@ -882,6 +902,13 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
           ? prev.filter((lineId) => lineId !== id)
           : [...prev, id]
       );
+      if(!selectedLines.includes(id)) { 
+        dispatch(setShowPopup(true));
+        dispatch(setTypeId(selectedLine.typeId || 1)) 
+      }else{
+        dispatch(setShowPopup(false))
+        dispatch(setTypeId(1)) 
+      } 
 
     }
     // if(type ==='door'){
@@ -1040,6 +1067,7 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
     leftPos,
     rightPos,
     setLeftPos,
-    setRightPos
+    setRightPos,
+    
   };
 };

@@ -10,7 +10,6 @@ import LineEditForm from "./component/LineEditForm.js";
 import BackgroundImage from "./component/background.js";
 import { useDrawing } from "./hooks/useDrawing.js";
 import CreateFiller from "./component/filler.js";
-import RoomFiller from "./component/roomFiller.js";
 import RomeDataManager from "./app/RomeDataManager.js";
 import {cookies} from "./App"
 import {
@@ -88,7 +87,8 @@ export const CanvasComponent = () => {
     showSnapLine,
     setShowSnapLine,
     setSnappingPoint,
-    escape
+    escape,
+    deleteSelectedLines
   } = useDrawing();
 
   const getUrlParameter = (name) => {
@@ -210,12 +210,6 @@ export const CanvasComponent = () => {
           )}
 
           <CreateFiller/>
-           {roomSelectors.map((room) =>(<RoomFiller 
-           key={room.roomId}
-           roomName={room.roomName} 
-           wallIds ={room.wallIds} 
-           />))}
-          
 
           {/* 2D grid */}
           <Grid
@@ -243,7 +237,7 @@ export const CanvasComponent = () => {
         </div> */}
 
         {/* Buttons for interaction */}
-        {/* <div className="button-container1">
+         {/* <div className="button-container1">
           <button onClick={deleteLastPoint}>Delete Last Point</button>
           <button onClick={toggleSelectionroomMood}>
             {roomSelect ? "selectingRoom" : "roomSelecter"}
@@ -300,12 +294,11 @@ export const CanvasComponent = () => {
               setSelectionMode={setSelectionMode}
             />
           )}
-        </div> */}
+        </div>  */}
         <div style={{ position: "relative" }}>
           <DrawtoolHeader
             deleteLastPoint={deleteLastPoint}
             redo={redo}
-            toggleSelectionMode={toggleSelectionroomMood}
             lines={storeLines}
             points={points}
             roomSelectors={roomSelectors}
@@ -361,12 +354,16 @@ export const CanvasComponent = () => {
             <OrbitControls />
           </Canvas>
         </div>
-          <WindowPropertiesPopup />
-          <WallPropertiesPopup />
-          <DoorPropertiesPopup />
-          <RailingPropertiesPopup />
+          <WindowPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
+          <WallPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines} splitLines={() =>{ setLineBreak(!lineBreak)
+            setStop(!stop);
+          }} mergeLines={() =>{ setMerge(!merge)
+            setStop(!stop);
+          }}/>
+          <DoorPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
+          <RailingPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
           <RoomNamePopup />
-          <ButtonComponent setNewLine={escape} />
+          <ButtonComponent setNewLine={escape} selectionMode={selectionMode} toggleSelectionMode={toggleSelectionMode} />
         </div>
       </div>
       }

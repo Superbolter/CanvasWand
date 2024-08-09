@@ -3,6 +3,11 @@ export const setTypeId = (type_id) => ({
     payload: type_id,
     
   });
+
+export const setShowPopup = (val) => ({
+  type: "SET_PROPERTY_POPUP",
+  payload: val
+})
 export const setContextualMenuStatus=(value)=>({
      type: "SET_CONTEXTUAL_MENU_STATUS",
      payload:value,

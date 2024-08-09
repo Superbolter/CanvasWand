@@ -134,6 +134,10 @@ export const updateLineTypeId = (lineId, typeId, storeLines) => {
             typeId // Update the typeId
           };
           dispatch({
+            type: "SET_PROPERTY_POPUP",
+            payload: true,
+          })
+          dispatch({
 
             type:"SET_HEIGHT",
             payload:storeLines[lineIndex].height,

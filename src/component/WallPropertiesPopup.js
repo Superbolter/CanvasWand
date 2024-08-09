@@ -8,13 +8,14 @@ import Delete from "../assets/Delete.png"
 import "./WallPropertiesPopup.css";
 import Close from "../assets/Close.png"
 import { useDispatch, useSelector } from 'react-redux';
-import { setContextualMenuStatus, setTypeId } from '../Actions/DrawingActions.js';
+import { setContextualMenuStatus, setShowPopup, setTypeId } from '../Actions/DrawingActions.js';
 
-const WallPropertiesPopup = () => {
-  const typeId = useSelector((state) => state.Drawing.typeId);
+const WallPropertiesPopup = ({selectionMode,deleteSelectedLines, splitLines,mergeLines}) => {
+  const {typeId, showPropertiesPopup} = useSelector((state) => state.Drawing);
   const dispatch = useDispatch();
   const handleCloseClick = () => {
-    dispatch(setTypeId(0));
+    dispatch(setTypeId(1));
+    dispatch(setShowPopup(false))
     dispatch(setContextualMenuStatus(false));
   };
   const { height, width } = useSelector((state) => state.ApplicationState);
@@ -26,7 +27,7 @@ const WallPropertiesPopup = () => {
 
   return (
     <div>
-      <div className={typeId === 1 ? 'popup-container' : "popup-container-hidden"}>
+      <div className={typeId === 1 && showPropertiesPopup? 'popup-container' : "popup-container-hidden"}>
         <div className='header-container'>
           <Typography modifiers={["header6", "medium"]} style={{ fontSize: "16px", lineHeight: "18px", textAlign: "left" }}>Wall Properties</Typography>
           <img onClick={handleCloseClick} style={{ width: "28px", height: "28px" }} src={Close} alt="" />
@@ -62,13 +63,14 @@ const WallPropertiesPopup = () => {
           </div>
           <div className='divider'>
           </div>
+          {selectionMode?
           <div className='btn-container'>
             <div className='btn'>
-              <img src={split} alt="" />
+              <img src={split} alt="" onClick={splitLines}/>
               <Typography className='contextual-btn-text'>Split</Typography>
             </div>
             <div className='btn'>
-              <img src={merge} alt="" />
+              <img src={merge} alt="" onClick={mergeLines} />
               <Typography className='contextual-btn-text'>Merge</Typography>
             </div>
             <div className='btn'>
@@ -76,10 +78,10 @@ const WallPropertiesPopup = () => {
               <Typography className='contextual-btn-text'>Lock</Typography>
             </div>
             <div className='btn'>
-              <img src={Delete} alt="" />
+              <img src={Delete} alt="" onClick={deleteSelectedLines} />
               <Typography className='contextual-btn-text'>Delete</Typography>
             </div>
-          </div>
+          </div>:null}
         </div>
       </div>
     </div>

@@ -8,13 +8,14 @@ import Delete from "../assets/Delete.png"
 import "./WallPropertiesPopup.css";
 import Close from "../assets/Close.png"
 import { useDispatch, useSelector } from 'react-redux';
-import { setContextualMenuStatus, setTypeId } from '../Actions/DrawingActions.js';
+import { setContextualMenuStatus, setShowPopup, setTypeId } from '../Actions/DrawingActions.js';
 
-const DoorPropertiesPopup = () => {
-  const typeId=useSelector((state)=>state.Drawing.typeId);
+const DoorPropertiesPopup = ({selectionMode,deleteSelectedLines}) => {
+  const {typeId, showPropertiesPopup} = useSelector((state) => state.Drawing);
   const dispatch=useDispatch();
   const handleCloseClick=()=>{
-    dispatch(setTypeId(0));
+    dispatch(setTypeId(1));
+    dispatch(setShowPopup(false));
     dispatch(setContextualMenuStatus(false))
   }
   useEffect(() => {
@@ -24,7 +25,7 @@ const DoorPropertiesPopup = () => {
     }, [typeId])
   return (
     <div>
-  <div className={typeId===2?'popup-container':"popup-container-hidden"} >
+  <div className={typeId===2 && showPropertiesPopup?'popup-container':"popup-container-hidden"} >
 
 <div className='header-container'>
  <Typography  modifiers={["header6", "medium"]} style={{fontSize: "16px",lineHeight:" 18px",textAlign: "left"}}>Door Properties</Typography>
@@ -69,11 +70,12 @@ const DoorPropertiesPopup = () => {
         <Typography className='contextual-btn-text'>Lock</Typography>
         
     </div>
+    {selectionMode?
     <div className='btn'>
-        <img src={Delete} alt="" />
+        <img src={Delete} onClick={deleteSelectedLines} alt="" />
         <Typography className='contextual-btn-text'>Delete</Typography>
 
-    </div>
+    </div>: null}
  </div>
 </div>
 </div>

@@ -14,6 +14,7 @@ const initialState = {
   idSelection: [],
   widthChangeType: "between",
   type:"wall",
+  selectedButton: null,
 };
 
 export const drawingSlice = createSlice({
@@ -68,6 +69,9 @@ export const drawingSlice = createSlice({
         console.log(state.ApplicationState.storeLines)
       }
     },
+    setSelectedButton: (state,action) => {
+      state.selectedButton = action.payload
+    }
   },
 });
 
@@ -88,6 +92,7 @@ export const {
   setType,
   scale,
   setScale,
+  setSelectedButton
 } = drawingSlice.actions;
 
 export default drawingSlice.reducer;

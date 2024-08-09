@@ -1,7 +1,8 @@
 const initialState = {
-    typeId: 0,
+    typeId: 1,
     contextualMenuStatus:false,
     lineId:null,
+    showPropertiesPopup: false,
   };
   
   const DrawingReducer = (state = initialState, action) => {
@@ -21,6 +22,11 @@ const initialState = {
           ...state,
           lineId: action.payload,
         };
+      case "SET_PROPERTY_POPUP":
+        return {
+          ...state,
+          showPropertiesPopup: action.payload
+        }
       default:
         return state;
     }

@@ -4,12 +4,13 @@ import wallIcon from "../assets/wallIcon.png";
 import SelectedWall from "../assets/SelectedWall.png";
 import "./ButtonComponent.css";
 import { useDispatch, useSelector } from 'react-redux';
-import { setTypeId } from '../Actions/DrawingActions.js';
+import { setShowPopup, setTypeId } from '../Actions/DrawingActions.js';
+import { setSelectedButton } from '../features/drawing/drwingSlice.js';
 
-const ButtonComponent = ({ setNewLine }) => {
-  const typeId = useSelector((state) => state.Drawing.typeId);
+const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
+  const {typeId, showPropertiesPopup} = useSelector((state) => state.Drawing);
+  const { selectedButton} = useSelector((state)=> state.drawing)
   const roomPopup = useSelector((state) => state.ApplicationState.roomPopup);
-  const [selectedButton, setSelectedButton] = useState(null);
   const dispatch = useDispatch()
   useEffect(() => {
     
@@ -19,8 +20,12 @@ const ButtonComponent = ({ setNewLine }) => {
   }, [typeId, roomPopup])
   
   const handleButtonClick = (buttonName) => {
-    setSelectedButton(buttonName);
+    if(selectionMode){
+      toggleSelectionMode();
+    }
     setNewLine();
+    dispatch(setSelectedButton(buttonName))
+    dispatch(setShowPopup(true));
     if (buttonName === 'Walls') {
       dispatch(setTypeId(1))
     }
@@ -35,7 +40,7 @@ const ButtonComponent = ({ setNewLine }) => {
 
   return (
     <div>
-      <div className={(roomPopup||typeId > 0) ? "scrollable-container-hidden" : "scrollable-container"}>
+      <div className={showPropertiesPopup? "scrollable-container-hidden" : "scrollable-container"}>
         <div className="scrollable-content">
           <Typography className='btn-heading-text' modifiers={['medium']}>Structures</Typography>
           <div className="grid-container">

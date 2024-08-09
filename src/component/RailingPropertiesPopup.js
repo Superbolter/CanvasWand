@@ -8,13 +8,14 @@ import Delete from "../assets/Delete.png"
 import "./WallPropertiesPopup.css";
 import Close from "../assets/Close.png"
 import { useDispatch, useSelector } from 'react-redux';
-import { setContextualMenuStatus, setTypeId } from '../Actions/DrawingActions.js';
+import { setContextualMenuStatus, setShowPopup, setTypeId } from '../Actions/DrawingActions.js';
 
-const RailingPropertiesPopup = () => {
-  const typeId=useSelector((state)=>state.Drawing.typeId);
+const RailingPropertiesPopup = ({selectionMode,deleteSelectedLines}) => {
+  const {typeId, showPropertiesPopup} = useSelector((state) => state.Drawing);
   const dispatch=useDispatch();
   const handleCloseClick=()=>{
     dispatch(setTypeId(0));
+    dispatch(setShowPopup(false))
     dispatch(setContextualMenuStatus(false))
   }
   useEffect(() => {
@@ -24,7 +25,7 @@ const RailingPropertiesPopup = () => {
     }, [typeId])
   return (
     <div>
-  <div className={typeId===4?'popup-container':"popup-container-hidden"} >
+  <div className={typeId===4 && showPropertiesPopup?'popup-container':"popup-container-hidden"} >
 
 <div className='header-container'>
  <Typography  modifiers={["header6", "medium"]} style={{fontSize: "16px",lineHeight:" 18px",textAlign: "left"}}>Railing Properties</Typography>
@@ -62,6 +63,7 @@ const RailingPropertiesPopup = () => {
  <div className='divider'>
 
  </div>
+ {selectionMode?
  <div className='btn-container' style={{justifyContent:"flex-start"}}>
     
     <div className='btn'>
@@ -69,12 +71,12 @@ const RailingPropertiesPopup = () => {
         <Typography className='contextual-btn-text'>Lock</Typography>
         
     </div>
-    <div className='btn'>
+    <div className='btn' onClick={deleteSelectedLines}>
         <img src={Delete} alt="" />
         <Typography className='contextual-btn-text'>Delete</Typography>
 
     </div>
- </div>
+ </div>: null}
 </div>
 </div>
       

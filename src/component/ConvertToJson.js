@@ -14,6 +14,7 @@ const convertToJSON = (lines, points,roomSelectors) => {
             widthchangetype:line.widthchangetype,
             widthchange:line.widthchange,
             type:line.type,
+            typeId: line.typeId
         })),
         rooms: roomSelectors.map(room => ({
             roomId: room.roomId,
