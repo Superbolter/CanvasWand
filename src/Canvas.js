@@ -33,6 +33,7 @@ import WindowPropertiesPopup from "./component/WindowPropertiesPopup.js";
 import DoorPropertiesPopup from "./component/DoorPropertiesPopup.js";
 import RailingPropertiesPopup from "./component/RailingPropertiesPopup.js";
 import RoomNamePopup from "./component/RoomNamePopup.js";
+import RoomFiller from "./component/roomFiller.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -210,6 +211,12 @@ export const CanvasComponent = () => {
           )}
 
           <CreateFiller/>
+
+          {roomSelectors.map((room) =>(<RoomFiller 
+           key={room.roomId}
+           roomName={room.roomName} 
+           wallIds ={room.wallIds} 
+           />))}
 
           {/* 2D grid */}
           <Grid

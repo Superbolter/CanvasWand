@@ -9,6 +9,7 @@ import "./WallPropertiesPopup.css";
 import Close from "../assets/Close.png"
 import { useDispatch, useSelector } from 'react-redux';
 import { setContextualMenuStatus, setShowPopup, setTypeId } from '../Actions/DrawingActions.js';
+import { useDrawing } from '../hooks/useDrawing.js';
 
 const WallPropertiesPopup = ({selectionMode,deleteSelectedLines, splitLines,mergeLines}) => {
   const {typeId, showPropertiesPopup} = useSelector((state) => state.Drawing);
@@ -18,6 +19,7 @@ const WallPropertiesPopup = ({selectionMode,deleteSelectedLines, splitLines,merg
     dispatch(setShowPopup(false))
     dispatch(setContextualMenuStatus(false));
   };
+  const { setLineBreak,setMerge,lineBreak,stop,setStop} = useDrawing();
   const { height, width } = useSelector((state) => state.ApplicationState);
 
   useEffect(() => {
@@ -66,11 +68,20 @@ const WallPropertiesPopup = ({selectionMode,deleteSelectedLines, splitLines,merg
           {selectionMode?
           <div className='btn-container'>
             <div className='btn'>
-              <img src={split} alt="" onClick={splitLines}/>
+              <img src={split} alt="" onClick={() =>{ 
+            console.log("lineBreak 1", lineBreak);
+            
+            setLineBreak(!lineBreak);
+            
+
+            setStop(!stop);
+          }}/>
               <Typography className='contextual-btn-text'>Split</Typography>
             </div>
             <div className='btn'>
-              <img src={merge} alt="" onClick={mergeLines} />
+              <img src={merge} alt="" onClick={() =>{ setMerge(!merge);
+            setStop(!stop);
+          }}/ >
               <Typography className='contextual-btn-text'>Merge</Typography>
             </div>
             <div className='btn'>

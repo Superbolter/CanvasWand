@@ -804,6 +804,7 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
 
   const room =()=>{
     const roomName = prompt("Enter the room Name:");
+    console.log("roomName", roomName);
     
     const room = {
       roomId: uniqueId(),
@@ -820,7 +821,7 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
 
 
   const toggleSelectionroomMood= () => {
-    escape();
+    //escape();
     setSelectionMode(!selectionMode);
     dispatch(setRoomSelect(true));
     setSelectedLines([]);
@@ -848,6 +849,9 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
     
 
     console.log("Ia am inside")
+    console.log("lineBreak",lineBreak);
+
+    
     if(lineBreak){
        setId(id);
     }

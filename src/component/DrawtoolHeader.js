@@ -9,7 +9,7 @@ import {handleDownload} from "./ConvertToJson.js"
 import { useDispatch, useSelector } from 'react-redux'
 import { drawData, updateDrawData } from '../Actions/ApplicationStateAction.js'
 
-const DrawtoolHeader = ({deleteLastPoint,lines,points, roomSelectors,redo,toggleSelectionroomMood}) => {
+const DrawtoolHeader = ({deleteLastPoint,lines,points, roomSelectors,redo,toggleSelectionroomMood} ) => {
   const dispatch=useDispatch()
   const {factor,floorplanId}=useSelector((state)=>state.ApplicationState)
   const handleSaveClick =()=>{
