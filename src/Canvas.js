@@ -83,7 +83,7 @@ export const CanvasComponent = () => {
     setStop,
     lineBreak,
     setLineBreak,
-
+    handleSaveClick,
     snappingPoint,
     showSnapLine,
     setShowSnapLine,
@@ -92,8 +92,10 @@ export const CanvasComponent = () => {
     deleteSelectedLines,
     room,
     showRoomNamePopup,
-    handleDoubleClick
+    handleDoubleClick,
   } = useDrawing();
+
+  const { leftPos, rightPos } = useSelector((state) => state.drawing)
 
   const getUrlParameter = (name) => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -147,7 +149,7 @@ export const CanvasComponent = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [storeLines, selectionMode, selectedLines, points, stop]);
+  }, [storeLines, selectionMode, selectedLines, points, stop ,leftPos, rightPos]);
 
   useEffect(() => {
     // console.log(type_id);
@@ -351,9 +353,7 @@ export const CanvasComponent = () => {
           <DrawtoolHeader
             deleteLastPoint={deleteLastPoint}
             redo={redo}
-            lines={storeLines}
-            points={points}
-            roomSelectors={roomSelectors}
+            handleSaveClick={handleSaveClick}
           />
           {contextualMenuStatus && <ContextualMenu/>}
           <div

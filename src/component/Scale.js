@@ -21,7 +21,8 @@ export const Scale = () => {
   const [position, setPosition] = useState(new Vector3(0, 0, 0));
   const [lineAngle, setLineAngle] = useState(0);
   const [isPointerMoving, setIsPointerMoving] = useState(false);
-  const { handleDoubleClick, leftPos, rightPos, setLeftPos, setRightPos} = useDrawing();
+  const { handleDoubleClick, setLeftPos, setRightPos} = useDrawing();
+  const { leftPos, rightPos } = useSelector((state) => state.drawing)
 
   useEffect(() => {
     const canvasContainer = document.querySelector(".canvas-container");

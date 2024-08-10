@@ -9,6 +9,9 @@ import {
   setType,
   setScale,
   setSelectedButton,
+  setLeftPosState,
+  setRightPosState,
+  setUserLength,
 } from "../features/drawing/drwingSlice.js";
 import {
   uniqueId,
@@ -19,8 +22,9 @@ import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import {findLineForPoint }from "../utils/coolinear.js"
-import { setPoints,setStoreLines,setFactor, showRoomNamePopup } from "../Actions/ApplicationStateAction.js";
+import { setPoints,setStoreLines,setFactor, showRoomNamePopup, updateDrawData } from "../Actions/ApplicationStateAction.js";
 import { setContextualMenuStatus, setShowPopup, setTypeId } from "../Actions/DrawingActions.js";
+import { handleDownload } from "../component/ConvertToJson.js";
 
 export const useDrawing = () => {
   const dispatch = useDispatch();
@@ -30,9 +34,10 @@ export const useDrawing = () => {
       measured,
       scale,
     information,roomSelect,roomSelectors,
+    leftPos, rightPos, userLength
   } = useSelector((state) => state.drawing);
   const {typeId, contextualMenuStatus}=useSelector((state)=>state.Drawing)
-  const {storeLines,points,factor}=useSelector((state)=>state.ApplicationState)
+  const {storeLines,points,factor,floorplanId}=useSelector((state)=>state.ApplicationState)
 
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedLines, setSelectedLines] = useState([]);
@@ -65,9 +70,16 @@ export const useDrawing = () => {
 
 const [snappingPoint, setSnappingPoint] = useState([]);
 const [showSnapLine, setShowSnapLine] = useState(false);
-const [leftPos, setLeftPos] = useState(new Vector3(-5, 0, 0));
-const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
+// const [leftPos, setLeftPosState] = useState(new Vector3(-5, 0, 0));
+// const [rightPos, setRightPosState] = useState(new Vector3(5, 0, 0));
 
+const setLeftPos = (data) =>{
+  dispatch(setLeftPosState(data))
+}
+
+const setRightPos = (data) =>{
+  dispatch(setRightPosState(data))
+}
 
   const handlePointerDown = useCallback(
     (event, right, left, mesh) => {
@@ -454,6 +466,7 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
     const userLength = parseFloat(
       prompt("Enter the length of the first line:")
     );
+    dispatch(setUserLength(userLength))
     // const userWidth = parseFloat(
     //   prompt("Enter the thickness of the first line:")
     // );
@@ -965,6 +978,24 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
     dispatch(setStoreLines(store));
     dispatch(setPoints(pointsVal));
   };
+
+  const handleSaveClick =()=>{
+    const lines = storeLines
+    const scaleData={
+      leftPos,
+      rightPos,
+      distance: leftPos.distanceTo(rightPos),
+      unitLength:userLength,
+      unitType: "feet"
+    }
+    const data=handleDownload(lines,points, roomSelectors, scaleData)
+    const finalData={
+      floorplan_id:floorplanId,
+      draw_data:data,
+      scale:factor,
+    }
+    dispatch(updateDrawData(finalData,floorplanId))
+  }
   
 
   return {
@@ -1027,13 +1058,11 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
     room,
     escape,
     handleDoubleClick, 
-    leftPos,
-    rightPos,
     setLeftPos,
     setRightPos,
     deleteSelectedLines,
     room,
     showRoomNamePopup,
-    handleDoubleClick
+    handleSaveClick
   };
 };

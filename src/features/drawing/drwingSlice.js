@@ -1,5 +1,6 @@
 // drawingSlice.js
 import { createSlice } from "@reduxjs/toolkit";
+import { Vector3 } from "three";
 
 const initialState = {
   points: [],
@@ -15,6 +16,9 @@ const initialState = {
   widthChangeType: "between",
   type:"wall",
   selectedButton: null,
+  leftPos: new Vector3(-5, 0, 0),
+  rightPos: new Vector3(5, 0, 0),
+  userLength: 0
 };
 
 export const drawingSlice = createSlice({
@@ -71,6 +75,15 @@ export const drawingSlice = createSlice({
     },
     setSelectedButton: (state,action) => {
       state.selectedButton = action.payload
+    },
+    setLeftPosState: (state,action) => {
+      state.leftPos = action.payload
+    },
+    setRightPosState: (state,action) => {
+      state.rightPos = action.payload
+    },
+    setUserLength: (state,action) => {
+      state.userLength = action.payload
     }
   },
 });
@@ -92,7 +105,10 @@ export const {
   setType,
   scale,
   setScale,
-  setSelectedButton
+  setSelectedButton,
+  setLeftPosState,
+  setRightPosState,
+  setUserLength
 } = drawingSlice.actions;
 
 export default drawingSlice.reducer;
