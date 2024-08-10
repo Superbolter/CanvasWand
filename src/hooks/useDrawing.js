@@ -1072,6 +1072,6 @@ const [rightPos, setRightPos] = useState(new Vector3(5, 0, 0));
     rightPos,
     setLeftPos,
     setRightPos,
-    
+    deleteSelectedLines
   };
 };
