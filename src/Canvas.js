@@ -370,7 +370,7 @@ export const CanvasComponent = () => {
           }}
         >
           <Canvas
-            style={{ height: 400, width: "100%" }}
+            style={{ height: "100%", width: "100%" }}
             camera={{ position: [0, 0, 800], fov: 75 }}
           >
             {/* Render lines in 3D view */}
