@@ -89,7 +89,10 @@ export const CanvasComponent = () => {
     setShowSnapLine,
     setSnappingPoint,
     escape,
-    deleteSelectedLines
+    deleteSelectedLines,
+    room,
+    showRoomNamePopup,
+    handleDoubleClick
   } = useDrawing();
 
   const getUrlParameter = (name) => {
@@ -103,6 +106,48 @@ export const CanvasComponent = () => {
   const { floorplanId, drawData, storeLines, points } = useSelector(
     (state) => state.ApplicationState
   );
+
+  const handleKeyDown = (event) => {
+    if (event.key === "x" || event.key === "X") {
+      deleteLastPoint();
+    }
+    if (event.key === "s" || event.key === "S") {
+      setStop(!stop);
+    }
+    if((event.key === "r" || event.key === "R") && !event.ctrlKey){
+      room();
+
+    }
+    if(event.ctrlKey&&(event.key === "q" || event.key === "Q")){
+      dispatch(showRoomNamePopup(true));
+      // room();
+      
+    }
+    if(event.ctrlKey&&(event.key === "z" || event.key === "Z")){
+      deleteLastPoint();
+    }
+    if(event.ctrlKey&&(event.key === "y" || event.key === "Y")){
+      redo();
+    }
+    if(event.key === "escape" || event.key === "Escape"){
+      // escape();
+      toggleSelectionMode();
+    }
+    if(event.key === "Enter" && scale){
+      handleDoubleClick();
+    }
+    if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
+      deleteSelectedLines();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [storeLines, selectionMode, selectedLines, points, stop]);
 
   useEffect(() => {
     // console.log(type_id);
