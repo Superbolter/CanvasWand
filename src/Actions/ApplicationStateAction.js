@@ -82,7 +82,6 @@ export const updateDrawData = (data,floorplanId) => {
 };
 export const setStoreLines=(lines)=>{
     return (dispatch)=>{
-
         dispatch({
             type: "SET_STORE_LINES",
             payload: lines 

@@ -385,7 +385,7 @@ const setRightPos = (data) =>{
       updatedPoints = updatedPoints.slice(0, -1);
     }
     // Store the undone line and point in the redo stacks
-    const redoLine = storeLines[storeLines.length - 1];
+    const redoLine = deleteLine;
     const redoPoint = points[points.length - 1];
   
     setRedoLines((prevRedoLines) => [...prevRedoLines, redoLine]);
@@ -412,15 +412,15 @@ const setRightPos = (data) =>{
     setRedoLines(updatedRedoLines);
     setRedoPoints(updatedRedoPoints);
 
-    const updatedStoreLines = storeLines;
-    const updatedPoints = points;
+    const updatedStoreLines = [...storeLines];
+    const updatedPoints = [...points];
 
     updatedStoreLines.push(lastRedoLine);
     updatedPoints.push(lastRedoPoint);
 
     // Set the updated state
-    setStoreLines(updatedStoreLines);
-    setPoints(updatedPoints);
+    dispatch(setStoreLines(updatedStoreLines));
+    dispatch(setPoints(updatedPoints));
   };
 
   const deleteSelectedLines = () => {
