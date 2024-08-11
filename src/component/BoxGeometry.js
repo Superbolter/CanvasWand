@@ -1,7 +1,7 @@
-import React, {useMemo} from "react";
+import React, {useEffect, useMemo} from "react";
 import { Canvas, extend } from "@react-three/fiber";
 import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import convert from "convert-units";
 import CreateFiller from "./filler";
 import Window from "../assets/Window.png"
@@ -9,6 +9,7 @@ import Door from "../assets/Door.png"
 import Railing from "../assets/Railing.png"
 import New from "../assets/New.png"
 import Wall from "../assets/Walll.png"
+import { setStoreBoxes } from "../Actions/ApplicationStateAction";
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -95,9 +96,11 @@ const BoxGeometry = ({
   newPointMode,
   opacity = 0.5,
 }) => {
+  const dispatch = useDispatch();
+
 
   const { measured, roomSelect,newline } = useSelector((state) => state.drawing);
-  const { storeLines, factor} = useSelector((state) => state.ApplicationState);
+  const { storeLines, factor, storeBoxes} = useSelector((state) => state.ApplicationState);
 
   const textureLoader = useMemo(() => new TextureLoader(), []);
   const windowTexture = useMemo(
@@ -121,7 +124,6 @@ const BoxGeometry = ({
     [textureLoader]
   );
 
-  if (!start || !end) return null;
 
   const length = start.distanceTo(end);
   const width = convert(dimension.width * factor[1]).from("mm").to(measured);
@@ -230,6 +232,19 @@ if(mid1 && mid2 && !newline){
 // console.log(p2);
 // console.log(p3);
 // console.log(p4);
+
+useEffect(()=>{
+  if(mid1 && mid2 && mid1!==mid2){
+    // console.log("intersection point found between mid1 and mid2",p1,p2,p3,p4)
+    const data={p1,p2,p3,p4}
+    const boxes = [...storeBoxes]
+    boxes.push(data)
+    dispatch(setStoreBoxes(boxes))
+  }
+},[])
+
+if (!start || !end) return null;
+
   
   return (
     <>
@@ -257,7 +272,7 @@ if(mid1 && mid2 && !newline){
 
 
      
-      {mid1 && mid2 && mid1!==mid2 && (<CreateFiller p1={p1} p2={p2} p3={p3} p4={p4} />)}
+      {/* {mid1 && mid2 && mid1!==mid2 && (<CreateFiller p1={p1} p2={p2} p3={p3} p4={p4} />)} */}
      
       
 

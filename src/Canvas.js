@@ -96,6 +96,8 @@ export const CanvasComponent = () => {
   } = useDrawing();
 
   const { leftPos, rightPos } = useSelector((state) => state.drawing)
+  const { storeBoxes} = useSelector((state) => state.ApplicationState);
+
 
   const getUrlParameter = (name) => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -149,7 +151,7 @@ export const CanvasComponent = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [storeLines, selectionMode, selectedLines, points, stop ,leftPos, rightPos]);
+  }, [storeLines, selectionMode, selectedLines, points, stop ,leftPos, rightPos,storeBoxes]);
 
   useEffect(() => {
     // console.log(type_id);
@@ -256,8 +258,11 @@ export const CanvasComponent = () => {
               </Text>
             </>
           )}
+          {storeBoxes.map((box, index) => (
+            <CreateFiller key={index} p1={box.p1} p2={box.p2} p3={box.p3} p4={box.p4} />
+          ))}
 
-          <CreateFiller/>
+          
 
           {roomSelectors.map((room) =>(<RoomFiller 
            key={room.roomId}

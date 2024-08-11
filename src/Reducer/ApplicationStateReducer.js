@@ -12,6 +12,7 @@ const initialState = {
     points:[],
     factor:[1,1,1],
     roomPopup:false,
+    storeBoxes: [],
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {
@@ -32,8 +33,12 @@ const initialState = {
           ...state,
           storeLines:action.payload
 
-          
         };
+      case "SET_STORE_BOXES":
+        return {
+          ...state,
+          storeBoxes: action.payload,
+        }
       case "SET_POINTS":
         return {
           ...state,

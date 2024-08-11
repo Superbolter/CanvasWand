@@ -20,8 +20,8 @@ export const drawToolData = (floorplan_id) => {
                     type: "GET_DRAW_DATA",
                     payload: response.data // assuming the response contains some data you might need
                 });
-                console.log(JSON.parse(response.data.draw_data));
                 const drawData=JSON.parse(response.data.draw_data);
+                console.log(drawData)
                 let lines=[];
                 let point=[]
                 if(drawData&&drawData.lines&&drawData.lines.length>0){
@@ -42,30 +42,20 @@ export const drawToolData = (floorplan_id) => {
                     }));
                 }
                 if(drawData&&drawData.points&&drawData.points.length>0){
-                    
                     point = drawData && drawData.points && drawData.points.map(point =>
-
-                        
-                           
-                           new THREE.Vector3(point.x, point.y, point.z),
-                       
-                    
-                        
+                        new THREE.Vector3(point.x, point.y, point.z),
                     );
-                    
-                    console.log(point)
                 }
-                console.log(lines)
                 dispatch(setStoreLines(lines));
                 dispatch(setPoints(point));
+                dispatch(setStoreBoxes(drawData.storeBoxes));
                 if(response.data.scale!==null){
                     dispatch(setFactor(JSON.parse(response.data.scale)))
                     dispatch(setScale(false))
                 }
             })
             .catch(error => {
-                
-                console.log("Error", error);
+                console.error("Error", error);
             });
     };
 } 
@@ -91,8 +81,6 @@ export const updateDrawData = (data,floorplanId) => {
     };
 };
 export const setStoreLines=(lines)=>{
-
-    
     return (dispatch)=>{
 
         dispatch({
@@ -101,6 +89,16 @@ export const setStoreLines=(lines)=>{
         });
     }
 }
+
+export const setStoreBoxes=(box)=>{
+    return(dispatch)=>{
+        dispatch({
+            type: "SET_STORE_BOXES",
+            payload: box, 
+        });
+    }
+} 
+
 export const setPoints=(points)=>{
     return (dispatch)=>{
         dispatch({

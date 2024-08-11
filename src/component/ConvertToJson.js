@@ -1,6 +1,6 @@
 import React from 'react';
 
-const convertToJSON = (lines, points,roomSelectors,scaleData) => {
+const convertToJSON = (lines, points,roomSelectors,storeBoxes,scaleData) => {
     console.log("roomSelectors",roomSelectors);
     const jsonData = {
         points: points.map(point => ({ id:point.id,x: point.x, y: point.y,  z: point.z})),
@@ -21,6 +21,7 @@ const convertToJSON = (lines, points,roomSelectors,scaleData) => {
             roomName: room.roomName,
             wallIds: room.wallIds,
         })),
+        storeBoxes,
         scaleData
     };
     return JSON.stringify(jsonData);
@@ -49,10 +50,10 @@ const DownloadJSONButton = ({ lines, points,roomSelectors }) => {
 
 export default DownloadJSONButton;
 
-export const handleDownload = (lines, points, roomSelectors,scaleData) => {
+export const handleDownload = (lines, points, roomSelectors,storeBoxes,scaleData) => {
     console.log(lines);
     console.log("roomSelectors", roomSelectors, lines);
-    const data = convertToJSON(lines, points, roomSelectors,scaleData);
+    const data = convertToJSON(lines, points, roomSelectors,storeBoxes,scaleData);
     return data;
 };
 

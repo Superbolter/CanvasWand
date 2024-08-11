@@ -22,7 +22,7 @@ import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import {findLineForPoint }from "../utils/coolinear.js"
-import { setPoints,setStoreLines,setFactor, showRoomNamePopup, updateDrawData } from "../Actions/ApplicationStateAction.js";
+import { setPoints,setStoreLines,setFactor, showRoomNamePopup, updateDrawData, setStoreBoxes } from "../Actions/ApplicationStateAction.js";
 import { setContextualMenuStatus, setShowPopup, setTypeId } from "../Actions/DrawingActions.js";
 import { handleDownload } from "../component/ConvertToJson.js";
 
@@ -37,7 +37,7 @@ export const useDrawing = () => {
     leftPos, rightPos, userLength
   } = useSelector((state) => state.drawing);
   const {typeId, contextualMenuStatus}=useSelector((state)=>state.Drawing)
-  const {storeLines,points,factor,floorplanId}=useSelector((state)=>state.ApplicationState)
+  const {storeLines,points,factor,floorplanId,storeBoxes}=useSelector((state)=>state.ApplicationState)
 
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedLines, setSelectedLines] = useState([]);
@@ -348,6 +348,22 @@ const setRightPos = (data) =>{
     let updatedPoints = points.slice(0, -1);
     const lastPoint = updatedPoints[updatedPoints.length - 1];
     const lastPointId = deleteLine.id;
+    const deleteLinePoints = deleteLine.points;
+    // Function to compare two Vector3 objects
+    function arePointsEqual(pointA, pointB) {
+      return pointA.x === pointB.x && pointA.y === pointB.y && pointA.z === pointB.z;
+    }
+
+    // Function to check if deleteLine points match any points in a box
+    function shouldRemoveBox(boxPoints, deleteLinePoints) {
+      return boxPoints.some(boxPoint => 
+          deleteLinePoints.some(deletePoint => arePointsEqual(boxPoint, deletePoint))
+      );
+    }
+
+    // Iterate over storeBoxes and remove the ones that match
+    const result = storeBoxes.filter(box => !shouldRemoveBox([box.p1, box.p2, box.p3, box.p4], deleteLinePoints));
+    dispatch(setStoreBoxes(result));
 
 
     const roomToRemove = roomSelectors.find(room => room.wallIds.includes(lastPointId));
@@ -988,7 +1004,7 @@ const setRightPos = (data) =>{
       unitLength:userLength,
       unitType: "feet"
     }
-    const data=handleDownload(lines,points, roomSelectors, scaleData)
+    const data=handleDownload(lines,points, roomSelectors, storeBoxes, scaleData)
     const finalData={
       floorplan_id:floorplanId,
       draw_data:data,
