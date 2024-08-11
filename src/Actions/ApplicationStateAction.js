@@ -1,7 +1,8 @@
 import { useDispatch } from "react-redux";
 import RomeDataManager , {fetchWrapper} from "../app/RomeDataManager";
+import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant";
 import * as THREE from 'three';
-import { setScale } from "../features/drawing/drwingSlice";
+import { setScale, setUserLength } from "../features/drawing/drwingSlice";
 
 export const drawToolData = (floorplan_id) => {
     return (dispatch) => {
@@ -21,7 +22,6 @@ export const drawToolData = (floorplan_id) => {
                     payload: response.data // assuming the response contains some data you might need
                 });
                 const drawData=JSON.parse(response.data.draw_data);
-                console.log(drawData)
                 let lines=[];
                 let point=[]
                 if(drawData&&drawData.lines&&drawData.lines.length>0){
@@ -50,7 +50,15 @@ export const drawToolData = (floorplan_id) => {
                 dispatch(setPoints(point));
                 dispatch(setStoreBoxes(drawData.storeBoxes));
                 if(response.data.scale!==null){
-                    dispatch(setFactor(JSON.parse(response.data.scale)))
+                    const scaleData = JSON.parse(response.data.scale)
+                    const userHeight = 10;
+                    const userLength = scaleData.unitLength;
+                    dispatch(setUserLength(userLength))
+                    const userWidth = 2;
+                    const lfactor = userLength / scaleData.distance;
+                    const wfactor = INITIAL_BREADTH / userWidth;
+                    const hfactor = INITIAL_HEIGHT / userHeight;
+                    dispatch(setFactor([lfactor, wfactor, hfactor]));
                     dispatch(setScale(false))
                 }
             })

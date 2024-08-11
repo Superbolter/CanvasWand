@@ -491,6 +491,7 @@ const setRightPos = (data) =>{
       userLength / leftPos.distanceTo(rightPos);
     const wfactor = INITIAL_BREADTH / userWidth;
     const hfactor = INITIAL_HEIGHT / userHeight;
+    console.log([lfactor, wfactor, hfactor]);
     dispatch(setFactor([lfactor, wfactor, hfactor]));
     dispatch(setScale(false))
   };
@@ -1004,11 +1005,11 @@ const setRightPos = (data) =>{
       unitLength:userLength,
       unitType: "feet"
     }
-    const data=handleDownload(lines,points, roomSelectors, storeBoxes, scaleData)
+    const data=handleDownload(lines,points, roomSelectors, storeBoxes)
     const finalData={
       floorplan_id:floorplanId,
       draw_data:data,
-      scale:factor,
+      scale: scaleData,
     }
     dispatch(updateDrawData(finalData,floorplanId))
   }
