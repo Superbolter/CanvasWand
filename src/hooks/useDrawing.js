@@ -441,12 +441,10 @@ const setRightPos = (data) =>{
     const roomupdate = roomSelectors.map(room => {
       // Filter out the walls that are in the selectedLines array
       const updatedWallIds = room.wallIds.filter(lineId => !selectedLines.includes(lineId));
-    
       // Return null if the room has no walls left
       if (updatedWallIds.length === 1) {
         return null;
       }
-    
       // Otherwise, return the room with the updated walls
       return {
         ...room,
