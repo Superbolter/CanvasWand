@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import RomeDataManager , {fetchWrapper} from "../app/RomeDataManager";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant";
 import * as THREE from 'three';
-import { setLeftPosState, setRightPosState, setScale, setUserLength } from "../features/drawing/drwingSlice";
+import { setLeftPosState, setRightPosState, setRoomSelectors, setScale, setUserLength } from "../features/drawing/drwingSlice";
 
 export const drawToolData = (floorplan_id) => {
     return (dispatch) => {
@@ -48,6 +48,7 @@ export const drawToolData = (floorplan_id) => {
                 }
                 dispatch(setStoreLines(lines));
                 dispatch(setPoints(point));
+                dispatch(setRoomSelectors(drawData.rooms));
                 dispatch(setStoreBoxes(drawData.storeBoxes));
                 if(response.data.scale!==null){
                     const scaleData = JSON.parse(response.data.scale)

@@ -734,19 +734,46 @@ const setRightPos = (data) =>{
 
 
   const room =()=>{
-    const roomName = prompt("Enter the room Name:");
-    console.log("roomName", roomName);
+    MySwal.fire({
+      title: 'Enter the room name',
+      input: 'text',
+      inputPlaceholder: 'Enter the name here...',
+      showCancelButton: true,
+      preConfirm: (value) => {
+        if (!value) {
+          Swal.showValidationMessage('You need to enter a name!');
+        }
+      },
+      customClass: {
+        title: 'swal2-title-custom',
+        htmlContainer: 'swal2-text-custom',
+        input: 'swal2-input-custom',
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const roomName = result.value;
+        const room = {
+          roomId: uniqueId(),
+          roomName: roomName,
+          wallIds: [...selectedLines],
+        };
+        dispatch(setRoomSelectors([...roomSelectors, room]));
+        setSelectedLines([]);
+        dispatch(setRoomSelect(false));
+      }
+    })
+    // const roomName = prompt("Enter the room Name:");
     
-    const room = {
-      roomId: uniqueId(),
-      roomName: roomName,
-      wallIds: [...selectedLines],
-    }
+    // const room = {
+    //   roomId: uniqueId(),
+    //   roomName: roomName,
+    //   wallIds: [...selectedLines],
+    // }
 
 
-    dispatch(setRoomSelectors([...roomSelectors,room]));
-    setSelectedLines([]);
-    dispatch(setRoomSelect(false));
+    // dispatch(setRoomSelectors([...roomSelectors,room]));
+    // setSelectedLines([]);
+    // dispatch(setRoomSelect(false));
 
   }
 
@@ -1050,7 +1077,9 @@ const setRightPos = (data) =>{
       dispatch(setRoomSelectorMode(true))
     }
     else{
-      window.location.href = 'https://www.superbolter.com/'
+      setTimeout(()=>{
+        window.location.href = 'https://www.superbolter.com/'
+      },2000)
     }
     const lines = storeLines
     console.log(leftPos,rightPos)
