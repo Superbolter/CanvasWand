@@ -13,12 +13,12 @@ const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
   const { selectedButton} = useSelector((state)=> state.drawing)
   const roomPopup = useSelector((state) => state.ApplicationState.roomPopup);
   const dispatch = useDispatch()
-  useEffect(() => {
+  // useEffect(() => {
     
-  console.log(typeId);
-  console.log(roomPopup);
+  // console.log(typeId);
+  // console.log(roomPopup);
     
-  }, [typeId, roomPopup])
+  // }, [typeId, roomPopup])
   
   const handleButtonClick = (buttonName) => {
     if(selectionMode){
