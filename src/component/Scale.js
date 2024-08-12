@@ -16,7 +16,7 @@ export const Scale = () => {
   const left = useRef();
   const right = useRef();
   const [dragging, setDragging] = useState(null);
-  const [dimensions, setDimensions] = useState({ l: 10, w: 15, h: 0 });
+  const [dimensions, setDimensions] = useState({ l: 100, w: 15, h: 0 });
   const [isDraggingBox, setIsDraggingBox] = useState(false);
   const [position, setPosition] = useState(new Vector3(0, 0, 0));
   const [lineAngle, setLineAngle] = useState(0);
