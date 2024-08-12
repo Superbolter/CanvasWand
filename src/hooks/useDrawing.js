@@ -531,13 +531,13 @@ const setRightPos = (data) =>{
     // Check for snapping
   let snapFound = false;
   for (let i = 0; i < points.length; i++) {
-    if (Math.abs(points[i].x - point.x)< 10  && (points[points.length-1].y!==points[i].y && points[points.length-1].x!==points[i].x)) {
+    if (Math.abs(points[i].x - point.x)< 2  && (points[points.length-1].y!==points[i].y && points[points.length-1].x!==points[i].x)) {
       cuuPoint.x = points[i].x;
       let newarr = [cuuPoint,points[i]];
       setSnappingPoint([...newarr]);
       snapFound = true;
       break;
-    } else if (Math.abs(points[i].y - point.y) < 10  && (points[points.length-1].y!==points[i].y && points[points.length-1].x!==points[i].x)) {
+    } else if (Math.abs(points[i].y - point.y) < 2  && (points[points.length-1].y!==points[i].y && points[points.length-1].x!==points[i].x)) {
       cuuPoint.y = points[i].y;
       let newarr = [cuuPoint,points[i]];
       setSnappingPoint([...newarr]);
