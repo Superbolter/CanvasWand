@@ -1106,6 +1106,26 @@ const setRightPos = (data) =>{
         toggleSelectionMode();
       }
       dispatch(setRoomSelectorMode(true))
+      MySwal.fire({
+        title: 'Room Selector Instructions',
+        html: `
+          <p style="text-align: left;">
+            1. <strong>Select all the walls</strong> of a single room.<br><br>
+            2. Once all walls are selected, <strong>press the "R" key</strong> on your keyboard to assign the room.<br><br>
+            3. <strong>Repeat this process</strong> for each additional room you wish to assign.
+          </p>
+        `,
+        icon: 'info',
+        confirmButtonText: 'Got it!',
+        customClass: {
+          title: 'swal2-title-custom',
+          htmlContainer: 'swal2-html-custom',
+          confirmButton: 'swal2-confirm-button-custom',
+        },
+        width: '600px',
+        padding: '20px',
+        backdrop: true,
+      });
     }
     else{
       setTimeout(()=>{

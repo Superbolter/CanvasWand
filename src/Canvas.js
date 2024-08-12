@@ -265,7 +265,7 @@ export const CanvasComponent = () => {
 
           
 
-          {!scale && roomSelectors.map((room) =>(<RoomFiller 
+          {!scale && roomSelectorMode && roomSelectors.map((room) =>(<RoomFiller 
            key={room.roomId}
            roomName={room.roomName} 
            wallIds ={room.wallIds} 

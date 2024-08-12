@@ -23,6 +23,10 @@ body, html {
   font-size: 15px;
 }
 
+.swal2-html-custom{
+  font-family: 'DM Sans', sans-serif;
+}
+
 
 .container {
   display: flex;
