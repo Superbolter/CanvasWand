@@ -354,6 +354,18 @@ const setRightPos = (data) =>{
     dispatch(setStoreLines(updatedStoreLines));
   };
 
+  // Function to compare two Vector3 objects
+  function arePointsEqual(pointA, pointB) {
+    return pointA?.x === pointB?.x && pointA?.y === pointB?.y && pointA?.z === pointB?.z;
+  }
+
+  // Function to check if deleteLine points match any points in a box
+  function shouldRemoveBox(boxPoints, deleteLinePoints) {
+    return boxPoints.some(boxPoint => 
+        deleteLinePoints.some(deletePoint => arePointsEqual(boxPoint, deletePoint))
+    );
+  }
+
   const deleteLastPoint = () => {
     const deleteLine = storeLines[storeLines.length - 1];
     const updatedLines = storeLines.slice(0, -1);
@@ -361,18 +373,7 @@ const setRightPos = (data) =>{
     const lastPoint = updatedPoints[updatedPoints.length - 1];
     const lastPointId = deleteLine.id;
     const deleteLinePoints = deleteLine.points;
-    // Function to compare two Vector3 objects
-    function arePointsEqual(pointA, pointB) {
-      return pointA?.x === pointB?.x && pointA?.y === pointB?.y && pointA?.z === pointB?.z;
-    }
-
-    // Function to check if deleteLine points match any points in a box
-    function shouldRemoveBox(boxPoints, deleteLinePoints) {
-      return boxPoints.some(boxPoint => 
-          deleteLinePoints.some(deletePoint => arePointsEqual(boxPoint, deletePoint))
-      );
-    }
-
+    
     // Iterate over storeBoxes and remove the ones that match
     const result = storeBoxes.filter(box => !shouldRemoveBox([box.p1, box.p2, box.p3, box.p4], deleteLinePoints));
     dispatch(setStoreBoxes(result));
@@ -386,7 +387,7 @@ const setRightPos = (data) =>{
        
         dispatch(setRoomSelectors(updatedRoomSelectors));
     }
-
+    
      
 
     const hasBreakPoint = breakPoint.includes(lastPoint);
@@ -437,7 +438,21 @@ const setRightPos = (data) =>{
 
   const deleteSelectedLines = () => {
 
-    const roomupdate = roomSelectors.filter(room =>!room.wallIds.some(lineId => selectedLines.includes(lineId)));
+    const roomupdate = roomSelectors.map(room => {
+      // Filter out the walls that are in the selectedLines array
+      const updatedWallIds = room.wallIds.filter(lineId => !selectedLines.includes(lineId));
+    
+      // Return null if the room has no walls left
+      if (updatedWallIds.length === 1) {
+        return null;
+      }
+    
+      // Otherwise, return the room with the updated walls
+      return {
+        ...room,
+        wallIds: updatedWallIds
+      };
+    }).filter(room => room !== null);
     dispatch(setRoomSelectors(roomupdate));
     const updatedLines = storeLines.filter(
       (line) => !selectedLines.includes(line.id)
@@ -445,6 +460,10 @@ const setRightPos = (data) =>{
     const pointsToKeep = [];
 
     updatedLines.forEach((line) => {
+      const deleteLinePoints = line.points;
+      // Iterate over storeBoxes and remove the ones that match
+      const result = storeBoxes.filter(box => !shouldRemoveBox([box.p1, box.p2, box.p3, box.p4], deleteLinePoints));
+      dispatch(setStoreBoxes(result));
       pointsToKeep.push(line.points[0], line.points[1]);
     });
 
@@ -1119,7 +1138,6 @@ const setRightPos = (data) =>{
     setLeftPos,
     setRightPos,
     deleteSelectedLines,
-    room,
     showRoomNamePopup,
     handleSaveClick
   };
