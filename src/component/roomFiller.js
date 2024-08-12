@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
 import { extend } from "@react-three/fiber";
 import { Shape, ShapeGeometry, MeshBasicMaterial, Vector3, Box3 } from "three";
-import { Text } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import { useDrawing } from "../hooks/useDrawing";
+import { Typography } from "../design_system/StyledComponents/components/Typography";
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -68,7 +69,7 @@ const RoomFiller = ({ roomName, wallIds }) => {
   const sortedPoints = sortPointsClockwise(roomPoints);
   const shape = createShape(sortedPoints);
   const geometry = new ShapeGeometry(shape);
-  const material = new MeshBasicMaterial({ color: "#FFB6C1", transparent: true });
+  const material = new MeshBasicMaterial({ color: "#2E2E2E", transparent: true , opacity: 0.1});
 
   const centroid = getCentroid(sortedPoints);
   const boundingBox = calculateBoundingBox(sortedPoints);
@@ -84,15 +85,20 @@ const RoomFiller = ({ roomName, wallIds }) => {
         <shapeGeometry attach="geometry" args={[shape]} />
         <meshBasicMaterial attach="material" args={[material]} />
       </mesh>
-      <Text
-        position={[centroid.x, centroid.y, centroid.z]}
-        fontSize={fontSize}
-        color="black"
-        anchorX="center"
-        anchorY="middle"
+      <Html
+        position={[centroid.x - 60, centroid.y + 10, centroid.z]}
       >
-        {roomName}
-      </Text>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          padding: "8px 12px",
+          backgroundColor: "white",
+          borderRadius: "4px",
+          width: "100%",
+          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+          fontFamily: "'DM Sans', sans-serif"
+        }}>{roomName}</div>
+      </Html>
     </>
   );
 };
