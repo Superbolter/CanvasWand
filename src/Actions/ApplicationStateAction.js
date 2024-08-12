@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import RomeDataManager , {fetchWrapper} from "../app/RomeDataManager";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant";
 import * as THREE from 'three';
-import { setScale, setUserLength } from "../features/drawing/drwingSlice";
+import { setLeftPosState, setRightPosState, setScale, setUserLength } from "../features/drawing/drwingSlice";
 
 export const drawToolData = (floorplan_id) => {
     return (dispatch) => {
@@ -54,6 +54,10 @@ export const drawToolData = (floorplan_id) => {
                     const userHeight = 10;
                     const userLength = scaleData.unitLength;
                     dispatch(setUserLength(userLength))
+                    const left = new THREE.Vector3(scaleData.leftPos.x, scaleData.leftPos.y, scaleData.leftPos.z);
+                    const right = new THREE.Vector3(scaleData.rightPos.x, scaleData.rightPos.y, scaleData.rightPos.z);
+                    dispatch(setLeftPosState(left))
+                    dispatch(setRightPosState(right))
                     const userWidth = 2;
                     const lfactor = userLength / scaleData.distance;
                     const wfactor = INITIAL_BREADTH / userWidth;
@@ -69,21 +73,16 @@ export const drawToolData = (floorplan_id) => {
 } 
 export const updateDrawData = (data,floorplanId) => {
     return (dispatch) => {
-        
-        console.log(data)
-
         fetchWrapper.post(`/floorplans/update_draw_data`, data)
             .then(response => {
                 dispatch({
                     type: "UPDATE_DRAW_DATA",
                     payload: response.data 
                 });
-                dispatch(drawToolData(floorplanId))
-                console.log(response);
-                
+                dispatch(drawToolData(floorplanId))                
             })
             .catch(error => {
-                console.log("Error", error);
+                console.error("Error", error);
              
             });
     };

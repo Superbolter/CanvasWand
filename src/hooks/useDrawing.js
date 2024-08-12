@@ -999,10 +999,13 @@ const setRightPos = (data) =>{
 
   const handleSaveClick =()=>{
     const lines = storeLines
+    console.log(leftPos,rightPos)
+    const distance = Math.sqrt((rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2);
+    console.log(distance)
     const scaleData={
       leftPos,
       rightPos,
-      distance: leftPos.distanceTo(rightPos),
+      distance: distance,
       unitLength:userLength,
       unitType: "feet"
     }
