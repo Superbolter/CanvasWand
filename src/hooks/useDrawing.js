@@ -351,7 +351,7 @@ const setRightPos = (data) =>{
     const deleteLinePoints = deleteLine.points;
     // Function to compare two Vector3 objects
     function arePointsEqual(pointA, pointB) {
-      return pointA.x === pointB.x && pointA.y === pointB.y && pointA.z === pointB.z;
+      return pointA?.x === pointB?.x && pointA?.y === pointB?.y && pointA?.z === pointB?.z;
     }
 
     // Function to check if deleteLine points match any points in a box
