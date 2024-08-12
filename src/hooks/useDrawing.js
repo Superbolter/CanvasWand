@@ -24,7 +24,7 @@ import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import {findLineForPoint }from "../utils/coolinear.js"
-import { setPoints,setStoreLines,setFactor, showRoomNamePopup, updateDrawData, setStoreBoxes, updateLineTypeId } from "../Actions/ApplicationStateAction.js";
+import { setPoints,setStoreLines,setFactor, showRoomNamePopup, updateDrawData, setStoreBoxes, updateLineTypeId, setRoomSelectorMode } from "../Actions/ApplicationStateAction.js";
 import { setContextualMenuStatus, setShowPopup, setTypeId } from "../Actions/DrawingActions.js";
 import { handleDownload } from "../component/ConvertToJson.js";
 import Swal from 'sweetalert2';
@@ -43,7 +43,7 @@ export const useDrawing = () => {
     leftPos, rightPos, userLength, lineBreak, merge
   } = useSelector((state) => state.drawing);
   const {typeId, contextualMenuStatus}=useSelector((state)=>state.Drawing)
-  const {storeLines,points,factor,floorplanId,storeBoxes}=useSelector((state)=>state.ApplicationState)
+  const {storeLines,points,factor,floorplanId,storeBoxes, roomSelectorMode}=useSelector((state)=>state.ApplicationState)
 
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedLines, setSelectedLines] = useState([]);
@@ -1026,6 +1026,15 @@ const setRightPos = (data) =>{
   };
 
   const handleSaveClick =()=>{
+    if(!roomSelectorMode){
+      if(!selectionMode){
+        toggleSelectionMode();
+      }
+      dispatch(setRoomSelectorMode(true))
+    }
+    else{
+      window.location.href = 'https://www.superbolter.com/'
+    }
     const lines = storeLines
     console.log(leftPos,rightPos)
     const distance = Math.sqrt((rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2);

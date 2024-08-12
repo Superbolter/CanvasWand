@@ -16,7 +16,7 @@ import {
 
 const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
   const { typeId, showPropertiesPopup } = useSelector((state) => state.Drawing);
-  const { height, width } = useSelector((state) => state.ApplicationState);
+  const { height, width,roomSelectorMode } = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch();
   const handleCloseClick = () => {
     dispatch(setTypeId(0));
@@ -27,7 +27,7 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
     <div>
       <div
         className={
-          typeId === 3 && showPropertiesPopup
+          typeId === 3 && showPropertiesPopup && !roomSelectorMode
             ? "popup-container"
             : "popup-container-hidden"
         }

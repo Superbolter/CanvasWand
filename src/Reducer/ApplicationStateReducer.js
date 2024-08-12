@@ -13,6 +13,7 @@ const initialState = {
     factor:[1,1,1],
     roomPopup:false,
     storeBoxes: [],
+    roomSelectorMode: false,
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {
@@ -25,8 +26,6 @@ const initialState = {
           drawnBy:action.payload.drawed_by,
           workStatus:action.payload.work_status,
           drawData:action.payload.draw_data,
-
-          
         };
       case "SET_STORE_LINES":
         return {
@@ -43,36 +42,32 @@ const initialState = {
         return {
           ...state,
           points:action.payload
-
-          
         };
       case "SET_FACTOR":
         return {
           ...state,
           factor:action.payload
-
-          
         };
       case "SET_HEIGHT":
         return {
           ...state,
           height:action.payload
-
-          
         };
       case "SET_WIDTH":
         return {
           ...state,
           width:action.payload
-
-          
         };
       case "SHOW_ROOM_NAME_POPUP":
         return {
           ...state,
           roomPopup:action.payload,
-
-          
+        };
+      
+      case "SET_ROOM_SELECTOR_MODE":
+        return {
+          ...state,
+          roomSelectorMode:action.payload,
         };
 
 

@@ -166,3 +166,12 @@ export const updateLineTypeId = (lineId, typeId, storeLines) => {
         })
     }
   }
+
+export const setRoomSelectorMode = (value) => {
+    return (dispatch) => {
+      dispatch({
+        type: "SET_ROOM_SELECTOR_MODE",
+        payload: value,
+      });
+    };
+  };

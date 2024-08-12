@@ -30,14 +30,16 @@ const WallPropertiesPopup = ({
   };
   const { lineBreak, merge } = useSelector((state) => state.drawing);
   const { setLineBreak, setMerge, stop, setStop } = useDrawing();
-  const { height, width } = useSelector((state) => state.ApplicationState);
+  const { height, width,roomSelectorMode } = useSelector((state) => state.ApplicationState);
 
   const handleMergeClick = () => {
     setSelectedLines([]);
+    setLineBreak(false);
     setMerge(!merge);
   };
 
   const handleSplitClick = () => {
+    setMerge(false)
     if (!lineBreak && selectionMode) {
       toggleSelectionMode();
     } else if (lineBreak && !selectionMode) {
@@ -58,7 +60,7 @@ const WallPropertiesPopup = ({
     <div>
       <div
         className={
-          (typeId === 1 && showPropertiesPopup) || lineBreak || merge
+          (typeId === 1 && showPropertiesPopup && !roomSelectorMode) || lineBreak && !roomSelectorMode || merge && !roomSelectorMode
             ? "popup-container"
             : "popup-container-hidden"
         }

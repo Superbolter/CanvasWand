@@ -96,7 +96,7 @@ export const CanvasComponent = () => {
   } = useDrawing();
 
   const { leftPos, rightPos } = useSelector((state) => state.drawing)
-  const { storeBoxes} = useSelector((state) => state.ApplicationState);
+  const { storeBoxes, roomSelectorMode} = useSelector((state) => state.ApplicationState);
 
 
   const getUrlParameter = (name) => {
@@ -118,7 +118,7 @@ export const CanvasComponent = () => {
     if (event.key === "s" || event.key === "S") {
       setStop(!stop);
     }
-    if((event.key === "r" || event.key === "R") && !event.ctrlKey){
+    if((event.key === "r" || event.key === "R") && !event.ctrlKey && roomSelectorMode){
       room();
 
     }
@@ -133,7 +133,7 @@ export const CanvasComponent = () => {
     if(event.ctrlKey&&(event.key === "y" || event.key === "Y")){
       redo();
     }
-    if(event.key === "escape" || event.key === "Escape"){
+    if(event.key === "escape" || event.key === "Escape" && !roomSelectorMode){
       // escape();
       toggleSelectionMode();
     }
