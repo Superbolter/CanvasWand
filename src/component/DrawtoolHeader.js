@@ -42,8 +42,8 @@ const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick
         }
       </Typography>
       {scale? <div style={{display:"flex",gap:"8px"}}>
-          {userLength===0 ? null : <Button className='undo-redo-btn' modifiers={["blue"]} onClick={handleCancel}>Cancel & next</Button>}
-          <Button className='save-btn' modifiers={["blue"]} onClick={handleDoubleClick}>Save & next</Button>
+          {userLength===0 ? null : <Button modifiers={["outlineBlack", "small"]} onClick={handleCancel}>Cancel & next</Button>}
+          <Button modifiers={["blue","small"]} onClick={handleDoubleClick}>Save & next</Button>
         </div>:
       <div style={{display:"flex",gap:"8px"}}>
       <Button modifiers={["outlineBlack","sm"]} className='undo-redo-btn' onClick={deleteLastPoint}>

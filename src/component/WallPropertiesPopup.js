@@ -96,7 +96,7 @@ const WallPropertiesPopup = ({
               size="small"
               required={true}
               type="tel"
-              value={height > 0 ? height : ""}
+              value={height > 0 ? height.toFixed(2) : ""}
               disabled
             />
           </div>
@@ -111,7 +111,7 @@ const WallPropertiesPopup = ({
               size="small"
               required={true}
               type="tel"
-              value={width > 0 ? width : ""}
+              value={width > 0 ? width.toFixed(2) : ""}
               disabled
             />
           </div>

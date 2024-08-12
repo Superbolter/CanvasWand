@@ -59,7 +59,7 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
               size="small"
               required={true}
               type="tel"
-              value={height > 0 ? height : ""}
+              value={height > 0 ? height.toFixed(2) : ""}
               disabled
             />
           </div>
@@ -74,11 +74,11 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
               size="small"
               required={true}
               type="tel"
-              value={width > 0 ? width : ""}
+              value={width > 0 ? width.toFixed(2) : ""}
               disabled
             />
           </div>
-          <div className="thickness-input-container">
+          {/* <div className="thickness-input-container">
             <Typography className="thickness-text">
               Distance from floor
             </Typography>
@@ -92,7 +92,7 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
               required={true}
               type="tel"
             />
-          </div>
+          </div> */}
           <div className="divider"></div>
           {selectionMode ? (
             <div

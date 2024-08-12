@@ -3,7 +3,7 @@
     flex-direction: column;
     position: absolute;
     height:273px;
-    width: 240px;
+    width: 230px;
     top: 262px;
     right:20px;
     padding: 12px;
@@ -71,6 +71,7 @@ line-height: 18.23px;
 letter-spacing: -0.01em;
 text-align: left;
 color:#2E2E2E;
+margin-bottom: 8px;
 
 }
 .thickness-text {
@@ -80,6 +81,7 @@ line-height: 18.23px;
 letter-spacing: -0.01em;
 text-align: left;
 color: #2E2E2E;
+margin-bottom: 8px;
 
 }
 .divider{
