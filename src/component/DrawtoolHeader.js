@@ -19,6 +19,9 @@ const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick
     dispatch(setScale(true))
     handleReset()
   }
+  const handleCancel = () =>{
+    dispatch(setScale(false))
+  }
   
   return (
     <div style={{position:"fixed", top:"20px", left:"20px", backgroundColor:"white",borderRadius:"12px", width:"79vw", padding:"12px", display:"flex", alignItems:"center", justifyContent:"space-between",boxShadow: "0px 4px 14px -3px #0C0C0D21", zIndex:"2"
@@ -38,6 +41,7 @@ const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick
         }
       </Typography>
       {scale? <div style={{display:"flex",gap:"8px"}}>
+          <Button className='undo-redo-btn' modifiers={["blue"]} onClick={handleCancel}>Cancel & next</Button>
           <Button className='save-btn' modifiers={["blue"]} onClick={handleDoubleClick}>Save & next</Button>
         </div>:
       <div style={{display:"flex",gap:"8px"}}>
