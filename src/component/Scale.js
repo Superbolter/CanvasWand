@@ -4,6 +4,8 @@ import { Vector3, Matrix4 } from "three";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant";
 import {
   setFactor,
+  setLeftPosState,
+  setRightPosState,
   setScale,
 } from "../features/drawing/drwingSlice.js";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,8 +23,17 @@ export const Scale = () => {
   const [position, setPosition] = useState(new Vector3(0, 0, 0));
   const [lineAngle, setLineAngle] = useState(0);
   const [isPointerMoving, setIsPointerMoving] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
   const { handleDoubleClick, setLeftPos, setRightPos} = useDrawing();
   const { leftPos, rightPos } = useSelector((state) => state.drawing)
+
+  useEffect(()=>{
+    if(firstLoad){
+      setFirstLoad(false)
+      dispatch(setLeftPosState(new Vector3(-50, 0, 0)))
+      dispatch(setRightPosState(new Vector3(50, 0, 0)))
+    }
+  },[firstLoad])
 
   useEffect(() => {
     const canvasContainer = document.querySelector(".canvas-container");
@@ -30,6 +41,7 @@ export const Scale = () => {
     const cameraWidth = rect.width;
     const cameraHeight = rect.height;
     let frameId = null;
+    
 
     const handlePointerMove = (event) => {
       if (!isDraggingBox && !dragging) return;

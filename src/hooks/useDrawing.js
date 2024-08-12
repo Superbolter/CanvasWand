@@ -542,6 +542,7 @@ const setRightPos = (data) =>{
         const hfactor = INITIAL_HEIGHT / userHeight;
         dispatch(setFactor([lfactor, wfactor, hfactor]));
         dispatch(setScale(false))
+        handleApiCall();
       }
     })
     
@@ -1069,22 +1070,9 @@ const setRightPos = (data) =>{
     dispatch(setPoints(pointsVal));
   };
 
-  const handleSaveClick =()=>{
-    if(!roomSelectorMode){
-      if(!selectionMode){
-        toggleSelectionMode();
-      }
-      dispatch(setRoomSelectorMode(true))
-    }
-    else{
-      setTimeout(()=>{
-        window.location.href = 'https://www.superbolter.com/'
-      },2000)
-    }
+  const handleApiCall = () =>{
     const lines = storeLines
-    console.log(leftPos,rightPos)
     const distance = Math.sqrt((rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2);
-    console.log(distance)
     const scaleData={
       leftPos,
       rightPos,
@@ -1099,6 +1087,21 @@ const setRightPos = (data) =>{
       scale: scaleData,
     }
     dispatch(updateDrawData(finalData,floorplanId))
+  }
+
+  const handleSaveClick =()=>{
+    if(!roomSelectorMode){
+      if(!selectionMode){
+        toggleSelectionMode();
+      }
+      dispatch(setRoomSelectorMode(true))
+    }
+    else{
+      setTimeout(()=>{
+        window.location.href = 'https://www.superbolter.com/'
+      },2000)
+    }
+    handleApiCall();
   }
   
 
@@ -1166,6 +1169,7 @@ const setRightPos = (data) =>{
     setRightPos,
     deleteSelectedLines,
     showRoomNamePopup,
-    handleSaveClick
+    handleSaveClick,
+    handleApiCall
   };
 };

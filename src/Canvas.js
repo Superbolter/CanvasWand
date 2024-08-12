@@ -195,7 +195,7 @@ export const CanvasComponent = () => {
         >
 
           {scale && (<Scale/>)}
-          {addOn && (
+          {addOn && !scale && (
             <DraggableDoor
               doorPosition={doorPosition}
               setDoorPosition={setDoorPosition}
@@ -209,7 +209,7 @@ export const CanvasComponent = () => {
           )}
           <BackgroundImage />
           {/* Render lines in 2D view */}
-          {storeLines.map((line) => (
+          {!scale && storeLines.map((line) => (
             <BoxGeometry
               key={line.id}
               start={line.points[0]}
@@ -225,7 +225,7 @@ export const CanvasComponent = () => {
           ))}
 
           
-            {showSnapLine && snappingPoint && (
+            {!scale && showSnapLine && snappingPoint && (
               <Line
               points={[snappingPoint[1], snappingPoint[0]]}
               color="green"
@@ -234,7 +234,7 @@ export const CanvasComponent = () => {
             )}
              
 
-          {currentMousePosition && points.length > 0 && !stop && (
+          {!scale && currentMousePosition && points.length > 0 && !stop && (
             <>
               <Line
                 points={[points[points.length - 1], currentMousePosition]}
@@ -258,13 +258,13 @@ export const CanvasComponent = () => {
               </Text>
             </>
           )}
-          {storeBoxes.map((box, index) => (
+          {!scale && storeBoxes.map((box, index) => (
             <CreateFiller key={index} p1={box.p1} p2={box.p2} p3={box.p3} p4={box.p4} />
           ))}
 
           
 
-          {roomSelectors.map((room) =>(<RoomFiller 
+          {!scale && roomSelectors.map((room) =>(<RoomFiller 
            key={room.roomId}
            roomName={room.roomName} 
            wallIds ={room.wallIds} 
@@ -286,7 +286,12 @@ export const CanvasComponent = () => {
           />
           
         </Canvas>
-        
+        <DrawtoolHeader
+            deleteLastPoint={deleteLastPoint}
+            redo={redo}
+            handleSaveClick={handleSaveClick}
+            handleDoubleClick={handleDoubleClick}
+          />
       </div>
       {!scale &&
       <div className="button-container">
@@ -355,11 +360,6 @@ export const CanvasComponent = () => {
           )}
         </div>  */}
         <div style={{ position: "relative" }}>
-          <DrawtoolHeader
-            deleteLastPoint={deleteLastPoint}
-            redo={redo}
-            handleSaveClick={handleSaveClick}
-          />
           {contextualMenuStatus && <ContextualMenu/>}
           <div
           className="perspective-canvas"
