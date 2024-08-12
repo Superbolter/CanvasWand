@@ -833,7 +833,6 @@ const setRightPos = (data) =>{
   const handleLineClick = (event,id) => {
     let storeid = [];
     if(merge){
-      console.log(selectedLines,mergeLine)
       storeid = [...mergeLine,id];
       setMergeLine([...mergeLine,id]);
     }
@@ -866,8 +865,6 @@ const setRightPos = (data) =>{
         }
         dispatch(setStoreLines(updatedLine));
         setMergeLine([]);
-
-
       }
       else{
         setMergeLine([]);
