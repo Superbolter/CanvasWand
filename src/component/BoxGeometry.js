@@ -235,11 +235,13 @@ if(mid1 && mid2 && !newline){
 
 useEffect(()=>{
   if(mid1 && mid2 && mid1!==mid2){
-    // console.log("intersection point found between mid1 and mid2",p1,p2,p3,p4)
-    const data={p1,p2,p3,p4}
-    const boxes = [...storeBoxes]
-    boxes.push(data)
-    dispatch(setStoreBoxes(boxes))
+    if(Math.abs(p1?.x) <1000 && Math.abs(p1?.y) <1000 && Math.abs(p2?.x) <1000 && Math.abs(p2?.y) <1000 && Math.abs(p3?.x) <1000 && Math.abs(p3?.y) <1000 && Math.abs(p4?.x) <1000 && Math.abs(p4?.y) <1000){
+      // console.log("intersection point found between mid1 and mid2",p1,p2,p3,p4)
+      const data={p1,p2,p3,p4}
+      const boxes = [...storeBoxes]
+      boxes.push(data)
+      dispatch(setStoreBoxes(boxes))
+    }
   }
 },[])
 
