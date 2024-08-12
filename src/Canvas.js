@@ -76,7 +76,7 @@ export const CanvasComponent = () => {
     handlePointerDown,
     handlePointerUp,
     handlePointerMove,
-    toggleSelectionroomMood,
+    toggleSelectionSplitMode,
     roomSelectors,
     handlemode,
     type,
@@ -220,7 +220,7 @@ export const CanvasComponent = () => {
               type={line.type}
               typeId={line.typeId}
               isSelected={selectedLines.includes(line.id)}
-              onClick={() => handleLineClick(line.id)}
+              onClick={(e) => handleLineClick(e,line.id)}
             />
           ))}
 
@@ -390,7 +390,7 @@ export const CanvasComponent = () => {
                 type={line.type}
                 isSelected={selectedLines.includes(line.id)}
                 isChoose={idSelection.includes(line.id)}
-                onClick={() => handleLineClick(line.id)}
+                onClick={(e) => handleLineClick(e,line.id)}
               />
             ))}
 
@@ -412,11 +412,7 @@ export const CanvasComponent = () => {
           </Canvas>
         </div>
           <WindowPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
-          <WallPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines} splitLines={() =>{ setLineBreak(!lineBreak)
-            setStop(!stop);
-          }} mergeLines={() =>{ setMerge(!merge)
-            setStop(!stop);
-          }}/>
+          <WallPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines} toggleSelectionMode={toggleSelectionSplitMode} setSelectedLines={setSelectedLines} />
           <DoorPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
           <RailingPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
           <RoomNamePopup />

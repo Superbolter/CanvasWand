@@ -12,6 +12,8 @@ import {
   setLeftPosState,
   setRightPosState,
   setUserLength,
+  setLineBreakState,
+  setMergeState,
 } from "../features/drawing/drwingSlice.js";
 import {
   uniqueId,
@@ -34,7 +36,7 @@ export const useDrawing = () => {
       measured,
       scale,
     information,roomSelect,roomSelectors,
-    leftPos, rightPos, userLength
+    leftPos, rightPos, userLength, lineBreak, merge
   } = useSelector((state) => state.drawing);
   const {typeId, contextualMenuStatus}=useSelector((state)=>state.Drawing)
   const {storeLines,points,factor,floorplanId,storeBoxes}=useSelector((state)=>state.ApplicationState)
@@ -58,10 +60,8 @@ export const useDrawing = () => {
   const [doorPosition, setDoorPosition] = useState([]);
   const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
   const [check,setCheck]= useState(true);
-  const[lineBreak, setLineBreak] = useState(false);
   const[breakPointLocation, setBreakPointLocation] = useState(null);
   const [selectId,setId] = useState(null);
-  const [ merge,setMerge]=useState(false);
   const [mergeLine, setMergeLine] = useState([]);
 
   const [doorPoint, setdoorPoint] = useState([]);
@@ -72,6 +72,14 @@ const [snappingPoint, setSnappingPoint] = useState([]);
 const [showSnapLine, setShowSnapLine] = useState(false);
 // const [leftPos, setLeftPosState] = useState(new Vector3(-5, 0, 0));
 // const [rightPos, setRightPosState] = useState(new Vector3(5, 0, 0));
+
+const setMerge = (data) =>{
+  dispatch(setMergeState(data))
+}
+
+const setLineBreak = (data) =>{
+  dispatch(setLineBreakState(data))
+}
 
 const setLeftPos = (data) =>{
   dispatch(setLeftPosState(data))
@@ -452,10 +460,10 @@ const setRightPos = (data) =>{
   const toggleSelectionMode = () => {
     if(selectionMode){
       setSelectedLines([]);
-      setNewLine(false);
+      setNewLine(true);
       dispatch(setContextualMenuStatus(false))
       setShowSnapLine(false);
-      setStop(false);
+      setStop(true);
     }else{
       setNewLine(true);
       setShowSnapLine(false);
@@ -494,115 +502,6 @@ const setRightPos = (data) =>{
     console.log([lfactor, wfactor, hfactor]);
     dispatch(setFactor([lfactor, wfactor, hfactor]));
     dispatch(setScale(false))
-  };
-
-  const handleClick = (event) => {
-    if (selectionMode || dragMode || doorWindowMode|| merge|| scale) return; // Prevent drawing new lines in selection mode
-    //if (dragMode) return;
-
-    const canvasContainer = document.querySelector(".canvas-container");
-    const rect = canvasContainer.getBoundingClientRect();
-
-    let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-    const cameraWidth = rect.width;
-    const cameraHeight = rect.height;
-
-    const posX = x * (cameraWidth / 2);
-    const posY = y * (cameraHeight / 2);
-
-    let point = new Vector3(posX, posY, 0);
-    if(lineBreak){
-      console.log("point: ", point);
-      let{closestPointOnLine}=findLineForPoint(point,storeLines);
-      breakingLine(closestPointOnLine);
-      setBreakPointLocation(closestPointOnLine);
-      
-      return;
-    }
-    
-    if (newLine) {
-      setStop(!stop);
-      dispatch(setContextualMenuStatus(true))
-      setNewLine(false);
-      point = snapToPoint(point, points, storeLines);
-
-
-      const newPoint = [...points, point];
-      const breaking = [...breakPoint, point];
-      setBreakPoint(breaking);
-      dispatch(setPoints(newPoint));
-      return;
-    }
-
-    if (perpendicularLine && points.length > 0) {
-      point = calculateAlignedPoint(points[points.length - 1], point);
-    }
-    point = snapToPoint(point, points, storeLines); //snapping
-    const newPoints = [...points, point];
-    dispatch(setPoints(newPoints));
-
-
-    if(showSnapLine){
-      addPoint(snappingPoint[0],newPoints[newPoints.length - 2]);
-    }
-
-
-    if (points.length >= 1) {
-      dispatch(setContextualMenuStatus(true))
-      addPoint(point, newPoints[newPoints.length - 2]);
-    }
-
-
-
-
-
-
-
-
-
-
-
-    // if (newPoints.length === 2 && firstTime) {
-    //   setFirstTime(false);
-    //   const userHeight = parseFloat(
-    //     prompt("Enter the height of the first line:")
-    //   );
-    //   const userLength = parseFloat(
-    //     prompt("Enter the length of the first line:")
-    //   );
-    //   const userWidth = parseFloat(
-    //     prompt("Enter the thickness of the first line:")
-    //   );
-    //   const lfactor =
-    //     userLength / point.distanceTo(newPoints[newPoints.length - 2]);
-    //   const wfactor = INITIAL_BREADTH / userWidth;
-    //   const hfactor = INITIAL_HEIGHT / userHeight;
-    //   dispatch(setFactor([lfactor, wfactor, hfactor]));
-
-    //   let newLine = {
-    //     id: uniqueId(),
-    //     points: [newPoints[newPoints.length - 2], point],
-    //     length: convert(
-    //       newPoints[newPoints.length - 2].distanceTo(point) * lfactor
-    //     )
-    //       .from(measured)
-    //       .to("mm"),
-    //     width: convert(INITIAL_BREADTH / wfactor)
-    //       .from(measured)
-    //       .to("mm"),
-    //     height: convert(INITIAL_HEIGHT / hfactor)
-    //       .from(measured)
-    //       .to("mm"),
-    //     widthchangetype: "between",
-    //     widthchange: 0,
-    //     type: "wall",
-    //   };
-    //   dispatch(setStoreLines([newLine]));
-    // }
-    setCurrentMousePosition(null); // Clear the temporary line on click
-    setDistance(0); // Reset distance display
   };
 
   const handleMouseMove = (event) => {
@@ -809,43 +708,143 @@ const setRightPos = (data) =>{
   }
 
 
-  const toggleSelectionroomMood= () => {
-    //escape();
+  const toggleSelectionSplitMode= () => {
+    if(selectionMode){
+      setSelectedLines([]);
+      setNewLine(false);
+      dispatch(setContextualMenuStatus(false))
+      setShowSnapLine(false);
+      setStop(true);
+    }else{
+      setNewLine(true);
+      setShowSnapLine(false);
+      dispatch(setContextualMenuStatus(false))
+      setStop(true);
+      dispatch(setSelectedButton([]))
+    }
     setSelectionMode(!selectionMode);
-    dispatch(setRoomSelect(true));
-    setSelectedLines([]);
   };
 
+  const handleClick = (event) => {
+    if (selectionMode || dragMode || doorWindowMode|| merge|| scale) return; // Prevent drawing new lines in selection mode
+    //if (dragMode) return;
+
+    const canvasContainer = document.querySelector(".canvas-container");
+    const rect = canvasContainer.getBoundingClientRect();
+
+    let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    const cameraWidth = rect.width;
+    const cameraHeight = rect.height;
+
+    const posX = x * (cameraWidth / 2);
+    const posY = y * (cameraHeight / 2);
+
+    let point = new Vector3(posX, posY, 0);
+    if(lineBreak){
+      if(findLineForPoint(point,storeLines)){
+        let{closestPointOnLine}=findLineForPoint(point,storeLines);
+        breakingLine(closestPointOnLine);
+        setBreakPointLocation(closestPointOnLine);
+      }else{
+        setLineBreak(false);
+        if(!selectionMode){
+          toggleSelectionSplitMode();
+        }
+      }
+      return;
+    }
+    
+    if (newLine) {
+      setStop(!stop);
+      dispatch(setContextualMenuStatus(true))
+      setNewLine(false);
+      point = snapToPoint(point, points, storeLines);
 
 
+      const newPoint = [...points, point];
+      const breaking = [...breakPoint, point];
+      setBreakPoint(breaking);
+      dispatch(setPoints(newPoint));
+      return;
+    }
+
+    if (perpendicularLine && points.length > 0) {
+      point = calculateAlignedPoint(points[points.length - 1], point);
+    }
+    point = snapToPoint(point, points, storeLines); //snapping
+    const newPoints = [...points, point];
+    dispatch(setPoints(newPoints));
 
 
+    if(showSnapLine){
+      addPoint(snappingPoint[0],newPoints[newPoints.length - 2]);
+    }
 
 
+    if (points.length >= 1) {
+      dispatch(setContextualMenuStatus(true))
+      addPoint(point, newPoints[newPoints.length - 2]);
+    }
 
 
+    // if (newPoints.length === 2 && firstTime) {
+    //   setFirstTime(false);
+    //   const userHeight = parseFloat(
+    //     prompt("Enter the height of the first line:")
+    //   );
+    //   const userLength = parseFloat(
+    //     prompt("Enter the length of the first line:")
+    //   );
+    //   const userWidth = parseFloat(
+    //     prompt("Enter the thickness of the first line:")
+    //   );
+    //   const lfactor =
+    //     userLength / point.distanceTo(newPoints[newPoints.length - 2]);
+    //   const wfactor = INITIAL_BREADTH / userWidth;
+    //   const hfactor = INITIAL_HEIGHT / userHeight;
+    //   dispatch(setFactor([lfactor, wfactor, hfactor]));
 
-  
+    //   let newLine = {
+    //     id: uniqueId(),
+    //     points: [newPoints[newPoints.length - 2], point],
+    //     length: convert(
+    //       newPoints[newPoints.length - 2].distanceTo(point) * lfactor
+    //     )
+    //       .from(measured)
+    //       .to("mm"),
+    //     width: convert(INITIAL_BREADTH / wfactor)
+    //       .from(measured)
+    //       .to("mm"),
+    //     height: convert(INITIAL_HEIGHT / hfactor)
+    //       .from(measured)
+    //       .to("mm"),
+    //     widthchangetype: "between",
+    //     widthchange: 0,
+    //     type: "wall",
+    //   };
+    //   dispatch(setStoreLines([newLine]));
+    // }
+    setCurrentMousePosition(null); // Clear the temporary line on click
+    setDistance(0); // Reset distance display
+  };
 
-  const handleLineClick = (id) => {
-    let storeid = null;
+  const handleLineClick = (event,id) => {
+    let storeid = [];
     if(merge){
+      console.log(selectedLines,mergeLine)
       storeid = [...mergeLine,id];
       setMergeLine([...mergeLine,id]);
     }
     
-    console.log("hello mergeLine",storeid);
-    
-
-    console.log("Ia am inside")
-    console.log("lineBreak",lineBreak);
-
     
     if(lineBreak){
-       setId(id);
+      setId(id);
     }
 
     if(merge && storeid.length ===2){
+      setSelectedLines([]);
       let idx1 = storeLines.findIndex((line)=>line.id ===storeid[0]);
       let idx2 = storeLines.findIndex((line)=> line.id === storeid[1]);
       let arr = [idx1,idx2];
@@ -870,10 +869,15 @@ const setRightPos = (data) =>{
 
 
       }
+      else{
+        setMergeLine([]);
+      }
+    }else if (storeid.length> 2){
+      setMergeLine([]);
     }
     const selectedLine = storeLines.find((line)=> line.id === id);
     console.log(selectedLine.typeId)
-    if(selectionMode && roomSelect){
+    if(selectionMode && roomSelect && (storeid.length!==2)){
       
       setSelectedLines((prev) =>
         prev.includes(id)
@@ -889,7 +893,7 @@ const setRightPos = (data) =>{
       
 
     }
-    else if (selectionMode) {
+    else if (selectionMode && (storeid.length!==2)) {
       setSelectedLines((prev) =>
         prev.includes(id)
           ? prev.filter((lineId) => lineId !== id)
@@ -1070,7 +1074,7 @@ const setRightPos = (data) =>{
     handlePointerDown,
     handlePointerUp,
     setDimensions,
-    toggleSelectionroomMood,
+    toggleSelectionSplitMode,
     handlemode,
     room,
     escape,

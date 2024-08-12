@@ -8,6 +8,7 @@ import { setShowPopup, setTypeId } from '../Actions/DrawingActions.js';
 import { setSelectedButton } from '../features/drawing/drwingSlice.js';
 
 const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
+  const {lineBreak,merge} = useSelector((state) => state.drawing);
   const {typeId, showPropertiesPopup} = useSelector((state) => state.Drawing);
   const { selectedButton} = useSelector((state)=> state.drawing)
   const roomPopup = useSelector((state) => state.ApplicationState.roomPopup);
@@ -40,7 +41,7 @@ const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
 
   return (
     <div>
-      <div className={showPropertiesPopup? "scrollable-container-hidden" : "scrollable-container"}>
+      <div className={showPropertiesPopup || lineBreak || merge? "scrollable-container-hidden" : "scrollable-container"}>
         <div className="scrollable-content">
           <Typography className='btn-heading-text' modifiers={['medium']}>Structures</Typography>
           <div className="grid-container">

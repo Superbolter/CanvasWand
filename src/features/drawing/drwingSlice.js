@@ -18,7 +18,9 @@ const initialState = {
   selectedButton: null,
   leftPos: new Vector3(-5, 0, 0),
   rightPos: new Vector3(5, 0, 0),
-  userLength: 0
+  userLength: 0,
+  lineBreak: false,
+  merge: false
 };
 
 export const drawingSlice = createSlice({
@@ -84,6 +86,12 @@ export const drawingSlice = createSlice({
     },
     setUserLength: (state,action) => {
       state.userLength = action.payload
+    },
+    setLineBreakState: (state,action) => {
+      state.lineBreak = action.payload
+    },
+    setMergeState: (state,action) => {
+      state.merge = action.payload
     }
   },
 });
@@ -108,7 +116,9 @@ export const {
   setSelectedButton,
   setLeftPosState,
   setRightPosState,
-  setUserLength
+  setUserLength,
+  setLineBreakState,
+  setMergeState
 } = drawingSlice.actions;
 
 export default drawingSlice.reducer;
