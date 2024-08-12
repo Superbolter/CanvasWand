@@ -70,6 +70,7 @@ const WallPropertiesPopup = ({selectionMode,deleteSelectedLines, toggleSelection
               required={true}
               type="tel"
               value={height > 0 ? height : ''}
+              disabled
             />
           </div>
           <div className='thickness-input-container'>
@@ -84,6 +85,7 @@ const WallPropertiesPopup = ({selectionMode,deleteSelectedLines, toggleSelection
               required={true}
               type="tel"
               value={width > 0 ? width : ''}
+              disabled
             />
           </div>
           <div className='divider'>

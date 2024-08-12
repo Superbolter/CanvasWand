@@ -26,7 +26,7 @@ const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
     }
     setNewLine();
     dispatch(setSelectedButton(buttonName))
-    dispatch(setShowPopup(true));
+    // dispatch(setShowPopup(true));
     if (buttonName === 'Walls') {
       dispatch(setTypeId(1))
     }

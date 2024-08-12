@@ -12,6 +12,7 @@ import { setContextualMenuStatus, setShowPopup, setTypeId } from '../Actions/Dra
 
 const DoorPropertiesPopup = ({selectionMode,deleteSelectedLines}) => {
   const {typeId, showPropertiesPopup} = useSelector((state) => state.Drawing);
+  const { height, width } = useSelector((state) => state.ApplicationState);
   const dispatch=useDispatch();
   const handleCloseClick=()=>{
     dispatch(setTypeId(1));
@@ -33,7 +34,7 @@ const DoorPropertiesPopup = ({selectionMode,deleteSelectedLines}) => {
 </div>
 <div className='input-container'>
  <div className='height-input-container'>
-   <Typography className='height-text'>Width</Typography>
+   <Typography className='height-text'>Height</Typography>
    <TextField
       style={{width:"100%", height:"34px"}}
       id="outlined-required"
@@ -43,11 +44,13 @@ const DoorPropertiesPopup = ({selectionMode,deleteSelectedLines}) => {
       size="small"
       required={true}
       type="tel"
+      value={height > 0 ? height : ''}
+      disabled
   />
 
  </div>
  <div className='thickness-input-container'>
- <Typography className='thickness-text'>Height</Typography>
+ <Typography className='thickness-text'>Width</Typography>
  <TextField
       style={{width:"100%", height:"34px"}}
       id="outlined-required"
@@ -57,6 +60,8 @@ const DoorPropertiesPopup = ({selectionMode,deleteSelectedLines}) => {
       size="small"
       required={true}
       type="tel"
+      value={width > 0 ? width : ''}
+      disabled
   />
  </div>
 

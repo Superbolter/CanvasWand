@@ -24,7 +24,7 @@ import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import {findLineForPoint }from "../utils/coolinear.js"
-import { setPoints,setStoreLines,setFactor, showRoomNamePopup, updateDrawData, setStoreBoxes } from "../Actions/ApplicationStateAction.js";
+import { setPoints,setStoreLines,setFactor, showRoomNamePopup, updateDrawData, setStoreBoxes, updateLineTypeId } from "../Actions/ApplicationStateAction.js";
 import { setContextualMenuStatus, setShowPopup, setTypeId } from "../Actions/DrawingActions.js";
 import { handleDownload } from "../component/ConvertToJson.js";
 
@@ -881,7 +881,8 @@ const setRightPos = (data) =>{
           ? prev.filter((lineId) => lineId !== id)
           : [...prev, id]);
       if(!selectedLine.includes(id)) { 
-        dispatch(setShowPopup(true));
+        // dispatch(setShowPopup(true));
+        dispatch(updateLineTypeId(selectedLine.id,selectedLine.typeId || 1, storeLines))
         dispatch(setTypeId(selectedLine.typeId || 1)) 
       }else{
         dispatch(setShowPopup(false))
@@ -897,7 +898,8 @@ const setRightPos = (data) =>{
           : [...prev, id]
       );
       if(!selectedLines.includes(id)) { 
-        dispatch(setShowPopup(true));
+        // dispatch(setShowPopup(true));
+        dispatch(updateLineTypeId(selectedLine.id,selectedLine.typeId || 1, storeLines))
         dispatch(setTypeId(selectedLine.typeId || 1)) 
       }else{
         dispatch(setShowPopup(false))
