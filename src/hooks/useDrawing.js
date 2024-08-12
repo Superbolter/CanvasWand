@@ -542,7 +542,22 @@ const setRightPos = (data) =>{
         const hfactor = INITIAL_HEIGHT / userHeight;
         dispatch(setFactor([lfactor, wfactor, hfactor]));
         dispatch(setScale(false))
-        handleApiCall();
+        const lines = storeLines
+        const distance = Math.sqrt((rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2);
+        const scaleData={
+          leftPos,
+          rightPos,
+          distance: distance,
+          unitLength:userLength,
+          unitType: "feet"
+        }
+        const data=handleDownload(lines,points, roomSelectors, storeBoxes)
+        const finalData={
+          floorplan_id:floorplanId,
+          draw_data:data,
+          scale: scaleData,
+        }
+        dispatch(updateDrawData(finalData,floorplanId))
       }
     })
     
