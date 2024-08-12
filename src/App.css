@@ -5,6 +5,25 @@ body, html {
   overflow: hidden;
 }
 
+.swal2-title-custom {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 25px;
+}
+
+.swal2-text-custom {
+  font-family: 'DM Sans', sans-serif;
+}
+
+.swal2-input-custom {
+  font-family: 'DM Sans', sans-serif;
+}
+
+.swal2-validation-message{
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+}
+
+
 .container {
   display: flex;
   height: 100%; /* Full height of viewport */

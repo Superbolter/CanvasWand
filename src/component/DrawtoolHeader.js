@@ -26,12 +26,6 @@ const DrawtoolHeader = ({deleteLastPoint,redo,toggleSelectionroomMood, handleSav
       <img style={{width:"24px", height:"24px"}}src={Redo} alt="" />
       <Typography>Redo</Typography>
       </Button>
-      
-      <Button modifiers={["outlineBlack","sm"]} className='undo-redo-btn' onClick={toggleSelectionroomMood}>
-      {/* <img style={{width:"24px", height:"24px"}}src={Redo} alt="" /> */}
-      <Typography>roomSelect</Typography>
-      </Button>
-      
       <Button className='save-btn' modifiers={["blue"]} onClick={handleSaveClick}>Save & next</Button>
       </div>
     </div>

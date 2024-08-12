@@ -27,6 +27,10 @@ import {findLineForPoint }from "../utils/coolinear.js"
 import { setPoints,setStoreLines,setFactor, showRoomNamePopup, updateDrawData, setStoreBoxes, updateLineTypeId } from "../Actions/ApplicationStateAction.js";
 import { setContextualMenuStatus, setShowPopup, setTypeId } from "../Actions/DrawingActions.js";
 import { handleDownload } from "../component/ConvertToJson.js";
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 export const useDrawing = () => {
   const dispatch = useDispatch();
@@ -482,26 +486,48 @@ const setRightPos = (data) =>{
     setStop(!stop);
   }
 
-  const handleDoubleClick = () => {
+  const handleDoubleClick = async() => {
     // const userHeight = parseFloat(
     //   prompt("Enter the height of the first line:")
     // );
-    const userHeight = 10;
-    const userLength = parseFloat(
-      prompt("Enter the length of the first line:")
-    );
-    dispatch(setUserLength(userLength))
     // const userWidth = parseFloat(
     //   prompt("Enter the thickness of the first line:")
     // );
-    const userWidth = 2;
-    const lfactor =
-      userLength / leftPos.distanceTo(rightPos);
-    const wfactor = INITIAL_BREADTH / userWidth;
-    const hfactor = INITIAL_HEIGHT / userHeight;
-    console.log([lfactor, wfactor, hfactor]);
-    dispatch(setFactor([lfactor, wfactor, hfactor]));
-    dispatch(setScale(false))
+    // const userLength = parseFloat(
+    //   prompt("Enter the length of the first line:")
+    // );
+    const userHeight = 10;
+    MySwal.fire({
+      title: 'Enter the length of the line(in feets)',
+      input: 'number',
+      inputPlaceholder: 'Enter the length here...',
+      showCancelButton: true,
+      preConfirm: (value) => {
+        if (!value) {
+          Swal.showValidationMessage('You need to enter a number!');
+        } else if (value <= 0) {
+          Swal.showValidationMessage('Please enter a positive number!');
+        }
+      },
+      customClass: {
+        title: 'swal2-title-custom',
+        htmlContainer: 'swal2-text-custom',
+        input: 'swal2-input-custom',
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const userLength = parseFloat(result.value);
+        dispatch(setUserLength(userLength))
+        const userWidth = 2;
+        const lfactor =
+          userLength / leftPos.distanceTo(rightPos);
+        const wfactor = INITIAL_BREADTH / userWidth;
+        const hfactor = INITIAL_HEIGHT / userHeight;
+        dispatch(setFactor([lfactor, wfactor, hfactor]));
+        dispatch(setScale(false))
+      }
+    })
+    
   };
 
   const handleMouseMove = (event) => {
