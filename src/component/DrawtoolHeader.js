@@ -13,6 +13,7 @@ import { setScale } from '../features/drawing/drwingSlice.js'
 const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick, handleReset} ) => {
   const dispatch=useDispatch()
   const {factor,floorplanId,roomSelectorMode}=useSelector((state)=>state.ApplicationState)
+  const {userLength} = useSelector((state) => state.drawing)
   const {scale} = useSelector((state) => state.drawing)
 
   const handleBackToScale = () =>{
@@ -41,7 +42,7 @@ const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick
         }
       </Typography>
       {scale? <div style={{display:"flex",gap:"8px"}}>
-          <Button className='undo-redo-btn' modifiers={["blue"]} onClick={handleCancel}>Cancel & next</Button>
+          {userLength===0 ? null : <Button className='undo-redo-btn' modifiers={["blue"]} onClick={handleCancel}>Cancel & next</Button>}
           <Button className='save-btn' modifiers={["blue"]} onClick={handleDoubleClick}>Save & next</Button>
         </div>:
       <div style={{display:"flex",gap:"8px"}}>
