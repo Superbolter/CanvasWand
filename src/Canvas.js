@@ -151,7 +151,7 @@ export const CanvasComponent = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [storeLines, selectionMode, selectedLines, points, stop ,leftPos, rightPos,storeBoxes]);
+  }, [storeLines, selectionMode, selectedLines, points, stop ,leftPos, rightPos,storeBoxes,roomSelectorMode]);
 
   useEffect(() => {
     // console.log(type_id);

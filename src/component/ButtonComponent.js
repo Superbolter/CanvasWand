@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Typography } from "../design_system/StyledComponents/components/Typography.js";
-import wallIcon from "../assets/wallIcon.png";
-import SelectedWall from "../assets/SelectedWall.png";
+import WallIcon from "../assets/wallBig.png";
+import DoorIcon from "../assets/doorBig.png";
+import WindowIcon from "../assets/windowBig.png";
+import RailingIcon from "../assets/railingBig.png";
 import "./ButtonComponent.css";
 import { useDispatch, useSelector } from 'react-redux';
 import { setShowPopup, setTypeId } from '../Actions/DrawingActions.js';
@@ -26,7 +28,11 @@ const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
       toggleSelectionMode();
     }
     setNewLine();
-    dispatch(setSelectedButton(buttonName))
+    if(buttonName=== selectedButton){
+      dispatch(setSelectedButton(null))
+    }else{
+      dispatch(setSelectedButton(buttonName))
+    }
     // dispatch(setShowPopup(true));
     if (buttonName === 'Walls') {
       dispatch(setTypeId(1))
@@ -38,6 +44,7 @@ const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
     }else{
       dispatch(setTypeId(4))
     }
+    
   };
 
   return (
@@ -50,7 +57,7 @@ const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
               className={`drawtool-btn ${selectedButton === 'Walls' ? 'selected' : ''}`}
               onClick={() => handleButtonClick('Walls')}
             >
-              <img src={selectedButton==="Walls"?SelectedWall:wallIcon} alt="" style={{ width: "20px", height: "15px",}} />
+              <img src={WallIcon} alt="" style={{ width: "24px", height: "24px",}} />
               <Typography className='btn-text' style={{color:selectedButton==="Walls"&&"#4B73EC" }}>Walls</Typography>
             </div>
             {/* <div
@@ -83,7 +90,7 @@ const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
               className={`drawtool-btn ${selectedButton === 'Door' ? 'selected' : ''}`}
               onClick={() => handleButtonClick('Door')}
             >
-              <img src={selectedButton==="Door"?SelectedWall:wallIcon} alt="" style={{ width: "20px", height: "15px" }} />
+              <img src={DoorIcon} alt="" style={{ width: "24px", height: "24px",}}/>
               <Typography className='btn-text' style={{color:selectedButton==="Door"&&"#4B73EC" }}>Door</Typography>
             </div>
             {/* <div
@@ -104,15 +111,15 @@ const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
               className={`drawtool-btn ${selectedButton === 'Window' ? 'selected' : ''}`}
               onClick={() => handleButtonClick('Window')}
             >
-              <img src={selectedButton==="Window"?SelectedWall:wallIcon} alt="" style={{ width: "20px", height: "15px" }} />
+              <img src={WindowIcon} alt="" style={{ width: "24px", height: "24px",}} />
               <Typography className='btn-text'style={{color:selectedButton==="Window"&&"#4B73EC" }}>Window</Typography>
             </div>
             <div
               className={`drawtool-btn ${selectedButton === 'Balcony railing' ? 'selected' : ''}`}
               onClick={() => handleButtonClick('Balcony railing')}
             >
-              <img src={selectedButton==="Balcony railing"?SelectedWall:wallIcon} alt="" style={{ width: "20px", height: "15px" }} />
-              <Typography className='btn-text'style={{color:selectedButton==="Balcony railing"&&"#4B73EC" }}>Balcony railing</Typography>
+              <img src={RailingIcon} alt="" style={{ width: "24px", height: "24px",}} />
+              <Typography className='btn-text'style={{color:selectedButton==="Balcony railing"&&"#4B73EC" }}>Balcony</Typography>
             </div>
           </div>
         </div>

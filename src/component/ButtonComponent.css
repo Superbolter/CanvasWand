@@ -78,6 +78,7 @@
     justify-content:center;
     align-items:center;
     gap:4px;
+    border: 1.5px solid #F4F4F4;
 }
 .drawtool-btn:hover{
   cursor: pointer;
