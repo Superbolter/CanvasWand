@@ -10,10 +10,15 @@ import { drawData, setRoomSelectorMode, updateDrawData } from '../Actions/Applic
 import { ArrowBack } from '@mui/icons-material'
 import { setScale } from '../features/drawing/drwingSlice.js'
 
-const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick} ) => {
+const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick, handleReset} ) => {
   const dispatch=useDispatch()
   const {factor,floorplanId,roomSelectorMode}=useSelector((state)=>state.ApplicationState)
   const {scale} = useSelector((state) => state.drawing)
+
+  const handleBackToScale = () =>{
+    dispatch(setScale(true))
+    handleReset()
+  }
   
   return (
     <div style={{position:"fixed", top:"20px", left:"20px", backgroundColor:"white",borderRadius:"12px", width:"79vw", padding:"12px", display:"flex", alignItems:"center", justifyContent:"space-between",boxShadow: "0px 4px 14px -3px #0C0C0D21", zIndex:"2"
@@ -27,7 +32,7 @@ const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick
         : scale? "Select the accurate scale for your floor plan"
         : 
         <div style={{display:"flex", alignItems:"center", gap:"8px"}}>
-            <div style={{backgroundColor:"#F4F4F4", padding:"4px 8px", borderRadius:"8px"}} onClick={()=>{dispatch(setScale(true))}}><ArrowBack style={{fontSize:"20px", cursor:"pointer", marginTop:"5px"}}/></div>
+            <div style={{backgroundColor:"#F4F4F4", padding:"4px 8px", borderRadius:"8px"}} onClick={handleBackToScale}><ArrowBack style={{fontSize:"20px", cursor:"pointer", marginTop:"5px"}}/></div>
             <Typography>Create your own 3D home</Typography>
           </div>
         }

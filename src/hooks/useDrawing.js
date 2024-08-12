@@ -901,6 +901,17 @@ const setRightPos = (data) =>{
     setDistance(0); // Reset distance display
   };
 
+  const handleMergeClick = () =>{
+    if(selectedLines.length === 0){
+      return;
+    }else{
+      let id = selectedLines[selectedLines.length-1];
+      setMergeLine([...mergeLine,id]);
+      const selected = selectedLines.filter((line)=>line === id);
+      setSelectedLines([...selected]);
+    }
+  }
+
   const handleLineClick = (event,id) => {
     let storeid = [];
     if(merge){
@@ -1103,6 +1114,18 @@ const setRightPos = (data) =>{
     }
     handleApiCall();
   }
+
+  const handleReset = () =>{
+    if(selectionMode){
+      toggleSelectionMode();
+    }
+    if(lineBreak){
+      setLineBreak(false);
+    }
+    if(merge){
+      setMerge(false);
+    }
+  }
   
 
   return {
@@ -1170,6 +1193,8 @@ const setRightPos = (data) =>{
     deleteSelectedLines,
     showRoomNamePopup,
     handleSaveClick,
-    handleApiCall
+    handleApiCall,
+    handleReset,
+    handleMergeClick
   };
 };

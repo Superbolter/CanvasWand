@@ -69,7 +69,7 @@ export const CanvasComponent = () => {
     information,
     idSelection,
     doorPosition,
-    merge,setMerge,
+    setMerge,
     setDoorPosition,
     isDraggingDoor,
     setIsDraggingDoor,
@@ -81,7 +81,6 @@ export const CanvasComponent = () => {
     handlemode,
     type,
     setStop,
-    lineBreak,
     setLineBreak,
     handleSaveClick,
     snappingPoint,
@@ -93,9 +92,11 @@ export const CanvasComponent = () => {
     room,
     showRoomNamePopup,
     handleDoubleClick,
+    handleReset,
+    handleMergeClick
   } = useDrawing();
 
-  const { leftPos, rightPos } = useSelector((state) => state.drawing)
+  const { leftPos, rightPos, merge, lineBreak } = useSelector((state) => state.drawing)
   const { storeBoxes, roomSelectorMode} = useSelector((state) => state.ApplicationState);
 
 
@@ -133,7 +134,7 @@ export const CanvasComponent = () => {
     if(event.ctrlKey&&(event.key === "y" || event.key === "Y")){
       redo();
     }
-    if(event.key === "escape" || event.key === "Escape" && !roomSelectorMode){
+    if(event.key === "escape" || event.key === "Escape" && !roomSelectorMode && !merge && !lineBreak){
       // escape();
       toggleSelectionMode();
     }
@@ -291,6 +292,7 @@ export const CanvasComponent = () => {
             redo={redo}
             handleSaveClick={handleSaveClick}
             handleDoubleClick={handleDoubleClick}
+            handleReset={handleReset}
           />
       </div>
       {!scale &&
@@ -412,7 +414,7 @@ export const CanvasComponent = () => {
           </Canvas>
         </div>
           <WindowPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
-          <WallPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines} toggleSelectionMode={toggleSelectionSplitMode} setSelectedLines={setSelectedLines} />
+          <WallPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines} toggleSelectionMode={toggleSelectionSplitMode} setSelectedLines={setSelectedLines} handleMerge={handleMergeClick} />
           <DoorPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
           <RailingPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
           <RoomNamePopup />

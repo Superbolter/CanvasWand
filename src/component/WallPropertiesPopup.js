@@ -20,6 +20,7 @@ const WallPropertiesPopup = ({
   deleteSelectedLines,
   toggleSelectionMode,
   setSelectedLines,
+  handleMerge
 }) => {
   const { typeId, showPropertiesPopup } = useSelector((state) => state.Drawing);
   const dispatch = useDispatch();
@@ -33,8 +34,12 @@ const WallPropertiesPopup = ({
   const { height, width,roomSelectorMode } = useSelector((state) => state.ApplicationState);
 
   const handleMergeClick = () => {
-    setSelectedLines([]);
+    // setSelectedLines([]);
+    handleMerge();
     setLineBreak(false);
+    if(!selectionMode) {
+      toggleSelectionMode();
+    }
     setMerge(!merge);
   };
 

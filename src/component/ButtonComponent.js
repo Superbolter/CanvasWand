@@ -27,7 +27,7 @@ const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
     if(selectionMode){
       toggleSelectionMode();
     }
-    setNewLine();
+    // setNewLine();
     if(buttonName=== selectedButton){
       dispatch(setSelectedButton(null))
     }else{
