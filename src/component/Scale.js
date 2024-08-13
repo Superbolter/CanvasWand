@@ -28,10 +28,28 @@ export const Scale = () => {
   const { leftPos, rightPos } = useSelector((state) => state.drawing)
 
   useEffect(()=>{
+    const updateMesh = (pointA, pointB) => {
+      const midpoint = new Vector3().addVectors(pointA, pointB).multiplyScalar(0.5);
+      console.log(midpoint)
+      setPosition(midpoint);
+
+      const angle = Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x);
+      setLineAngle(angle);
+      mesh.current.rotation.z = angle;
+
+      mesh.current.position.set(midpoint.x, midpoint.y, 0);
+    };
+
+
     if(firstLoad){
       setFirstLoad(false)
-      dispatch(setLeftPosState(new Vector3(-50, 0, 0)))
-      dispatch(setRightPosState(new Vector3(50, 0, 0)))
+      updateMesh(leftPos, rightPos)
+      const l = Math.abs(rightPos.x - leftPos.x)
+      const w = Math.abs(rightPos.y - leftPos.y);
+      const h = 0;
+      setDimensions({l,w,h})
+      // dispatch(setLeftPosState(new Vector3(-50, 0, 0)))
+      // dispatch(setRightPosState(new Vector3(50, 0, 0)))
     }
   },[firstLoad])
 
@@ -155,7 +173,7 @@ export const Scale = () => {
         onClick={(event) => event.stopPropagation()}
         onDoubleClick={handleDoubleClick}
       >
-        <boxGeometry args={[dimensions.l, dimensions.w, dimensions.h]} />
+        <boxGeometry args={[dimensions.l, 10, dimensions.h]} />
         <meshBasicMaterial color={"orange"} transparent={true} />
       </mesh>
       <mesh

@@ -180,7 +180,7 @@ export const CanvasComponent = () => {
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        style={selectionMode?{ cursor: "grab"}:{cursor:"crosshair"}}
+        style={ scale? {cursor:'grab'} :selectionMode?{ cursor: "grab"}:{cursor:"crosshair"}}
       >
         {/* 2D (Orthographic) Canvas */}
         <Canvas
