@@ -169,8 +169,6 @@ export const Scale = () => {
         rotation={[0, 0, lineAngle]}
         onPointerDown={handlePointerDownBox}
         onPointerUp={handlePointerUpBox}
-        onClick={(event) => event.stopPropagation()}
-        onDoubleClick={handleDoubleClick}
       >
         <boxGeometry args={[dimensions.l, 10, dimensions.h]} />
         <meshBasicMaterial color={"orange"} transparent={true} />
