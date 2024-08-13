@@ -111,20 +111,11 @@ export const CanvasComponent = () => {
   );
 
   const handleKeyDown = (event) => {
-    if (event.key === "x" || event.key === "X") {
-      deleteLastPoint();
-    }
     if (event.key === "s" || event.key === "S") {
       setStop(!stop);
     }
     if((event.key === "r" || event.key === "R") && !event.ctrlKey && roomSelectorMode){
       room();
-
-    }
-    if(event.ctrlKey&&(event.key === "q" || event.key === "Q")){
-      dispatch(showRoomNamePopup(true));
-      // room();
-      
     }
     if(event.ctrlKey&&(event.key === "z" || event.key === "Z")){
       deleteLastPoint();
@@ -135,9 +126,6 @@ export const CanvasComponent = () => {
     if(event.key === "escape" || event.key === "Escape" && !roomSelectorMode && !merge && !lineBreak){
       // escape();
       toggleSelectionMode();
-    }
-    if(event.key === "Enter" && scale){
-      handleDoubleClick();
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
       deleteSelectedLines();
