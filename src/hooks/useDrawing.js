@@ -843,7 +843,6 @@ export const useDrawing = () => {
       if (findLineForPoint(point, storeLines)) {
         let { closestPointOnLine } = findLineForPoint(point, storeLines);
         breakingLine(closestPointOnLine);
-        setBreakPointLocation(closestPointOnLine);
       } else {
         setLineBreak(false);
         if (!selectionMode) {
@@ -1055,11 +1054,10 @@ export const useDrawing = () => {
 
   const breakingLine = (point) => {
     const idx = storeLines.findIndex((line) => line.id === selectId);
+    if(storeLines[idx].typeId !==1) return;
     if (idx === -1) return; // Line not found
-
+    setBreakPointLocation(point);
     let updatedLine = storeLines[idx];
-    console.log("updatedLine: ", updatedLine);
-    console.log("breakPointLocation: ", breakPointLocation);
 
     let store = [...storeLines];
     let pointsVal = [...points];
