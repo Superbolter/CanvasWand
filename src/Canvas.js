@@ -52,10 +52,7 @@ export const CanvasComponent = () => {
     newLine,
     setNewLine,
     redo,
-    selectionMode,
-    selectedLines,
     setSelectedLines,
-    setSelectionMode,
     toggleDragMode,
     toggleDoorWindowMode,
     doorWindowMode,
@@ -97,7 +94,7 @@ export const CanvasComponent = () => {
   } = useDrawing();
 
   const { leftPos, rightPos, merge, lineBreak } = useSelector((state) => state.drawing)
-  const { storeBoxes, roomSelectorMode} = useSelector((state) => state.ApplicationState);
+  const { storeBoxes, roomSelectorMode, selectionMode,selectedLines} = useSelector((state) => state.ApplicationState);
 
 
   const getUrlParameter = (name) => {

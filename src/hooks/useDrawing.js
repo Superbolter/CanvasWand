@@ -24,7 +24,7 @@ import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import {findLineForPoint }from "../utils/coolinear.js"
-import { setPoints,setStoreLines,setFactor, showRoomNamePopup, updateDrawData, setStoreBoxes, updateLineTypeId, setRoomSelectorMode } from "../Actions/ApplicationStateAction.js";
+import { setPoints,setStoreLines,setFactor, showRoomNamePopup, updateDrawData, setStoreBoxes, updateLineTypeId, setRoomSelectorMode, setSelectionMode, setSelectedLinesState } from "../Actions/ApplicationStateAction.js";
 import { setContextualMenuStatus, setShowPopup, setTypeId } from "../Actions/DrawingActions.js";
 import { handleDownload } from "../component/ConvertToJson.js";
 import Swal from 'sweetalert2';
@@ -43,10 +43,8 @@ export const useDrawing = () => {
     leftPos, rightPos, userLength, lineBreak, merge
   } = useSelector((state) => state.drawing);
   const {typeId, contextualMenuStatus}=useSelector((state)=>state.Drawing)
-  const {storeLines,points,factor,floorplanId,storeBoxes, roomSelectorMode}=useSelector((state)=>state.ApplicationState)
+  const {storeLines,points,factor,floorplanId,storeBoxes, roomSelectorMode, selectionMode, selectedLines}=useSelector((state)=>state.ApplicationState)
 
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [selectedLines, setSelectedLines] = useState([]);
   const [firstTime, setFirstTime] = useState(true);
   const [newLine, setNewLine] = useState(false);
   const [currentMousePosition, setCurrentMousePosition] = useState(null);
@@ -76,6 +74,10 @@ const [snappingPoint, setSnappingPoint] = useState([]);
 const [showSnapLine, setShowSnapLine] = useState(false);
 // const [leftPos, setLeftPosState] = useState(new Vector3(-5, 0, 0));
 // const [rightPos, setRightPosState] = useState(new Vector3(5, 0, 0));
+
+const setSelectedLines = (data) =>{
+  dispatch(setSelectedLinesState(data))
+}
 
 const setMerge = (data) =>{
   dispatch(setMergeState(data))
@@ -207,8 +209,7 @@ const setRightPos = (data) =>{
       dispatch(setStoreLines(updatedLine));
       setIsDraggingDoor(false);
 
-
-      setSelectionMode(false);
+      dispatch(setSelectionMode(false));
       setDragMode(false);
       setTimeout(() => {
         setDoorWindowMode(false);
@@ -492,7 +493,7 @@ const setRightPos = (data) =>{
       setStop(true);
       dispatch(setSelectedButton([]))
     }
-    setSelectionMode(!selectionMode);
+    dispatch(setSelectionMode(!selectionMode));
   };
 
 
@@ -808,7 +809,7 @@ const setRightPos = (data) =>{
       setStop(true);
       dispatch(setSelectedButton([]))
     }
-    setSelectionMode(!selectionMode);
+    dispatch(setSelectionMode(!selectionMode));
   };
 
   const handleClick = (event) => {
@@ -933,6 +934,10 @@ const setRightPos = (data) =>{
       storeid = [...mergeLine,id];
       setMergeLine([...mergeLine,id]);
     }
+
+    if(!lineBreak && !merge && !roomSelectorMode){
+      dispatch(setContextualMenuStatus(true))
+    }
     
     
     if(lineBreak){
@@ -970,33 +975,13 @@ const setRightPos = (data) =>{
       setMergeLine([]);
     }
     const selectedLine = storeLines.find((line)=> line.id === id);
-    console.log(selectedLine.typeId)
-    if(selectionMode && roomSelect && (storeid.length!==2)){
-      
-      setSelectedLines((prev) =>
-        prev.includes(id)
-          ? prev.filter((lineId) => lineId !== id)
-          : [...prev, id]);
-      if(!selectedLine.includes(id)) { 
-        // dispatch(setShowPopup(true));
-        dispatch(updateLineTypeId(selectedLine.id,selectedLine.typeId || 1, storeLines))
-        dispatch(setTypeId(selectedLine.typeId || 1)) 
-      }else{
-        dispatch(setShowPopup(false))
-        dispatch(setTypeId(1)) 
-      } 
-      
-
-    }
-    else if (selectionMode && (storeid.length!==2)) {
-      setSelectedLines((prev) =>
-        prev.includes(id)
-          ? prev.filter((lineId) => lineId !== id)
-          : [...prev, id]
-      );
+    
+    if (selectionMode && (storeid.length!==2)) {
+      const selected =  selectedLines.includes(id) ? selectedLines.filter((lineId) => lineId !== id): [...selectedLines, id]
+      setSelectedLines(selected);
       if(!selectedLines.includes(id)) { 
-        // dispatch(setShowPopup(true));
-        dispatch(updateLineTypeId(selectedLine.id,selectedLine.typeId || 1, storeLines))
+        dispatch(setShowPopup(true));
+        // dispatch(updateLineTypeId(selectedLine.id,selectedLine.typeId || 1))
         dispatch(setTypeId(selectedLine.typeId || 1)) 
       }else{
         dispatch(setShowPopup(false))
@@ -1016,7 +1001,7 @@ const setRightPos = (data) =>{
   };
 
   const handleInformtion = () => {
-    setSelectionMode(!selectionMode);
+    dispatch(setSelectionMode(!selectionMode));
     dispatch(setInformation(!information));
   };
 
@@ -1027,7 +1012,7 @@ const setRightPos = (data) =>{
   const toggleDoorWindowMode = (mode) => {
     setaddOn("door");
     setIsDraggingDoor(true);
-    setSelectionMode(false);
+    dispatch(setSelectionMode(false));
     setDragMode(false);
     setDoorWindowMode(!doorWindowMode);
   };
@@ -1167,8 +1152,6 @@ const setRightPos = (data) =>{
     doorWindowMode,
     newLine,
     doorPoint,
-    selectionMode,
-    selectedLines,
     addOn,
     dragMode,
     currentMousePosition,
@@ -1206,7 +1189,6 @@ const setRightPos = (data) =>{
     deleteLastPoint,
     redo,
     setSelectedLines,
-    setSelectionMode,
     toggleDragMode,
     handleMouseDown,
     handleMouseUp,

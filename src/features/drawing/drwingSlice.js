@@ -64,17 +64,6 @@ export const drawingSlice = createSlice({
     setType: (state, action) => {
       state.type = action.payload;
     },
-    updateLineTypeId: (state, action) => {
-      const { id, typeId } = action.payload;
-      console.log(state.ApplicationState.storeLines);
-      const lineIndex = state.ApplicationState.storeLines.findIndex(line => line.id === id);
-      if (lineIndex !== -1) {
-        state.storeLines[lineIndex].typeId = typeId;
-        state.height=state.ApplicationState.storeLines[lineIndex].height;
-        state.width=state.ApplicationState.storeLines[lineIndex].width;
-        console.log(state.ApplicationState.storeLines)
-      }
-    },
     setSelectedButton: (state,action) => {
       state.selectedButton = action.payload
     },

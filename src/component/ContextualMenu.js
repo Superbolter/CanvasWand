@@ -7,29 +7,29 @@ import RailingIcon from "../assets/RailingIcon.svg";
 import "./ContextualMenu.css";
 import { useDispatch, useSelector } from "react-redux";
 import { setTypeId } from "../Actions/DrawingActions.js";
-import { updateLineTypeId } from "../Actions/ApplicationStateAction.js";
+import { setSelectedLinesState, updateLineTypeId } from "../Actions/ApplicationStateAction.js";
 const ContextualMenu = () => {
   const dispatch = useDispatch();
-  let newLineId = null;
-  const storeLines = useSelector((state) => state.ApplicationState.storeLines);
-  if (storeLines.length > 0) {
-    newLineId = storeLines[storeLines.length - 1].id;
-  }
+  
   const handleWallClick = () => {
-    dispatch(updateLineTypeId(newLineId, 1, storeLines));
+    dispatch(updateLineTypeId(1));
     dispatch(setTypeId(1));
+    dispatch(setSelectedLinesState([]));
   };
   const handleDoorClick = () => {
-    dispatch(updateLineTypeId(newLineId, 2, storeLines));
+    dispatch(updateLineTypeId(2));
     dispatch(setTypeId(2));
+    dispatch(setSelectedLinesState([]));
   };
   const handleWindowClick = () => {
-    dispatch(updateLineTypeId(newLineId, 3, storeLines));
+    dispatch(updateLineTypeId(3));
     dispatch(setTypeId(3));
+    dispatch(setSelectedLinesState([]));
   };
   const handleRailingClick = () => {
-    dispatch(updateLineTypeId(newLineId, 4, storeLines));
+    dispatch(updateLineTypeId(4));
     dispatch(setTypeId(4));
+    dispatch(setSelectedLinesState([]));
   };
 
   return (

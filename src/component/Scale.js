@@ -30,7 +30,6 @@ export const Scale = () => {
   useEffect(()=>{
     const updateMesh = (pointA, pointB) => {
       const midpoint = new Vector3().addVectors(pointA, pointB).multiplyScalar(0.5);
-      console.log(midpoint)
       setPosition(midpoint);
 
       const angle = Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x);
