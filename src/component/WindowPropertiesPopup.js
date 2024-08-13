@@ -107,7 +107,11 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
                 <Typography className="contextual-btn-text">Delete</Typography>
               </div>
             </div>
-          ) : null}
+          ) :
+          <div className="btn-container">
+            <Typography modifiers={["helpText"]}>(Press esc to enter selection mode)</Typography>
+          </div> 
+          }
         </div>
       </div>
     </div>

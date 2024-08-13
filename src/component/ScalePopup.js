@@ -12,7 +12,7 @@ const ScalePopup = (props) => {
   const [error, setError] = useState(false);
 
   const handleContinueClick = () =>{
-    if(userLength===0 || userWidth===0){
+    if(userLength===0 || userWidth===0 || userLength===undefined || userWidth===undefined){
         setError(true);
         return;
     }

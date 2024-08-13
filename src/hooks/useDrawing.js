@@ -551,26 +551,7 @@ export const useDrawing = () => {
     const hfactor = INITIAL_HEIGHT / userHeight;
     dispatch(setFactor([lfactor, wfactor, hfactor]));
     dispatch(setScale(false));
-    const lines = storeLines;
-    const distance = Math.sqrt(
-      (rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2
-    );
-    const scaleData = {
-      leftPos,
-      rightPos,
-      distance: distance,
-      unitLength: userLength,
-      userWidth: userWidth,
-      userHeight: userHeight,
-      unitType: "inch",
-    };
-    const data = handleDownload(lines, points, roomSelectors, storeBoxes);
-    const finalData = {
-      floorplan_id: floorplanId,
-      draw_data: data,
-      scale: scaleData,
-    };
-    dispatch(updateDrawData(finalData, floorplanId));
+    handleApiCall();
   };
 
   const handleMouseMove = (event) => {
@@ -1112,7 +1093,9 @@ export const useDrawing = () => {
       rightPos,
       distance: distance,
       unitLength: userLength,
-      unitType: "feet",
+      userWidth: userWidth,
+      userHeight: 120,
+      unitType: "inch",
     };
     const data = handleDownload(lines, points, roomSelectors, storeBoxes);
     const finalData = {

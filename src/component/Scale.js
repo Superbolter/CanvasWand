@@ -24,7 +24,7 @@ export const Scale = () => {
   const [lineAngle, setLineAngle] = useState(0);
   const [isPointerMoving, setIsPointerMoving] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
-  const { handleDoubleClick, setLeftPos, setRightPos} = useDrawing();
+  const { setLeftPos, setRightPos} = useDrawing();
   const { leftPos, rightPos } = useSelector((state) => state.drawing)
 
   useEffect(()=>{
@@ -43,8 +43,8 @@ export const Scale = () => {
     if(firstLoad){
       setFirstLoad(false)
       updateMesh(leftPos, rightPos)
-      const l = Math.abs(rightPos.x - leftPos.x)
-      const w = Math.abs(rightPos.y - leftPos.y);
+      const l = Math.abs(rightPos.x - leftPos.x) < 15 ? Math.abs(rightPos.y - leftPos.y) : Math.abs(rightPos.x - leftPos.x);
+      const w = 15;
       const h = 0;
       setDimensions({l,w,h})
       // dispatch(setLeftPosState(new Vector3(-50, 0, 0)))
