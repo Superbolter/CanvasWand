@@ -65,7 +65,7 @@ export const useDrawing = () => {
   const[breakPointLocation, setBreakPointLocation] = useState(null);
   const [selectId,setId] = useState(null);
   const [mergeLine, setMergeLine] = useState([]);
-
+  const [lineClick, setLineClick] = useState(false);
   const [doorPoint, setdoorPoint] = useState([]);
 
 
@@ -813,7 +813,11 @@ const setRightPos = (data) =>{
   };
 
   const handleClick = (event) => {
-    if (selectionMode || dragMode || doorWindowMode|| merge|| scale) return; // Prevent drawing new lines in selection mode
+    if(selectionMode && !lineClick){
+      setSelectedLines([])
+      return
+    }
+    if ( selectionMode || dragMode || doorWindowMode|| merge|| scale) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
@@ -928,7 +932,16 @@ const setRightPos = (data) =>{
     }
   }
 
+  useEffect(()=>{
+    if(lineClick){
+      setTimeout(()=>{
+        setLineClick(false);
+      },100)
+    }
+  },[lineClick])
+
   const handleLineClick = (event,id) => {
+    setLineClick(true)
     let storeid = [];
     if(merge){
       storeid = [...mergeLine,id];
