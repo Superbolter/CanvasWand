@@ -40,8 +40,9 @@ body, html {
   height: 100%; /* Full height of viewport */
   background-color: #f0f0f0; /* Optional: Background color for clarity */
   overflow: hidden; /* Ensure content doesn't overflow */
-  /* cursor: url('../src/assets/crosshair-icon.png') 16 16, crosshair; */
+  cursor: url('./assets/blade.png') 16 16, crosshair;
 }
+
 
 
 .button-container {

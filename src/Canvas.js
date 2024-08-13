@@ -35,6 +35,7 @@ import RailingPropertiesPopup from "./component/RailingPropertiesPopup.js";
 import RoomNamePopup from "./component/RoomNamePopup.js";
 import RoomFiller from "./component/roomFiller.js";
 import ScalePopup from "./component/ScalePopup.js";
+import blade from "./assets/blade.png"
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -166,7 +167,7 @@ export const CanvasComponent = () => {
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        style={ scale? {cursor:'grab'} :selectionMode?{ cursor: "grab"}:{cursor:"crosshair"}}
+        style={ scale? {cursor:'grab'}: lineBreak ?{cursor:`url(${blade}) 8 8, crosshair`} :selectionMode?{ cursor: "grab"}:{cursor:'crosshair'}}
       >
         {/* 2D (Orthographic) Canvas */}
         <Canvas
