@@ -28,6 +28,8 @@ const WallPropertiesPopup = ({
     dispatch(setTypeId(1));
     dispatch(setShowPopup(false));
     dispatch(setContextualMenuStatus(false));
+    setLineBreak(false);
+    setMerge(false);
   };
   const { lineBreak, merge } = useSelector((state) => state.drawing);
   const { setLineBreak, setMerge, stop, setStop } = useDrawing();
