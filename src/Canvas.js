@@ -36,6 +36,7 @@ import RoomNamePopup from "./component/RoomNamePopup.js";
 import RoomFiller from "./component/roomFiller.js";
 import ScalePopup from "./component/ScalePopup.js";
 import blade from "./assets/blade.png"
+import { setShowPopup } from "./Actions/DrawingActions.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -126,6 +127,7 @@ export const CanvasComponent = () => {
     }
     if(event.key === "escape" || event.key === "Escape" && !roomSelectorMode && !merge && !lineBreak){
       // escape();
+      dispatch(setShowPopup(false))
       toggleSelectionMode();
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {

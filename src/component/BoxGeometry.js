@@ -281,7 +281,7 @@ if (!start || !end) return null;
       <mesh position={start}>
         <sphereGeometry args={[4, 16, 16]} />
         <meshBasicMaterial
-          color={type === "door" ? "brown" : newPointMode && start.equals(currentPoint) ? "yellow" : "black"}
+          color={typeId === 2 ? "brown" : typeId === 3 ? "skyblue" : typeId === 4 ? "violet": "black"}
           transparent={true}
           opacity={opacity}
         />
@@ -289,7 +289,7 @@ if (!start || !end) return null;
       <mesh position={end}>
         <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial
-          color={type === "door" ? "brown" : newPointMode && end.equals(currentPoint) ? "yellow" : "black"}
+          color={typeId === 2 ? "brown" : typeId === 3 ? "skyblue" : typeId === 4 ? "violet":  "black"}
           transparent={true}
           opacity={opacity}
         />
