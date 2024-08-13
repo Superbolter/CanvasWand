@@ -117,7 +117,7 @@ const WallPropertiesPopup = ({
               disabled
             />
           </div>
-          <div className="divider"></div>
+          {/* <div className="divider"></div> */}
           {selectionMode || lineBreak || merge ? (
             <div className="btn-container">
               <div

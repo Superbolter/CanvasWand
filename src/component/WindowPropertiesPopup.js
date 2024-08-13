@@ -31,7 +31,6 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
             ? "popup-container"
             : "popup-container-hidden"
         }
-        style={{ height: "346px" }}
       >
         <div className="header-container">
           <Typography
@@ -93,7 +92,7 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
               type="tel"
             />
           </div> */}
-          <div className="divider"></div>
+          {/* <div className="divider"></div> */}
           {selectionMode ? (
             <div
               className="btn-container"

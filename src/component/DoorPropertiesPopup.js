@@ -78,7 +78,7 @@ const DoorPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
             />
           </div>
 
-          <div className="divider"></div>
+          {/* <div className="divider"></div> */}
           {selectionMode ? (
             <div
               className="btn-container"

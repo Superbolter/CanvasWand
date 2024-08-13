@@ -12,6 +12,7 @@ import {
   setUserWidth,
 } from "../features/drawing/drwingSlice";
 import { type } from "@testing-library/user-event/dist/type";
+import { setContextualMenuStatus } from "./DrawingActions";
 
 export const drawToolData = (floorplan_id) => {
   return (dispatch) => {
@@ -172,7 +173,8 @@ export const updateLineTypeId = (typeId) => {
             }
             return line; // Keep the line unchanged if no match is found
         }); 
-        dispatch(setStoreLines(updateLines))         
+        dispatch(setStoreLines(updateLines)) 
+        dispatch(setContextualMenuStatus(false))        
     } else {
       const lineIndex = storeLines.length - 1;
       if (lineIndex !== -1) {
