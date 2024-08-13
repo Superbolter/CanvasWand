@@ -25,7 +25,7 @@ const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick
   }
   
   return (
-    <div style={{position:"fixed", top:"20px", left:"20px", backgroundColor:"white",borderRadius:"12px", width:"79vw", padding:"12px", display:"flex", alignItems:"center", justifyContent:"space-between",boxShadow: "0px 4px 14px -3px #0C0C0D21", zIndex:"2"
+    <div style={{position:"fixed", top:"20px", left:"20px", backgroundColor:"white",borderRadius:"12px", width:"79vw", padding:"12px", display:"flex", alignItems:"center", justifyContent:"space-between",boxShadow: "0px 4px 14px -3px #0C0C0D21", zIndex:"2", height:"30px"
         }}>
       <Typography modifiers={["medium", "black600"]} className='header-text'>
         {roomSelectorMode?
@@ -41,10 +41,7 @@ const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick
           </div>
         }
       </Typography>
-      {scale? <div style={{display:"flex",gap:"8px"}}>
-          {userLength===0 ? null : <Button modifiers={["outlineBlack", "small"]} onClick={handleCancel}>Cancel & next</Button>}
-          <Button modifiers={["blue","small"]} onClick={handleDoubleClick}>Save & next</Button>
-        </div>:
+      {scale? null:
       <div style={{display:"flex",gap:"8px"}}>
       <Button modifiers={["outlineBlack","sm"]} className='undo-redo-btn' onClick={deleteLastPoint}>
         <img style={{width:"24px", height:"24px"}} src={Undo} alt="" />

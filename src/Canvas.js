@@ -34,6 +34,7 @@ import DoorPropertiesPopup from "./component/DoorPropertiesPopup.js";
 import RailingPropertiesPopup from "./component/RailingPropertiesPopup.js";
 import RoomNamePopup from "./component/RoomNamePopup.js";
 import RoomFiller from "./component/roomFiller.js";
+import ScalePopup from "./component/ScalePopup.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -292,7 +293,7 @@ export const CanvasComponent = () => {
             handleReset={handleReset}
           />
       </div>
-      {!scale &&
+      {!scale ?
       <div className="button-container">
         {/* 3D (Perspective) Canvas */}
         {/* <div className="perspective-canvas">
@@ -417,6 +418,10 @@ export const CanvasComponent = () => {
           <RoomNamePopup />
           <ButtonComponent setNewLine={escape} selectionMode={selectionMode} toggleSelectionMode={toggleSelectionMode} />
         </div>
+      </div>
+      :
+      <div className="button-container">
+        <ScalePopup handleDoubleClick={handleDoubleClick}/>
       </div>
       }
     </div>

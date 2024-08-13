@@ -19,6 +19,7 @@ const initialState = {
   leftPos: new Vector3(-50, 0, 0),
   rightPos: new Vector3(50, 0, 0),
   userLength: 0,
+  userWidth: 6,
   lineBreak: false,
   merge: false
 };
@@ -76,6 +77,9 @@ export const drawingSlice = createSlice({
     setUserLength: (state,action) => {
       state.userLength = action.payload
     },
+    setUserWidth: (state,action) => {
+      state.userWidth = action.payload
+    },
     setLineBreakState: (state,action) => {
       state.lineBreak = action.payload
     },
@@ -106,6 +110,7 @@ export const {
   setLeftPosState,
   setRightPosState,
   setUserLength,
+  setUserWidth,
   setLineBreakState,
   setMergeState
 } = drawingSlice.actions;

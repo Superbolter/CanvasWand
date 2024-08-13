@@ -9,6 +9,7 @@ import {
   setRoomSelectors,
   setScale,
   setUserLength,
+  setUserWidth,
 } from "../features/drawing/drwingSlice";
 import { type } from "@testing-library/user-event/dist/type";
 
@@ -75,9 +76,11 @@ export const drawToolData = (floorplan_id) => {
         dispatch(setStoreBoxes(drawData.storeBoxes));
         if (response.data.scale !== null) {
           const scaleData = JSON.parse(response.data.scale);
-          const userHeight = 120;
+          const userHeight = scaleData?.userHeight;
           const userLength = scaleData.unitLength;
+          const userWidth = scaleData?.userWidth
           dispatch(setUserLength(userLength));
+          dispatch(setUserWidth(userWidth));
           const left = new THREE.Vector3(
             scaleData.leftPos.x,
             scaleData.leftPos.y,
@@ -90,7 +93,6 @@ export const drawToolData = (floorplan_id) => {
           );
           dispatch(setLeftPosState(left));
           dispatch(setRightPosState(right));
-          const userWidth = 6;
           const lfactor = userLength / scaleData.distance;
           const wfactor = INITIAL_BREADTH / userWidth;
           const hfactor = INITIAL_HEIGHT / userHeight;
