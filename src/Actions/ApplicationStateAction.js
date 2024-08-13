@@ -1,4 +1,5 @@
 import { useDispatch } from "react-redux";
+import convert from "convert-units";
 import RomeDataManager, { fetchWrapper } from "../app/RomeDataManager";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant";
 import * as THREE from "three";
@@ -68,12 +69,13 @@ export const drawToolData = (floorplan_id) => {
             );
         }
         dispatch(setStoreLines(lines));
+        console.log(lines)
         dispatch(setPoints(point));
         dispatch(setRoomSelectors(drawData.rooms));
         dispatch(setStoreBoxes(drawData.storeBoxes));
         if (response.data.scale !== null) {
           const scaleData = JSON.parse(response.data.scale);
-          const userHeight = 10;
+          const userHeight = 120;
           const userLength = scaleData.unitLength;
           dispatch(setUserLength(userLength));
           const left = new THREE.Vector3(
@@ -88,7 +90,7 @@ export const drawToolData = (floorplan_id) => {
           );
           dispatch(setLeftPosState(left));
           dispatch(setRightPosState(right));
-          const userWidth = 2;
+          const userWidth = 6;
           const lfactor = userLength / scaleData.distance;
           const wfactor = INITIAL_BREADTH / userWidth;
           const hfactor = INITIAL_HEIGHT / userHeight;
@@ -180,13 +182,15 @@ export const updateLineTypeId = (typeId) => {
           type: "SET_PROPERTY_POPUP",
           payload: true,
         });
+        const height = convert(storeLines[lineIndex].height).from('mm').to('in')
+        const width = convert(storeLines[lineIndex].width).from('mm').to('in')
         dispatch({
           type: "SET_HEIGHT",
-          payload: storeLines[lineIndex].height,
+          payload: height,
         });
         dispatch({
           type: "SET_WIDTH",
-          payload: storeLines[lineIndex].width,
+          payload: width,
         });
         // Dispatch an action to update the state in the Redux store
         dispatch(setStoreLines(storeLines));

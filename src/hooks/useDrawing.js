@@ -514,7 +514,7 @@ const setRightPos = (data) =>{
     // const userLength = parseFloat(
     //   prompt("Enter the length of the first line:")
     // );
-    const userHeight = 10;
+    const userHeight = 120;
     MySwal.fire({
       title: 'Enter the length of the line(in feets)',
       input: 'number',
@@ -536,7 +536,7 @@ const setRightPos = (data) =>{
       if (result.isConfirmed) {
         const userLength = parseFloat(result.value);
         dispatch(setUserLength(userLength))
-        const userWidth = 2;
+        const userWidth = 6;
         const lfactor =
           userLength / leftPos.distanceTo(rightPos);
         const wfactor = INITIAL_BREADTH / userWidth;
