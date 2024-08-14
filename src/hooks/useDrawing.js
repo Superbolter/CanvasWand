@@ -976,35 +976,40 @@ export const useDrawing = () => {
   const handleMerge = (storeid) => {
     let updatedLine = [...storeLines];
     let merged = false;
+    let lockedCount = 0;
   
     // Sort storeids based on their indices in storeLines to maintain order
     storeid.sort((a, b) => storeLines.findIndex(line => line.id === a) - storeLines.findIndex(line => line.id === b));
   
-    // Use a while loop to continue merging as long as possible
     let i = 0;
     while (i < storeid.length - 1) {
       let idx1 = updatedLine.findIndex((line) => line.id === storeid[i]);
       let idx2 = updatedLine.findIndex((line) => line.id === storeid[i + 1]);
   
+      const line1 = updatedLine[idx1];
+      const line2 = updatedLine[idx2];
+  
+      // Check if either line is locked
+      if (line1?.locked || line2?.locked) {
+        lockedCount += line1.locked ? 1 : 0;
+        lockedCount += line2.locked ? 1 : 0;
+        i++;
+        continue; // Skip merging if any line is locked
+      }
+  
       if (
         Math.abs(idx1 - idx2) === 1 &&
-        updatedLine[idx1].points[1].equals(updatedLine[idx2].points[0])
+        line1.points[1].equals(line2.points[0])
       ) {
         if (
-          updatedLine[idx1].points[0].x === updatedLine[idx2].points[1].x ||
-          updatedLine[idx1].points[0].y === updatedLine[idx2].points[1].y
+          line1.points[0].x === line2.points[1].x ||
+          line1.points[0].y === line2.points[1].y
         ) {
-          let line = updatedLine[idx1];
           const newline = {
-            ...line,
-            points: [
-              updatedLine[idx1].points[0],
-              updatedLine[idx2].points[1],
-            ],
+            ...line1,
+            points: [line1.points[0], line2.points[1]],
             length: convert(
-              updatedLine[idx1].points[0].distanceTo(
-                updatedLine[idx2].points[1]
-              ) * factor[0]
+              line1.points[0].distanceTo(line2.points[1]) * factor[0]
             )
               .from(measured)
               .to("mm"),
@@ -1026,7 +1031,20 @@ export const useDrawing = () => {
     if (merged) {
       dispatch(setStoreLines(updatedLine));
       setMergeLine([]);
-      setSelectedLines([]);
+    }
+    setSelectedLines([]);
+
+    // Show a hot-toast notification if any lines were locked
+    if (lockedCount > 0) {
+      toast(`Some lines were locked and not merged.`, {
+        icon: '⚠️',
+        style: {
+          color: '#000',
+          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)',
+          borderRadius: '8px',
+          fontFamily: "'DM Sans', sans-serif",
+        },
+      });
     }
     return merged
   }
