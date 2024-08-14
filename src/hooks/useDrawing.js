@@ -410,7 +410,6 @@ export const useDrawing = () => {
     const updatedLines = storeLines.slice(0, -1);
     let updatedPoints = points.slice(0, -1);
     const lastPoint = updatedPoints[updatedPoints.length - 1];
-    const lastPointId = deleteLine.id;
     const deleteLinePoints = deleteLine.points;
 
     // Iterate over storeBoxes and remove the ones that match
@@ -420,17 +419,23 @@ export const useDrawing = () => {
     );
     dispatch(setStoreBoxes(result));
 
-    const roomToRemove = roomSelectors.find((room) =>
-      room.wallIds.includes(lastPointId)
-    );
-
-    if (roomToRemove) {
-      const updatedRoomSelectors = roomSelectors.filter(
-        (room) => room.roomId !== roomToRemove.roomId
-      );
-
-      dispatch(setRoomSelectors(updatedRoomSelectors));
-    }
+    const roomupdate = roomSelectors
+      .map((room) => {
+        // Filter out the walls that are in the selectedLines array
+        const updatedWallIds = room.wallIds.filter((lineId) =>  !selectedLines.includes(lineId) ); // Remove if in selectedLines
+        // Return null if the room has no walls left
+        if (updatedWallIds.length < 2) {
+          return null;
+        }
+        // Otherwise, return the room with the updated walls
+        return {
+          ...room,
+          wallIds: updatedWallIds,
+        };
+      })
+      .filter((room) => room !== null);
+  
+    dispatch(setRoomSelectors(roomupdate));
 
     const hasBreakPoint = breakPoint.includes(lastPoint);
     if (hasBreakPoint) {
