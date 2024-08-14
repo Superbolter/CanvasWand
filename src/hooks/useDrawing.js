@@ -551,7 +551,7 @@ export const useDrawing = () => {
   
     // Show hot-toast with the count of locked lines
     if (lockedCount > 1) {
-      toast(`${lockedCount} lines were locked and were not deleted.`, {
+      toast(`${lockedCount} structures were locked and were not deleted.`, {
         icon: '⚠️',
         style: {
           fontFamily: "'DM Sans', sans-serif",
@@ -560,7 +560,7 @@ export const useDrawing = () => {
         },
       });
     }else if(lockedCount === 1){
-      toast(`${lockedCount} line was locked and was not deleted.`, {
+      toast(`${lockedCount} structure was locked and was not deleted.`, {
         icon: '⚠️',
         style: {
           color: '#000',
