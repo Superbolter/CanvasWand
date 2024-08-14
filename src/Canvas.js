@@ -54,6 +54,7 @@ export const CanvasComponent = () => {
     perpendicularHandler,
     newLine,
     setNewLine,
+    undo,
     redo,
     setSelectedLines,
     toggleDragMode,
@@ -120,7 +121,8 @@ export const CanvasComponent = () => {
       room();
     }
     if(event.ctrlKey&&(event.key === "z" || event.key === "Z")){
-      deleteLastPoint();
+      // deleteLastPoint();
+      undo();
     }
     if(event.ctrlKey&&(event.key === "y" || event.key === "Y")){
       redo();
@@ -273,7 +275,7 @@ export const CanvasComponent = () => {
           
         </Canvas>
         <DrawtoolHeader
-            deleteLastPoint={deleteLastPoint}
+            undo={undo}
             redo={redo}
             handleSaveClick={handleSaveClick}
             handleDoubleClick={handleDoubleClick}

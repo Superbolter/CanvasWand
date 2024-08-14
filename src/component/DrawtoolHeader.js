@@ -10,7 +10,7 @@ import { drawData, setRoomSelectorMode, updateDrawData } from '../Actions/Applic
 import { ArrowBack } from '@mui/icons-material'
 import { setScale } from '../features/drawing/drwingSlice.js'
 
-const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick, handleReset} ) => {
+const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleReset} ) => {
   const dispatch=useDispatch()
   const {factor,floorplanId,roomSelectorMode}=useSelector((state)=>state.ApplicationState)
   const {userLength} = useSelector((state) => state.drawing)
@@ -43,7 +43,7 @@ const DrawtoolHeader = ({deleteLastPoint,redo, handleSaveClick,handleDoubleClick
       </Typography>
       {scale? null:
       <div style={{display:"flex",gap:"8px"}}>
-      <Button modifiers={["outlineBlack","sm"]} className='undo-redo-btn' onClick={deleteLastPoint}>
+      <Button modifiers={["outlineBlack","sm"]} className='undo-redo-btn' onClick={undo}>
         <img style={{width:"24px", height:"24px"}} src={Undo} alt="" />
         <Typography>Undo</Typography>
         </Button>

@@ -105,6 +105,7 @@ export const useDrawing = () => {
 
   const [snappingPoint, setSnappingPoint] = useState([]);
   const [showSnapLine, setShowSnapLine] = useState(false);
+  const [actionHistory, setActionHistory] = useState([]);
   // const [leftPos, setLeftPosState] = useState(new Vector3(-5, 0, 0));
   // const [rightPos, setRightPosState] = useState(new Vector3(5, 0, 0));
 
@@ -252,6 +253,9 @@ export const useDrawing = () => {
   );
 
   const addPoint = (newPoint, startPoint) => {
+    const previousLines = [...storeLines];
+    const previousPoints = [...points];
+    const previousBoxes = [...storeBoxes];
     let type = typeId === 1 ? "wall" : typeId===2? "door": typeId === 3 ? "window" : typeId === 4? "railing": "";
     let newLine = {
       id: uniqueId(),
@@ -385,6 +389,14 @@ export const useDrawing = () => {
     dispatch(setPoints(newPoints));
 
     dispatch(setStoreLines(updatedStoreLines));
+    const history = [...actionHistory]
+    history.push({
+      type: 'addPoint',
+      previousLines,
+      previousPoints,
+      previousBoxes,
+    });
+    setActionHistory(history);
   };
 
   // Function to compare two Vector3 objects
@@ -456,6 +468,54 @@ export const useDrawing = () => {
     dispatch(setPoints(updatedPoints));
   };
 
+  const undo = () => {
+    const lastAction = actionHistory.pop();
+    if (!lastAction) return; // No action to undo
+  
+    switch (lastAction.type) {
+      case 'delete':
+        // Undo deletion by adding back the deleted lines
+        dispatch(setStoreLines([...storeLines, ...lastAction.deletedLines]));
+        dispatch(setPoints([...points, ...lastAction.deletedPoints]));
+        dispatch(setStoreBoxes([...storeBoxes, ...lastAction.deletedBoxes]));
+        break;
+  
+      case 'merge':
+        // Undo merge by removing the merged line and adding back the original lines
+        const filteredLines = storeLines.filter(
+          (line) => line.id !== lastAction.mergedLine.id
+        );
+        dispatch(setStoreLines([...filteredLines, ...lastAction.originalLines]));
+        break;
+  
+      case 'split':
+        // Undo split by removing the split lines and adding back the original line
+        const linesAfterSplitUndo = storeLines.filter(
+          (line) =>
+            !lastAction.splitLines.some((splitLine) => splitLine.id === line.id)
+        );
+        dispatch(setStoreLines([...linesAfterSplitUndo, lastAction.originalLine]));
+        
+        // Optionally remove the break point if necessary
+        const pointsAfterSplitUndo = points.filter(
+          (p) => !p.equals(lastAction.newPoint)
+        );
+        dispatch(setPoints(pointsAfterSplitUndo));
+        break;
+      
+      case 'addPoint':
+         // Undo addPoint by restoring the previous state
+        dispatch(setStoreLines([...lastAction.previousLines]));
+        dispatch(setPoints([...lastAction.previousPoints]));
+        dispatch(setStoreBoxes([...lastAction.previousBoxes]));
+        break;
+  
+      default:
+        break;
+    }
+  };
+  
+
   const redo = () => {
     // Check if there are any lines or points to redo
     if (redoLines.length === 0 || redoPoints.length === 0) return;
@@ -523,7 +583,8 @@ export const useDrawing = () => {
       }
       return true; // Keep lines not in selectedLines
     });
-
+    const deletedPoints = [];
+    let deletedBoxes = [];
     deletedLines.forEach((line)=>{
       const deleteLinePoints = line.points;
       // Iterate over storeBoxes and remove the ones that match
@@ -531,8 +592,22 @@ export const useDrawing = () => {
         (box) =>
           !shouldRemoveBox([box.p1, box.p2, box.p3, box.p4], deleteLinePoints)
       );
+      deletedBoxes = storeBoxes.filter(
+        (box) =>
+          shouldRemoveBox([box.p1, box.p2, box.p3, box.p4], deleteLinePoints)
+      );
       dispatch(setStoreBoxes(result));
+      deletedPoints.push(line.points[0], line.points[1]);
     })
+
+    const history = [...actionHistory];
+    history.push({
+      type: 'delete',
+      deletedLines,
+      deletedPoints,
+      deletedBoxes
+    });
+    setActionHistory(history);
   
     const pointsToKeep = [];
 
@@ -863,7 +938,7 @@ export const useDrawing = () => {
       setSelectedLines([]);
       return;
     }
-    if (selectionMode || dragMode || doorWindowMode || merge || scale) return; // Prevent drawing new lines in selection mode
+    if (selectionMode || doorWindowMode || merge || scale) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
@@ -982,7 +1057,8 @@ export const useDrawing = () => {
   
     // Sort storeids based on their indices in storeLines to maintain order
     storeid.sort((a, b) => storeLines.findIndex(line => line.id === a) - storeLines.findIndex(line => line.id === b));
-  
+    const history = [...actionHistory]
+    
     let i = 0;
     while (i < storeid.length - 1) {
       let idx1 = updatedLine.findIndex((line) => line.id === storeid[i]);
@@ -1021,6 +1097,11 @@ export const useDrawing = () => {
           updatedLine.splice(idx1, 2, newline);
           storeid.splice(i, 2, newline.id); // Update storeid with the new line's ID
           merged = true;
+          history.push({
+            type: 'merge',
+            originalLines: [line1, line2],
+            mergedLine: newline,
+          });
           i = Math.max(0, i - 1); // Re-check from the previous line for further merging
         } else {
           i++;
@@ -1033,6 +1114,7 @@ export const useDrawing = () => {
     if (merged) {
       dispatch(setStoreLines(updatedLine));
       setMergeLine([]);
+      setActionHistory(history);
     }
     setSelectedLines([]);
 
@@ -1192,6 +1274,14 @@ export const useDrawing = () => {
     // Dispatch the updated store and points
     dispatch(setStoreLines(store));
     dispatch(setPoints(pointsVal));
+    const history = [...actionHistory]
+    history.push({
+      type: 'split',
+      originalLine: updatedLine,
+      splitLines: [splitNewLine, splitNewLine1],
+      newPoint: point, // store the breakpoint location
+    });
+    setActionHistory(history);
   };
 
   const handleApiCall = () => {
@@ -1301,6 +1391,7 @@ export const useDrawing = () => {
     setdoorPoint,
     handleInformtion,
     deleteLastPoint,
+    undo,
     redo,
     setSelectedLines,
     toggleDragMode,
