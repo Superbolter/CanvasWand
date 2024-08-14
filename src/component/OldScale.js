@@ -1,9 +1,18 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
-import { Vector3 } from "three";
+import React, { useRef, useState, useEffect } from "react";
+import { Vector3, Matrix4 } from "three";
+
+import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant";
+import {
+  setFactor,
+  setLeftPosState,
+  setRightPosState,
+  setScale,
+} from "../features/drawing/drwingSlice.js";
 import { useDispatch, useSelector } from "react-redux";
 import { useDrawing } from "../hooks/useDrawing.js";
 
 export const Scale = () => {
+
   const dispatch = useDispatch();
   const mesh = useRef();
   const left = useRef();
@@ -13,41 +22,53 @@ export const Scale = () => {
   const [isDraggingBox, setIsDraggingBox] = useState(false);
   const [position, setPosition] = useState(new Vector3(0, 0, 0));
   const [lineAngle, setLineAngle] = useState(0);
+  const [isPointerMoving, setIsPointerMoving] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
-  const { setLeftPos, setRightPos } = useDrawing();
-  const { leftPos, rightPos } = useSelector((state) => state.drawing);
+  const { setLeftPos, setRightPos} = useDrawing();
+  const { leftPos, rightPos } = useSelector((state) => state.drawing)
 
-  // Move updateMesh outside of useEffect so it can be used globally
-  const updateMesh = useCallback((pointA, pointB) => {
-    const midpoint = new Vector3().addVectors(pointA, pointB).multiplyScalar(0.5);
-    setPosition(midpoint);
+  useEffect(()=>{
+    const updateMesh = (pointA, pointB) => {
+      const midpoint = new Vector3().addVectors(pointA, pointB).multiplyScalar(0.5);
+      setPosition(midpoint);
 
-    const angle = Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x);
-    setLineAngle(angle);
-
-    if (mesh.current) {
+      const angle = Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x);
+      setLineAngle(angle);
       mesh.current.rotation.z = angle;
-      mesh.current.position.set(midpoint.x, midpoint.y, 0);
-    }
-  }, []);
 
-  useEffect(() => {
-    if (firstLoad) {
-      setFirstLoad(false);
-      updateMesh(leftPos, rightPos);
-      const l = Math.abs(rightPos.x - leftPos.x);
-      setDimensions({ l, w: 15, h: 0 });
+      mesh.current.position.set(midpoint.x, midpoint.y, 0);
+    };
+
+
+    if(firstLoad){
+      setFirstLoad(false)
+      updateMesh(leftPos, rightPos)
+      const l = Math.abs(rightPos.x - leftPos.x) < 15 ? Math.abs(rightPos.y - leftPos.y) : Math.abs(rightPos.x - leftPos.x);
+      const w = 15;
+      const h = 0;
+      setDimensions({l,w,h})
+      // dispatch(setLeftPosState(new Vector3(-50, 0, 0)))
+      // dispatch(setRightPosState(new Vector3(50, 0, 0)))
     }
-  }, [firstLoad, leftPos, rightPos, updateMesh]);
+  },[firstLoad])
 
   useEffect(() => {
     const canvasContainer = document.querySelector(".canvas-container");
     const rect = canvasContainer.getBoundingClientRect();
     const cameraWidth = rect.width;
     const cameraHeight = rect.height;
+    let frameId = null;
+    
 
     const handlePointerMove = (event) => {
       if (!isDraggingBox && !dragging) return;
+
+      if (!isPointerMoving) {
+        setIsPointerMoving(true);
+        frameId = requestAnimationFrame(() => {
+          setIsPointerMoving(false);
+        });
+      }
 
       let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -59,55 +80,63 @@ export const Scale = () => {
 
       if (dragging) {
         if (dragging === mesh.current) {
-          // Move the line freely and update points synchronously
           const delta = newPoint.sub(position);
-          const updatedPosition = position.add(delta);
-          setPosition(updatedPosition);
-          updatePoints(updatedPosition);
+          setPosition(position.add(delta));
+          updatePoints(position);
         } else if (dragging === left) {
-          // Move the left point horizontally only and adjust the line's length accordingly
-          const updatedLeft = new Vector3(newPoint.x, left.current.position.y, 0);
-          left.current.position.set(updatedLeft.x, updatedLeft.y, 0);
-          setLeftPos(updatedLeft);
+          left.current.position.set(newPoint.x, newPoint.y, 0);
+          setLeftPos(new Vector3(newPoint.x, newPoint.y, 0));
 
-          const length = right.current.position.distanceTo(updatedLeft);
+          const length = right.current.position.distanceTo(left.current.position);
           setDimensions((prev) => ({ ...prev, l: length }));
 
-          updateMesh(updatedLeft, right.current.position);
+          updateMesh(left.current.position, right.current.position);
         } else if (dragging === right) {
-          // Move the right point horizontally only and adjust the line's length accordingly
-          const updatedRight = new Vector3(newPoint.x, right.current.position.y, 0);
-          right.current.position.set(updatedRight.x, updatedRight.y, 0);
-          setRightPos(updatedRight);
+          right.current.position.set(newPoint.x, newPoint.y, 0);
+          setRightPos(new Vector3(newPoint.x, newPoint.y, 0));
 
-          const length = updatedRight.distanceTo(left.current.position);
+          const length = right.current.position.distanceTo(left.current.position);
           setDimensions((prev) => ({ ...prev, l: length }));
 
-          updateMesh(left.current.position, updatedRight);
+          updateMesh(left.current.position, right.current.position);
         }
       }
     };
 
+    const updateMesh = (pointA, pointB) => {
+      const midpoint = new Vector3().addVectors(pointA, pointB).multiplyScalar(0.5);
+      setPosition(midpoint);
+
+      const angle = Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x);
+      setLineAngle(angle);
+      mesh.current.rotation.z = angle;
+
+      mesh.current.position.set(midpoint.x, midpoint.y, 0);
+    };
+
     const updatePoints = (boxCenter) => {
       const halfLength = dimensions.l / 2;
-      const leftPos = new Vector3(boxCenter.x - halfLength, boxCenter.y, 0);
-      const rightPos = new Vector3(boxCenter.x + halfLength, boxCenter.y, 0);
+      const offset = new Vector3(halfLength, 0, 0);
+      const rotationMatrix = new Matrix4().makeRotationZ(lineAngle);
 
-      setLeftPos(leftPos);
-      setRightPos(rightPos);
-      left.current.position.set(leftPos.x, leftPos.y, 0);
-      right.current.position.set(rightPos.x, rightPos.y, 0);
+      const rotatedOffset = offset.clone().applyMatrix4(rotationMatrix);
 
-      // Synchronize the mesh immediately after updating points
-      updateMesh(leftPos, rightPos);
+      const rotatedLeft = boxCenter.clone().sub(rotatedOffset);
+      const rotatedRight = boxCenter.clone().add(rotatedOffset);
+
+      setLeftPos(rotatedLeft);
+      setRightPos(rotatedRight);
+      left.current.position.set(rotatedLeft.x, rotatedLeft.y, 0);
+      right.current.position.set(rotatedRight.x, rotatedRight.y, 0);
     };
 
     canvasContainer.addEventListener("pointermove", handlePointerMove);
 
     return () => {
+      cancelAnimationFrame(frameId);
       canvasContainer.removeEventListener("pointermove", handlePointerMove);
     };
-  }, [isDraggingBox, dragging, dimensions.l, position, lineAngle, updateMesh]);
+  }, [isDraggingBox, dragging, dimensions.l, position, lineAngle, isPointerMoving]);
 
   const handlePointerDownSphere = (event, sphereRef) => {
     setDragging(sphereRef);
