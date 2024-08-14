@@ -964,12 +964,72 @@ export const useDrawing = () => {
     if (selectedLines.length === 0) {
       return;
     } else {
-      let id = selectedLines[selectedLines.length - 1];
-      setMergeLine([...mergeLine, id]);
-      const selected = selectedLines.filter((line) => line === id);
-      setSelectedLines([...selected]);
+      let newMergeLines= [...mergeLine]
+      selectedLines.forEach((line)=>{
+        newMergeLines.push(line)
+      })
+      setMergeLine(newMergeLines)
+      handleMerge(newMergeLines);
     }
   };
+
+  const handleMerge = (storeid) => {
+    let updatedLine = [...storeLines];
+    let merged = false;
+  
+    // Sort storeids based on their indices in storeLines to maintain order
+    storeid.sort((a, b) => storeLines.findIndex(line => line.id === a) - storeLines.findIndex(line => line.id === b));
+  
+    // Use a while loop to continue merging as long as possible
+    let i = 0;
+    while (i < storeid.length - 1) {
+      let idx1 = updatedLine.findIndex((line) => line.id === storeid[i]);
+      let idx2 = updatedLine.findIndex((line) => line.id === storeid[i + 1]);
+  
+      if (
+        Math.abs(idx1 - idx2) === 1 &&
+        updatedLine[idx1].points[1].equals(updatedLine[idx2].points[0])
+      ) {
+        if (
+          updatedLine[idx1].points[0].x === updatedLine[idx2].points[1].x ||
+          updatedLine[idx1].points[0].y === updatedLine[idx2].points[1].y
+        ) {
+          let line = updatedLine[idx1];
+          const newline = {
+            ...line,
+            points: [
+              updatedLine[idx1].points[0],
+              updatedLine[idx2].points[1],
+            ],
+            length: convert(
+              updatedLine[idx1].points[0].distanceTo(
+                updatedLine[idx2].points[1]
+              ) * factor[0]
+            )
+              .from(measured)
+              .to("mm"),
+          };
+  
+          // Replace the two merged lines with the new line
+          updatedLine.splice(idx1, 2, newline);
+          storeid.splice(i, 2, newline.id); // Update storeid with the new line's ID
+          merged = true;
+          i = Math.max(0, i - 1); // Re-check from the previous line for further merging
+        } else {
+          i++;
+        }
+      } else {
+        i++;
+      }
+    }
+  
+    if (merged) {
+      dispatch(setStoreLines(updatedLine));
+      setMergeLine([]);
+      setSelectedLines([]);
+    }
+    return merged
+  }
 
   useEffect(() => {
     if (lineClick) {
@@ -994,52 +1054,14 @@ export const useDrawing = () => {
     if (lineBreak) {
       setId(id);
     }
-
-    if (merge && storeid.length === 2) {
-      setSelectedLines([]);
-      let idx1 = storeLines.findIndex((line) => line.id === storeid[0]);
-      let idx2 = storeLines.findIndex((line) => line.id === storeid[1]);
-      let arr = [idx1, idx2];
-
-      arr.sort();
-      let updatedLine = [...storeLines];
-      if (
-        Math.abs(idx1 - idx2) === 1 &&
-        storeLines[arr[0]].points[1].equals(storeLines[arr[1]].points[0])
-      ) {
-        if (
-          storeLines[arr[0]].points[0].x === storeLines[arr[1]].points[1].x ||
-          storeLines[arr[0]].points[0].y === storeLines[arr[1]].points[1].y
-        ) {
-          let line = updatedLine[arr[0]];
-          const newline = {
-            ...line,
-            points: [
-              storeLines[arr[0]].points[0],
-              storeLines[arr[1]].points[1],
-            ],
-            length: convert(
-              storeLines[arr[0]].points[0].distanceTo(
-                storeLines[arr[1]].points[1]
-              ) * factor[0]
-            )
-              .from(measured)
-              .to("mm"),
-          };
-
-          updatedLine.splice(arr[0], 2, newline);
-        }
-        dispatch(setStoreLines(updatedLine));
-        setMergeLine([]);
-      } else {
-        setMergeLine([]);
-      }
-    } else if (storeid.length > 2) {
-      setMergeLine([]);
+    let merged = false;
+    if (merge && storeid.length >= 2) {
+      merged = handleMerge(storeid);
     }
+    
     const selectedLine = storeLines.find((line) => line.id === id);
 
-    if (selectionMode && storeid.length !== 2) {
+    if (selectionMode &&!merged) {
       const selected = selectedLines.includes(id)
         ? selectedLines.filter((lineId) => lineId !== id)
         : [...selectedLines, id];
@@ -1093,7 +1115,7 @@ export const useDrawing = () => {
   const breakingLine = (point) => {
     const idx = storeLines.findIndex((line) => line.id === selectId);
     const line = storeLines.filter((line) => line.id === selectId);
-    if(line[0].locked){
+    if( line[0] && line[0]?.locked){
       toast("Line is locked and cannot be split.", {
         icon: '⚠️',
         style: {

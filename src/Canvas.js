@@ -145,12 +145,8 @@ export const CanvasComponent = () => {
 
   useEffect(() => {
     // console.log(type_id);
-    console.log(storeLines);
-    console.log(points);
-    console.log(lineId);
     // console.log(cookies);
     const floorplanId = getUrlParameter('floorplanId');
-    console.log(floorplanId)
     RomeDataManager.instantiate();
     if (cookies.get("USER-SESSION", { path: "/" }) !== undefined) {
       const result = cookies.get("LOGIN-RESPONSE", { path: "/" });
