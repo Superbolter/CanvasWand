@@ -45,6 +45,7 @@ import {
 import { handleDownload } from "../component/ConvertToJson.js";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { toast } from 'react-hot-toast';
 
 const MySwal = withReactContent(Swal);
 
@@ -192,6 +193,7 @@ export const useDrawing = () => {
         widthchange: 0,
         type: "wall",
         typeId: 1,
+        locked: false
       };
       const line2 = {
         id: uniqueId(),
@@ -209,6 +211,7 @@ export const useDrawing = () => {
         widthchange: 0,
         type: "wall",
         typeId: 1,
+        locked: false
       };
       const line3 = {
         id: uniqueId(),
@@ -226,6 +229,7 @@ export const useDrawing = () => {
         widthchange: 0,
         type: "door",
         typeId: 2,
+        locked: false
       };
 
       const updatedLine = [...storeLines];
@@ -248,6 +252,7 @@ export const useDrawing = () => {
   );
 
   const addPoint = (newPoint, startPoint) => {
+    let type = typeId === 1 ? "wall" : typeId===2? "door": typeId === 3 ? "window" : typeId === 4? "railing": "";
     let newLine = {
       id: uniqueId(),
       points: [startPoint, newPoint],
@@ -262,7 +267,9 @@ export const useDrawing = () => {
         .to("mm"),
       widthchangetype: "between",
       widthchange: 0,
+      type,
       typeId: typeId,
+      locked: false,
     };
 
     let updatedStoreLines = [...storeLines];
@@ -472,16 +479,24 @@ export const useDrawing = () => {
   };
 
   const deleteSelectedLines = () => {
+    let lockedCount = 0;
+  
     const roomupdate = roomSelectors
       .map((room) => {
-        // Filter out the walls that are in the selectedLines array
-        const updatedWallIds = room.wallIds.filter(
-          (lineId) => !selectedLines.includes(lineId)
-        );
+        // Filter out the walls that are in the selectedLines array and not locked
+        const updatedWallIds = room.wallIds.filter((lineId) => {
+          const line = storeLines.find((line) => line.id === lineId);
+          if (selectedLines.includes(lineId) && line?.locked) {
+            return true; // Keep the locked line
+          }
+          return !selectedLines.includes(lineId); // Remove if in selectedLines
+        });
+  
         // Return null if the room has no walls left
         if (updatedWallIds.length === 1) {
           return null;
         }
+  
         // Otherwise, return the room with the updated walls
         return {
           ...room,
@@ -489,13 +504,22 @@ export const useDrawing = () => {
         };
       })
       .filter((room) => room !== null);
+  
     dispatch(setRoomSelectors(roomupdate));
-    const updatedLines = storeLines.filter(
-      (line) => !selectedLines.includes(line.id)
-    );
-    const pointsToKeep = [];
+    const deletedLines = [];
+    const updatedLines = storeLines.filter((line) => {
+      if (selectedLines.includes(line.id)) {
+        if (line.locked) {
+          lockedCount += 1; // Increment locked count for locked lines
+          return true; // Keep the locked line
+        }
+        deletedLines.push(line);
+        return false; // Remove if not locked
+      }
+      return true; // Keep lines not in selectedLines
+    });
 
-    updatedLines.forEach((line) => {
+    deletedLines.forEach((line)=>{
       const deleteLinePoints = line.points;
       // Iterate over storeBoxes and remove the ones that match
       const result = storeBoxes.filter(
@@ -503,17 +527,45 @@ export const useDrawing = () => {
           !shouldRemoveBox([box.p1, box.p2, box.p3, box.p4], deleteLinePoints)
       );
       dispatch(setStoreBoxes(result));
+    })
+  
+    const pointsToKeep = [];
+
+  
+    updatedLines.forEach((line) => {
       pointsToKeep.push(line.points[0], line.points[1]);
     });
-
+  
     const updatedPoints = points.filter((point) =>
       pointsToKeep.some((p) => p.equals(point))
     );
-
+  
     dispatch(setStoreLines(updatedLines));
     dispatch(setPoints(updatedPoints));
     setSelectedLines([]);
+  
+    // Show hot-toast with the count of locked lines
+    if (lockedCount > 1) {
+      toast(`${lockedCount} lines were locked and were not deleted.`, {
+        icon: '⚠️',
+        style: {
+          fontFamily: "'DM Sans', sans-serif",
+          color: '#000',
+          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)'
+        },
+      });
+    }else if(lockedCount === 1){
+      toast(`${lockedCount} line was locked and was not deleted.`, {
+        icon: '⚠️',
+        style: {
+          color: '#000',
+          fontFamily: "'DM Sans', sans-serif",
+          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)'
+        },
+      });
+    }
   };
+  
 
   const perpendicularHandler = () => {
     dispatch(setPerpendicularLine(!perpendicularLine));

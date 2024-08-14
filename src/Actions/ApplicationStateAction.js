@@ -60,6 +60,7 @@ export const drawToolData = (floorplan_id) => {
               widthchange: line.widthchange,
               type: line.type,
               typeId: line.typeId,
+              locked: line.locked
             }));
         }
         if (drawData && drawData.points && drawData.points.length > 0) {
@@ -71,7 +72,6 @@ export const drawToolData = (floorplan_id) => {
             );
         }
         dispatch(setStoreLines(lines));
-        console.log(lines)
         dispatch(setPoints(point));
         dispatch(setRoomSelectors(drawData.rooms));
         dispatch(setStoreBoxes(drawData.storeBoxes));

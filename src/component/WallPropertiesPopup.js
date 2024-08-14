@@ -10,6 +10,7 @@ import Close from "../assets/Close.png";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setContextualMenuStatus,
+  setLockForLines,
   setShowPopup,
   setTypeId,
 } from "../Actions/DrawingActions.js";
@@ -34,6 +35,7 @@ const WallPropertiesPopup = ({
   const { lineBreak, merge } = useSelector((state) => state.drawing);
   const { setLineBreak, setMerge, stop, setStop } = useDrawing();
   const { height, width,roomSelectorMode } = useSelector((state) => state.ApplicationState);
+  const { locked } = useSelector((state) => state.Drawing);
 
   const handleMergeClick = () => {
     // setSelectedLines([]);
@@ -62,6 +64,10 @@ const WallPropertiesPopup = ({
       deleteSelectedLines();
     }
   };
+
+  const handleLockClick = () => {
+    dispatch(setLockForLines(!locked));
+  }
 
   return (
     <div>
@@ -137,7 +143,7 @@ const WallPropertiesPopup = ({
                 <Typography className="contextual-btn-text">Merge</Typography>
               </div>
               {lineBreak || merge ? null : (
-                <div className="btn">
+                <div className="btn" style={{ border: locked ? "2px solid cornflowerblue" : "" }} onClick={handleLockClick} >
                   <img src={Unlocked} alt="" />
                   <Typography className="contextual-btn-text">Lock</Typography>
                 </div>

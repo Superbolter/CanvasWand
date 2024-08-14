@@ -1,7 +1,6 @@
 import React from 'react';
 
 const convertToJSON = (lines, points,roomSelectors,storeBoxes) => {
-    console.log("roomSelectors",roomSelectors);
     const jsonData = {
         points: points.map(point => ({ id:point.id,x: point.x, y: point.y,  z: point.z})),
         lines: lines.map(line => ({
@@ -13,6 +12,7 @@ const convertToJSON = (lines, points,roomSelectors,storeBoxes) => {
             height: line.height,
             widthchangetype:line.widthchangetype,
             widthchange:line.widthchange,
+            locked: line.locked,
             type:line.type,
             typeId: line.typeId
         })),
