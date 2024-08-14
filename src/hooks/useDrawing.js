@@ -1092,6 +1092,18 @@ export const useDrawing = () => {
 
   const breakingLine = (point) => {
     const idx = storeLines.findIndex((line) => line.id === selectId);
+    const line = storeLines.filter((line) => line.id === selectId);
+    if(line[0].locked){
+      toast("Line is locked and cannot be split.", {
+        icon: '⚠️',
+        style: {
+          fontFamily: "'DM Sans', sans-serif",
+          color: '#000',
+          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)'
+        },
+      });
+      return;
+    }
     if(storeLines[idx].typeId !==1) return;
     if (idx === -1) return; // Line not found
     setBreakPointLocation(point);
