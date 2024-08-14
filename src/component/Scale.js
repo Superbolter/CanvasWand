@@ -19,6 +19,9 @@ export const Scale = () => {
   const [firstLoad, setFirstLoad] = useState(true);
   const { handleDoubleClick, setLeftPos, setRightPos } = useDrawing();
   const { leftPos, rightPos } = useSelector((state) => state.drawing);
+  const [leftJawActivated, setLeftJawActivated] = useState(false);
+const [rightJawActivated, setRightJawActivated] = useState(false);
+  const tolerance = 1e-3;
 
   useEffect(() => {
     if (firstLoad) {
@@ -66,8 +69,11 @@ export const Scale = () => {
           if (Math.abs(newPoint.y - rightPosition.y) < 100) {
             // Align horizontally
             adjustedY = rightPosition.y;
-          } else {
+          } else if(Math.abs(newPoint.x - rightPosition.x) < 100){
             // Align vertically
+            adjustedX = rightPosition.x;
+          }
+          else{
             adjustedX = rightPosition.x;
           }
 
@@ -86,8 +92,10 @@ export const Scale = () => {
           if (Math.abs(newPoint.y - leftPosition.y) < 100) {
             // Align horizontally
             adjustedY = leftPosition.y;
-          } else {
+          } else if(Math.abs(newPoint.x - leftPosition.x) < 100) {
             // Align vertically
+            adjustedX = leftPosition.x;
+          }else{
             adjustedX = leftPosition.x;
           }
 
@@ -137,6 +145,11 @@ export const Scale = () => {
     };
   }, [isDraggingBox, dragging, dimensions.l, position, lineAngle, isPointerMoving]);
 
+
+  const isWithinRange = (clickPosition, jawPosition, range = 10) => {
+    return clickPosition.distanceTo(jawPosition) <= range;
+  };
+
   const handlePointerDownBox = (event) => {
     setDragging(mesh.current);
     setIsDraggingBox(true);
@@ -144,13 +157,42 @@ export const Scale = () => {
   };
 
   const handlePointerDownJaw = (event, jawRef) => {
-    setDragging(jawRef);
+    const canvasContainer = document.querySelector(".canvas-container");
+    const rect = canvasContainer.getBoundingClientRect();
+    const cameraWidth = rect.width;
+    const cameraHeight = rect.height;
+
+    let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    const posX = x * (cameraWidth / 2);
+    const posY = y * (cameraHeight / 2);
+
+    const clickPosition = new Vector3(posX, posY, 0);
+
+    if (
+      jawRef.current === leftJaw.current &&
+      isWithinRange(clickPosition, leftJaw.current.position)
+    ) {
+      setLeftJawActivated(true);
+      setDragging(leftJaw);
+    } else if (
+      jawRef.current === rightJaw.current &&
+      isWithinRange(clickPosition, rightJaw.current.position)
+    ) {
+      setRightJawActivated(true);
+      setDragging(rightJaw);
+    }
+
     event.stopPropagation();
   };
+  
 
   const handlePointerUp = (event) => {
     setDragging(null);
     setIsDraggingBox(false);
+    setLeftJawActivated(false);
+    setRightJawActivated(false);
     event.stopPropagation();
   };
 
@@ -182,33 +224,31 @@ export const Scale = () => {
       {createJawLine(leftJaw.current?.position || new Vector3(), position)}
       {createJawLine(rightJaw.current?.position || new Vector3(), position)}
       <mesh
-        ref={leftJaw}
-        position={leftPos.toArray()}
-        onPointerDown={(event) => handlePointerDownJaw(event, leftJaw)}
-        onPointerUp={handlePointerUp}
-      >
-       <boxGeometry
-  args={rightJaw.current?.position.y === leftJaw.current?.position.y 
-    ? [3, 30, dimensions.h]  // If x-coordinates are the same, make it vertical
-    : [30, 3, dimensions.h]} // Otherwise, make it horizontal
-/>
-
-        <meshBasicMaterial color={"black"} />
-      </mesh>
-      <mesh
-        ref={rightJaw}
-        position={rightPos.toArray()}
-        onPointerDown={(event) => handlePointerDownJaw(event, rightJaw)}
-        onPointerUp={handlePointerUp}
-      >
-       <boxGeometry
-  args={rightJaw.current?.position.y === leftJaw.current?.position.y
-    ? [3, 30, dimensions.h]  // If x-coordinates are the same, make it vertical
-    : [30, 3, dimensions.h]} // Otherwise, make it horizontal
-/>
-
-        <meshBasicMaterial color={"black"} />
-      </mesh>
+  ref={leftJaw}
+  position={leftPos.toArray()}
+  onPointerDown={(event) => handlePointerDownJaw(event, leftJaw)}
+  onPointerUp={handlePointerUp}
+>
+  <boxGeometry
+    args={Math.abs(rightJaw.current?.position.y - leftJaw.current?.position.y) < tolerance
+      ? [3, 30, dimensions.h]  // Vertical
+      : [30, 3, dimensions.h]} // Horizontal
+  />
+   <meshBasicMaterial color={leftJawActivated ? "red" : "black"} />
+</mesh>
+<mesh
+  ref={rightJaw}
+  position={rightPos.toArray()}
+  onPointerDown={(event) => handlePointerDownJaw(event, rightJaw)}
+  onPointerUp={handlePointerUp}
+>
+  <boxGeometry
+    args={Math.abs(rightJaw.current?.position.y - leftJaw.current?.position.y) < tolerance
+      ? [3, 30, dimensions.h]  // Vertical
+      : [30, 3, dimensions.h]} // Horizontal
+  />
+   <meshBasicMaterial color={rightJawActivated ? "red" : "black"} />
+</mesh>
     </>
   );
 };
