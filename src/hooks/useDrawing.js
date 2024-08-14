@@ -519,7 +519,8 @@ export const useDrawing = () => {
   
       default:
         break;
-    }
+      }
+      setActionHistory([...actionHistory]);
   };
   
 
