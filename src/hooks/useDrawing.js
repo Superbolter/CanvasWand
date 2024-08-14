@@ -106,6 +106,7 @@ export const useDrawing = () => {
   const [snappingPoint, setSnappingPoint] = useState([]);
   const [showSnapLine, setShowSnapLine] = useState(false);
   const [actionHistory, setActionHistory] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
   // const [leftPos, setLeftPosState] = useState(new Vector3(-5, 0, 0));
   // const [rightPos, setRightPosState] = useState(new Vector3(5, 0, 0));
 
@@ -395,6 +396,9 @@ export const useDrawing = () => {
       previousLines,
       previousPoints,
       previousBoxes,
+      newLines: updatedStoreLines,
+      newPoints,
+      newBoxes: [...storeBoxes],
     });
     setActionHistory(history);
   };
@@ -471,6 +475,9 @@ export const useDrawing = () => {
   const undo = () => {
     const lastAction = actionHistory.pop();
     if (!lastAction) return; // No action to undo
+
+    const redoStackCopy = [...redoStack, lastAction];
+    setRedoStack(redoStackCopy);
   
     switch (lastAction.type) {
       case 'delete':
@@ -517,30 +524,66 @@ export const useDrawing = () => {
   
 
   const redo = () => {
-    // Check if there are any lines or points to redo
-    if (redoLines.length === 0 || redoPoints.length === 0) return;
+    const lastRedoAction = redoStack.pop();
+    if (!lastRedoAction) return; // No action to redo
 
-    // Get the last undone line and point
-    const lastRedoLine = redoLines[redoLines.length - 1];
-    const lastRedoPoint = redoPoints[redoPoints.length - 1];
+    // Push the redone action back to the undo stack
+    const updatedHistory = [...actionHistory, lastRedoAction];
+    setActionHistory(updatedHistory);
 
-    // Remove these elements from the redo stacks
-    const updatedRedoLines = redoLines.slice(0, -1);
-    const updatedRedoPoints = redoPoints.slice(0, -1);
+    switch (lastRedoAction.type) {
+      case "delete":
+        // Redo deletion by removing the deleted lines again
+        const updatedLines = storeLines.filter(
+          (line) => !lastRedoAction.deletedLines.some((dl) => dl.id === line.id)
+        );
+        dispatch(setStoreLines(updatedLines));
+        const updatedPoints = points.filter(
+          (p) => !lastRedoAction.deletedPoints.some((dp) => dp.equals(p))
+        );
+        dispatch(setPoints(updatedPoints));
+        dispatch(
+          setStoreBoxes(
+            storeBoxes.filter(
+              (box) =>
+                !lastRedoAction.deletedBoxes.some((db) => db.id === box.id)
+            )
+          )
+        );
+        break;
 
-    // Update the redo stacks with the new values
-    setRedoLines(updatedRedoLines);
-    setRedoPoints(updatedRedoPoints);
+      case "merge":
+        // Redo merge by removing the original lines and adding the merged line
+        const mergedLines = storeLines.filter(
+          (line) =>
+            !lastRedoAction.originalLines.some((ol) => ol.id === line.id)
+        );
+        dispatch(setStoreLines([...mergedLines, lastRedoAction.mergedLine]));
+        break;
 
-    const updatedStoreLines = [...storeLines];
-    const updatedPoints = [...points];
+      case "split":
+        // Redo split by removing the original line and adding the split lines
+        const splitLines = storeLines.filter(
+          (line) => line.id !== lastRedoAction.originalLine.id
+        );
+        dispatch(setStoreLines([...splitLines, ...lastRedoAction.splitLines]));
 
-    updatedStoreLines.push(lastRedoLine);
-    updatedPoints.push(lastRedoPoint);
+        // Optionally add the break point if necessary
+        dispatch(setPoints([...points, lastRedoAction.newPoint]));
+        break;
 
-    // Set the updated state
-    dispatch(setStoreLines(updatedStoreLines));
-    dispatch(setPoints(updatedPoints));
+      case "addPoint":
+        // Redo addPoint by restoring the state after the point was added
+        dispatch(setStoreLines([...lastRedoAction.newLines]));
+        dispatch(setPoints([...lastRedoAction.newPoints]));
+        dispatch(setStoreBoxes([...lastRedoAction.newBoxes]));
+        break;
+
+      default:
+        break;
+    }
+
+    setRedoStack([...redoStack]); // Update the redo stack
   };
 
   const deleteSelectedLines = () => {
