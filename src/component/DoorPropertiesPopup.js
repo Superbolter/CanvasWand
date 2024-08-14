@@ -11,18 +11,23 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setContextualMenuStatus,
   setShowPopup,
+  setLockForLines,
   setTypeId,
 } from "../Actions/DrawingActions.js";
 
 const DoorPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
   const { typeId, showPropertiesPopup } = useSelector((state) => state.Drawing);
   const { height, width, roomSelectorMode } = useSelector((state) => state.ApplicationState);
+  const { locked } = useSelector((state) => state.Drawing);
   const dispatch = useDispatch();
   const handleCloseClick = () => {
     dispatch(setTypeId(1));
     dispatch(setShowPopup(false));
     dispatch(setContextualMenuStatus(false));
   };
+  const handleLockClick = () => {
+    dispatch(setLockForLines(!locked));
+  }
   return (
     <div>
       <div
@@ -84,10 +89,10 @@ const DoorPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
               className="btn-container"
               style={{ justifyContent: "flex-start" }}
             >
-              <div className="btn">
-                <img src={Unlocked} alt="" />
-                <Typography className="contextual-btn-text">Lock</Typography>
-              </div>
+              <div className="btn" style={{ border: locked ? "2px solid cornflowerblue" : "" }} onClick={handleLockClick} >
+                  <img src={Unlocked} alt="" />
+                  <Typography className="contextual-btn-text">Lock</Typography>
+                </div>
               <div className="btn" onClick={deleteSelectedLines}>
                 <img src={Delete} alt="" />
                 <Typography className="contextual-btn-text">Delete</Typography>
