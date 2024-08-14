@@ -583,11 +583,13 @@ export const useDrawing = () => {
       dispatch(setContextualMenuStatus(false));
       setShowSnapLine(false);
       setStop(true);
+      setDragMode(false);
     } else {
       setNewLine(true);
       setShowSnapLine(false);
       dispatch(setContextualMenuStatus(false));
       setStop(true);
+      setDragMode(true);
       dispatch(setSelectedButton([]));
     }
     dispatch(setSelectionMode(!selectionMode));
