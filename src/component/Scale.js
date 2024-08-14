@@ -177,7 +177,7 @@ export const Scale = () => {
         onDoubleClick={handleDoubleClick}
       >
         <boxGeometry args={[dimensions.l, dimensions.w, dimensions.h]} />
-        <meshBasicMaterial color={"#6360FB"} transparent={true} opacity={2}/>
+        <meshBasicMaterial color={"#6360FB"} transparent={true} />
       </mesh>
       {createJawLine(leftJaw.current?.position || new Vector3(), position)}
       {createJawLine(rightJaw.current?.position || new Vector3(), position)}

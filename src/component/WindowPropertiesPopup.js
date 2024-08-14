@@ -10,6 +10,7 @@ import Close from "../assets/Close.png";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setContextualMenuStatus,
+  setLockForLines,
   setShowPopup,
   setTypeId,
 } from "../Actions/DrawingActions.js";
@@ -17,12 +18,16 @@ import {
 const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
   const { typeId, showPropertiesPopup } = useSelector((state) => state.Drawing);
   const { height, width,roomSelectorMode } = useSelector((state) => state.ApplicationState);
+  const { locked } = useSelector((state) => state.Drawing);
   const dispatch = useDispatch();
   const handleCloseClick = () => {
     dispatch(setTypeId(0));
     dispatch(setShowPopup(false));
     dispatch(setContextualMenuStatus(false));
   };
+  const handleLockClick = () => {
+    dispatch(setLockForLines(!locked));
+  }
   return (
     <div>
       <div
@@ -31,7 +36,6 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
             ? "popup-container"
             : "popup-container-hidden"
         }
-        style={{ height: "346px" }}
       >
         <div className="header-container">
           <Typography
@@ -93,22 +97,26 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
               type="tel"
             />
           </div> */}
-          <div className="divider"></div>
+          {/* <div className="divider"></div> */}
           {selectionMode ? (
             <div
               className="btn-container"
               style={{ justifyContent: "flex-start" }}
             >
-              <div className="btn">
-                <img src={Unlocked} alt="" />
-                <Typography className="contextual-btn-text">Lock</Typography>
-              </div>
+              <div className="btn" style={{ border: locked ? "2px solid cornflowerblue" : "" }} onClick={handleLockClick} >
+                  <img src={Unlocked} alt="" />
+                  <Typography className="contextual-btn-text">Lock</Typography>
+                </div>
               <div className="btn" onClick={deleteSelectedLines}>
                 <img src={Delete} alt="" />
                 <Typography className="contextual-btn-text">Delete</Typography>
               </div>
             </div>
-          ) : null}
+          ) :
+          <div className="btn-container">
+            <Typography modifiers={["helpText"]}>(Press esc to enter selection mode)</Typography>
+          </div> 
+          }
         </div>
       </div>
     </div>

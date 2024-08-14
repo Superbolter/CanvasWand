@@ -14,6 +14,8 @@ const initialState = {
     roomPopup:false,
     storeBoxes: [],
     roomSelectorMode: false,
+    selectionMode: false,
+    selectedLines: [],
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {
@@ -69,20 +71,18 @@ const initialState = {
           ...state,
           roomSelectorMode:action.payload,
         };
+      
+      case "SET_SELECTION_MODE":
+        return{
+          ...state,
+          selectionMode: action.payload
+        };
 
-
-    //   case "UPDATE_DRAW_DATA":
-    //     return {
-    //       ...state,
-    //       floorplanId:action.payload.id,
-    //       img:action.payload.image_uri,
-    //       scale:action.payload.scale,
-    //       drawnBy:action.payload.drawed_by,
-    //       workStatus:action.payload.work_status,
-    //       drawdata:action.payload.draw_data,
-
-          
-    //     };
+      case 'UPDATE_APPLICATION_STATE':
+        return Object.assign({}, state, {
+          ...state,
+          ...action
+       })
      
       default:
         return state;

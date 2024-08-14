@@ -3,6 +3,7 @@ const initialState = {
     contextualMenuStatus:false,
     lineId:null,
     showPropertiesPopup: false,
+    locked: false,
   };
   
   const DrawingReducer = (state = initialState, action) => {
@@ -26,6 +27,11 @@ const initialState = {
         return {
           ...state,
           showPropertiesPopup: action.payload
+        }
+      case "SET_LOCK":
+        return {
+         ...state,
+          locked: action.payload
         }
       default:
         return state;

@@ -10,6 +10,7 @@ import Close from "../assets/Close.png";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setContextualMenuStatus,
+  setLockForLines,
   setShowPopup,
   setTypeId,
 } from "../Actions/DrawingActions.js";
@@ -28,10 +29,13 @@ const WallPropertiesPopup = ({
     dispatch(setTypeId(1));
     dispatch(setShowPopup(false));
     dispatch(setContextualMenuStatus(false));
+    setLineBreak(false);
+    setMerge(false);
   };
   const { lineBreak, merge } = useSelector((state) => state.drawing);
   const { setLineBreak, setMerge, stop, setStop } = useDrawing();
   const { height, width,roomSelectorMode } = useSelector((state) => state.ApplicationState);
+  const { locked } = useSelector((state) => state.Drawing);
 
   const handleMergeClick = () => {
     // setSelectedLines([]);
@@ -60,6 +64,10 @@ const WallPropertiesPopup = ({
       deleteSelectedLines();
     }
   };
+
+  const handleLockClick = () => {
+    dispatch(setLockForLines(!locked));
+  }
 
   return (
     <div>
@@ -115,7 +123,7 @@ const WallPropertiesPopup = ({
               disabled
             />
           </div>
-          <div className="divider"></div>
+          {/* <div className="divider"></div> */}
           {selectionMode || lineBreak || merge ? (
             <div className="btn-container">
               <div
@@ -135,7 +143,7 @@ const WallPropertiesPopup = ({
                 <Typography className="contextual-btn-text">Merge</Typography>
               </div>
               {lineBreak || merge ? null : (
-                <div className="btn">
+                <div className="btn" style={{ border: locked ? "2px solid cornflowerblue" : "" }} onClick={handleLockClick} >
                   <img src={Unlocked} alt="" />
                   <Typography className="contextual-btn-text">Lock</Typography>
                 </div>
@@ -149,7 +157,11 @@ const WallPropertiesPopup = ({
                 </div>
               )}
             </div>
-          ) : null}
+          ) : 
+          <div className="btn-container">
+            <Typography modifiers={["helpText"]}>(Press esc to enter selection mode)</Typography>
+          </div>
+          }
         </div>
       </div>
     </div>

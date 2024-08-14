@@ -34,6 +34,9 @@ import DoorPropertiesPopup from "./component/DoorPropertiesPopup.js";
 import RailingPropertiesPopup from "./component/RailingPropertiesPopup.js";
 import RoomNamePopup from "./component/RoomNamePopup.js";
 import RoomFiller from "./component/roomFiller.js";
+import ScalePopup from "./component/ScalePopup.js";
+import blade from "./assets/blade.png"
+import { setShowPopup } from "./Actions/DrawingActions.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -51,11 +54,9 @@ export const CanvasComponent = () => {
     perpendicularHandler,
     newLine,
     setNewLine,
+    undo,
     redo,
-    selectionMode,
-    selectedLines,
     setSelectedLines,
-    setSelectionMode,
     toggleDragMode,
     toggleDoorWindowMode,
     doorWindowMode,
@@ -97,7 +98,7 @@ export const CanvasComponent = () => {
   } = useDrawing();
 
   const { leftPos, rightPos, merge, lineBreak } = useSelector((state) => state.drawing)
-  const { storeBoxes, roomSelectorMode} = useSelector((state) => state.ApplicationState);
+  const { storeBoxes, roomSelectorMode, selectionMode,selectedLines} = useSelector((state) => state.ApplicationState);
 
 
   const getUrlParameter = (name) => {
@@ -113,33 +114,23 @@ export const CanvasComponent = () => {
   );
 
   const handleKeyDown = (event) => {
-    if (event.key === "x" || event.key === "X") {
-      deleteLastPoint();
-    }
     if (event.key === "s" || event.key === "S") {
       setStop(!stop);
     }
     if((event.key === "r" || event.key === "R") && !event.ctrlKey && roomSelectorMode){
       room();
-
-    }
-    if(event.ctrlKey&&(event.key === "q" || event.key === "Q")){
-      dispatch(showRoomNamePopup(true));
-      // room();
-      
     }
     if(event.ctrlKey&&(event.key === "z" || event.key === "Z")){
-      deleteLastPoint();
+      // deleteLastPoint();
+      undo();
     }
     if(event.ctrlKey&&(event.key === "y" || event.key === "Y")){
       redo();
     }
     if(event.key === "escape" || event.key === "Escape" && !roomSelectorMode && !merge && !lineBreak){
       // escape();
+      dispatch(setShowPopup(false))
       toggleSelectionMode();
-    }
-    if(event.key === "Enter" && scale){
-      handleDoubleClick();
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
       deleteSelectedLines();
@@ -156,12 +147,8 @@ export const CanvasComponent = () => {
 
   useEffect(() => {
     // console.log(type_id);
-    console.log(storeLines);
-    console.log(points);
-    console.log(lineId);
     // console.log(cookies);
     const floorplanId = getUrlParameter('floorplanId');
-    console.log(floorplanId)
     RomeDataManager.instantiate();
     if (cookies.get("USER-SESSION", { path: "/" }) !== undefined) {
       const result = cookies.get("LOGIN-RESPONSE", { path: "/" });
@@ -180,7 +167,7 @@ export const CanvasComponent = () => {
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        style={selectionMode?{ cursor: "grab"}:{cursor:"crosshair"}}
+        style={ scale? {cursor:'grab'}: lineBreak ?{cursor:`url(${blade}) 8 8, crosshair`} :selectionMode?{ cursor: "grab"}:{cursor:'crosshair'}}
       >
         {/* 2D (Orthographic) Canvas */}
         <Canvas
@@ -288,14 +275,14 @@ export const CanvasComponent = () => {
           
         </Canvas>
         <DrawtoolHeader
-            deleteLastPoint={deleteLastPoint}
+            undo={undo}
             redo={redo}
             handleSaveClick={handleSaveClick}
             handleDoubleClick={handleDoubleClick}
             handleReset={handleReset}
           />
       </div>
-      {!scale &&
+      {!scale ?
       <div className="button-container">
         {/* 3D (Perspective) Canvas */}
         {/* <div className="perspective-canvas">
@@ -420,6 +407,10 @@ export const CanvasComponent = () => {
           <RoomNamePopup />
           <ButtonComponent setNewLine={escape} selectionMode={selectionMode} toggleSelectionMode={toggleSelectionMode} />
         </div>
+      </div>
+      :
+      <div className="button-container">
+        <ScalePopup handleDoubleClick={handleDoubleClick}/>
       </div>
       }
     </div>

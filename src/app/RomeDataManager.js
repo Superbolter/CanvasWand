@@ -110,7 +110,6 @@ export default class RomeDataManager        {
       if (!!accessToken) {
          this._access_token = accessToken;
       }
-       console.log(accessToken)
        this._userEmail = email;
    }
 

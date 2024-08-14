@@ -19,6 +19,7 @@ const initialState = {
   leftPos: new Vector3(-50, 0, 0),
   rightPos: new Vector3(50, 0, 0),
   userLength: 0,
+  userWidth: 6,
   lineBreak: false,
   merge: false
 };
@@ -64,17 +65,6 @@ export const drawingSlice = createSlice({
     setType: (state, action) => {
       state.type = action.payload;
     },
-    updateLineTypeId: (state, action) => {
-      const { id, typeId } = action.payload;
-      console.log(state.ApplicationState.storeLines);
-      const lineIndex = state.ApplicationState.storeLines.findIndex(line => line.id === id);
-      if (lineIndex !== -1) {
-        state.storeLines[lineIndex].typeId = typeId;
-        state.height=state.ApplicationState.storeLines[lineIndex].height;
-        state.width=state.ApplicationState.storeLines[lineIndex].width;
-        console.log(state.ApplicationState.storeLines)
-      }
-    },
     setSelectedButton: (state,action) => {
       state.selectedButton = action.payload
     },
@@ -86,6 +76,9 @@ export const drawingSlice = createSlice({
     },
     setUserLength: (state,action) => {
       state.userLength = action.payload
+    },
+    setUserWidth: (state,action) => {
+      state.userWidth = action.payload
     },
     setLineBreakState: (state,action) => {
       state.lineBreak = action.payload
@@ -117,6 +110,7 @@ export const {
   setLeftPosState,
   setRightPosState,
   setUserLength,
+  setUserWidth,
   setLineBreakState,
   setMergeState
 } = drawingSlice.actions;
