@@ -46,6 +46,7 @@ import { handleDownload } from "../component/ConvertToJson.js";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { toast } from 'react-hot-toast';
+import { fetchWrapper } from "../app/RomeDataManager.js";
 
 const MySwal = withReactContent(Swal);
 
@@ -1378,9 +1379,10 @@ export const useDrawing = () => {
         backdrop: true,
       });
     } else {
-      setTimeout(() => {
-        window.location.href = "https://www.superbolter.com/";
-      }, 2000);
+      fetchWrapper.post(`/floorplans/process_draw_data/${floorplanId}`).then((res)=>{
+        console.log(res)
+        // window.location.href = "https://sbst-beta.getsuperbolt.com/my-homes";
+      })
     }
     handleApiCall();
   };
