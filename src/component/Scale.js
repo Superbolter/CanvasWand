@@ -23,13 +23,30 @@ export const Scale = () => {
 const [rightJawActivated, setRightJawActivated] = useState(false);
   const tolerance = 1e-3;
 
-  useEffect(() => {
-    if (firstLoad) {
-      setFirstLoad(false);
-      dispatch(setLeftPosState(new Vector3(-50, 0, 0)));
-      dispatch(setRightPosState(new Vector3(50, 0, 0)));
+  useEffect(()=>{
+    const updateMesh = (pointA, pointB) => {
+      const midpoint = new Vector3().addVectors(pointA, pointB).multiplyScalar(0.5);
+      setPosition(midpoint);
+
+      const angle = Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x);
+      setLineAngle(angle);
+      mesh.current.rotation.z = angle;
+
+      mesh.current.position.set(midpoint.x, midpoint.y, 0);
+    };
+
+
+    if(firstLoad){
+      setFirstLoad(false)
+      updateMesh(leftPos, rightPos)
+      const l = Math.abs(rightPos.x - leftPos.x) < 15 ? Math.abs(rightPos.y - leftPos.y) : Math.abs(rightPos.x - leftPos.x);
+      const w = 15;
+      const h = 0;
+      setDimensions({l,w,h})
+      // dispatch(setLeftPosState(new Vector3(-50, 0, 0)))
+      // dispatch(setRightPosState(new Vector3(50, 0, 0)))
     }
-  }, [firstLoad]);
+  },[firstLoad])
 
   useEffect(() => {
     const canvasContainer = document.querySelector(".canvas-container");
