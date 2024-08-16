@@ -657,16 +657,18 @@ export const useDrawing = () => {
     const pointsToKeep = [];
 
   
-    updatedLines.forEach((line) => {
-      pointsToKeep.push(line.points[0], line.points[1]);
-    });
-  
-    const updatedPoints = points.filter((point) =>
-      pointsToKeep.some((p) => p.equals(point))
-    );
-  
-    dispatch(setStoreLines(updatedLines));
-    dispatch(setPoints(updatedPoints));
+    if(updatedLines){
+      updatedLines.forEach((line) => {
+        pointsToKeep.push(line.points[0], line.points[1]);
+      });
+    
+      const updatedPoints = points.filter((point) =>
+        pointsToKeep.some((p) => p.equals(point))
+      );
+    
+      dispatch(setStoreLines(updatedLines));
+      dispatch(setPoints(updatedPoints));
+    }
     setSelectedLines([]);
   
     // Show hot-toast with the count of locked lines
