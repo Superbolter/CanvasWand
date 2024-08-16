@@ -739,6 +739,7 @@ export const useDrawing = () => {
       !dragMode
     )
       return; // No point to start from or not in perpendicular mode
+    if(roomSelectorMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
     const rect = canvasContainer.getBoundingClientRect();
@@ -1354,6 +1355,7 @@ export const useDrawing = () => {
 
   const handleSaveClick = () => {
     if (!roomSelectorMode) {
+      handleApiCall();
       if (!selectionMode) {
         toggleSelectionMode();
       }
@@ -1379,12 +1381,14 @@ export const useDrawing = () => {
         backdrop: true,
       });
     } else {
-      fetchWrapper.post(`/floorplans/process_draw_data/${floorplanId}`).then((res)=>{
-        console.log(res)
-        // window.location.href = "https://sbst-beta.getsuperbolt.com/my-homes";
-      })
+      handleApiCall();
+      setTimeout(() => {
+        fetchWrapper.post(`/floorplans/process_draw_data/${floorplanId}`).then((res)=>{
+          console.log(res)
+          // window.location.href = "https://sbst-beta.getsuperbolt.com/my-homes";
+        })
+      }, 1000);
     }
-    handleApiCall();
   };
 
   const handleReset = () => {
