@@ -2,6 +2,7 @@ import React, {useEffect, useMemo} from "react";
 import { Canvas, extend } from "@react-three/fiber";
 import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
 import { useDispatch, useSelector } from "react-redux";
+import { Text } from "@react-three/drei"; 
 import convert from "convert-units";
 import CreateFiller from "./filler";
 import Window from "../assets/Window.png"
@@ -13,6 +14,7 @@ import { setStoreBoxes } from "../Actions/ApplicationStateAction";
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
+
 
 
 
@@ -247,6 +249,17 @@ useEffect(()=>{
 
 if (!start || !end) return null;
 
+// Calculate the text position slightly above the midpoint
+const textPosition = new Vector3(
+  midpoint.x - 20 * Math.sin(angle),
+  midpoint.y + 20 * Math.cos(angle),
+  0.1 // Ensure it's above the box geometry
+);
+
+// Calculate the rotation angle for the text based on the line angle
+const textRotation = angle;
+
+
   
   return (
     <>
@@ -286,6 +299,20 @@ if (!start || !end) return null;
           opacity={opacity}
         />
       </mesh>
+
+       {/* Text to display the length of the box */}
+       <Text
+        position={textPosition}
+        rotation={[0, 0, textRotation]}
+        fontSize={12}
+        color="black"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {`${(length*factor[0]).toFixed(2)} ${measured}`}
+      </Text>
+
+
       <mesh position={end}>
         <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial
