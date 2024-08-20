@@ -281,7 +281,8 @@ const textRotation = angle;
               : wallTexture
           }
           width={typeId===4?"10px":"20px"}
-          transparent={false}
+          transparent={true}
+          opacity={0.9}
         />
       </mesh>
 

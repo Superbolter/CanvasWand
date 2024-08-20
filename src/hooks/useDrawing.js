@@ -1017,7 +1017,8 @@ export const useDrawing = () => {
 
     if (newLine) {
       setStop(!stop);
-      dispatch(setContextualMenuStatus(true));
+      const pointToSend = [point?.x + 40, point?.y , point?.z];
+      dispatch(setContextualMenuStatus(true,pointToSend,"neutral"));
       setNewLine(false);
       point = snapToPoint(point, points, storeLines);
 
@@ -1040,7 +1041,8 @@ export const useDrawing = () => {
     }
 
     if (points.length >= 1) {
-      dispatch(setContextualMenuStatus(true));
+      const pointToSend = [point?.x + 40, point?.y - 20 , point?.z];
+      dispatch(setContextualMenuStatus(true,pointToSend, "neutral"));
       addPoint(point, newPoints[newPoints.length - 2]);
     }
 
@@ -1198,7 +1200,24 @@ export const useDrawing = () => {
     }
 
     if (!lineBreak && !merge && !roomSelectorMode) {
-      dispatch(setContextualMenuStatus(true));
+      const line = storeLines.find((line) => line.id === id);
+      let pointToSend = [0,0,0];
+      let idx = 0; 
+      let position = "neutral";
+      if(line?.points[0]?.x > line?.points[1]?.x){
+        idx = 1;
+      }
+      if(line?.points[1]?.y > line?.points[0]?.y){
+        idx = 1;
+      }
+      if(Math.abs(line?.points[0]?.x - line?.points[1]?.x)<40){
+        pointToSend = [line?.points[idx]?.x + 40, line?.points[idx]?.y - 20  , line?.points[idx]?.z];
+        position = "right";
+      }else{
+        pointToSend = [line?.points[idx]?.x + 20, line?.points[idx]?.y - 40, line?.points[idx]?.z];
+        position = "bottom";
+      }
+      dispatch(setContextualMenuStatus(true, pointToSend, position));
     }
 
     if (lineBreak) {

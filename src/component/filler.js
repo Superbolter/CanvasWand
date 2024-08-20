@@ -38,9 +38,10 @@
 // export default CreateFiller;
 
 
-import React from "react";
+import React, { useMemo } from "react";
 import { extend } from "@react-three/fiber";
-import { Shape, ShapeGeometry, MeshBasicMaterial } from "three";
+import { Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
+import Wall from "../assets/Walll.png"
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -56,6 +57,12 @@ const createQuadrilateral = (p1, p2, p3, p4) => {
 };
 
 const CreateFiller = ({ p1, p2, p3, p4 }) => {
+  const textureLoader = useMemo(() => new TextureLoader(), []);
+
+  const wallTexture = useMemo(
+    () => textureLoader.load(Wall), // Replace with the path to your window image
+    [textureLoader]
+  );
   if (!p1 || !p2 || !p3 || !p4) {
     // console.error("One or more points are undefined", { p1, p2, p3, p4 });
     return null;
@@ -70,7 +77,8 @@ const CreateFiller = ({ p1, p2, p3, p4 }) => {
   return (
     <mesh>
     <shapeGeometry attach="geometry" args={[shape]} />
-    <meshBasicMaterial attach="material" args={[material]} />
+    {/* <meshBasicMaterial attach="material" args={[material]} transparent={true} opacity={0.75}/> */}
+    <meshBasicMaterial map={wallTexture} transparent={true} opacity={0.9}/>
     </mesh>
   );
 };

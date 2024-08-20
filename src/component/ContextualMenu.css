@@ -1,7 +1,7 @@
 .contextual-menu-component{
-    position: absolute;
+    /* position: absolute;
     bottom:194px;
-    right: 304px;
+    right: 304px; */
     width: 275px;
     height: 66px;
     background-color: white;
@@ -9,7 +9,36 @@
     display: flex;
     align-items: center;
     justify-content: space-around;
+    position: relative;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+
+.right {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-right: 10px solid white;
+    border-bottom: 10px solid transparent;
+    left: -10px; 
+    top: 50%;
+    transform: translateY(-50%);
+    filter: drop-shadow(0px -2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.bottom{
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid white;
+    left: 20px; 
+    top: -10px; 
+    filter: drop-shadow(0px -2px 4px rgba(0, 0, 0, 0.1));
+}
+
 .contextual-menu-element{
     width: 64px;
     height: 58px;

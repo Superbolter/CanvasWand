@@ -62,10 +62,16 @@ export const setLockForLines = (val) =>{
   }
 }
   
-export const setContextualMenuStatus=(value)=>({
-     type: "SET_CONTEXTUAL_MENU_STATUS",
-     payload:value,
-})
+export const setContextualMenuStatus=(value, position=[0,0,0], positionType="neutral")=>{
+  return(dispatch) => {
+    dispatch({
+      type: "SET_CONTEXTUAL_MENU_STATUS",
+      payload: value,
+      position,
+      positionType
+    });
+  }
+}
 export const setLineId=(lineId)=>({
   type:"SET_LINE_ID",
   payload:lineId,

@@ -4,6 +4,8 @@ const initialState = {
     lineId:null,
     showPropertiesPopup: false,
     locked: false,
+    position: [0, 0, 0],
+    positionType: "neutral"
   };
   
   const DrawingReducer = (state = initialState, action) => {
@@ -17,6 +19,8 @@ const initialState = {
         return {
           ...state,
           contextualMenuStatus: action.payload,
+          position: action.position,
+          positionType: action.positionType
         };
       case "SET_LINE_ID":
         return {

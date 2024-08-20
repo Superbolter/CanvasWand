@@ -250,7 +250,7 @@ export const CanvasComponent = () => {
             <CreateFiller key={index} p1={box.p1} p2={box.p2} p3={box.p3} p4={box.p4} />
           ))}
 
-          
+          {!scale && <ContextualMenu/>}
 
           {!scale && roomSelectorMode && roomSelectors.map((room) =>(<RoomFiller 
            key={room.roomId}
@@ -349,7 +349,6 @@ export const CanvasComponent = () => {
           )}
         </div>  */}
         <div style={{ position: "relative" }}>
-          {contextualMenuStatus && <ContextualMenu/>}
           <div
           className="perspective-canvas"
           style={{
