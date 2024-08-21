@@ -757,8 +757,8 @@ export const useDrawing = () => {
 
     let point = new Vector3(posX, posY, 0);
 
-    if (perpendicularLine && draggingPointIndex === null) {
-      point = calculateAlignedPoint(points[points.length - 1], point);
+    if (!perpendicularLine && draggingPointIndex === null) {
+      point = calculateAlignedPoint(points[points.length-2]||new Vector3(0,0,0),points[points.length - 1], point);
     }
 
     setCurrentMousePosition(point);
@@ -1029,8 +1029,8 @@ export const useDrawing = () => {
       return;
     }
 
-    if (perpendicularLine && points.length > 0) {
-      point = calculateAlignedPoint(points[points.length - 1], point);
+    if (!perpendicularLine && points.length > 0) {
+      point = calculateAlignedPoint(points[points.length-2]||new Vector3(0,0,0),points[points.length - 1], point);
     }
     point = snapToPoint(point, points, storeLines); //snapping
     const newPoints = [...points, point];
