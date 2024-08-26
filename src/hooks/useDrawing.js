@@ -1042,7 +1042,7 @@ export const useDrawing = () => {
 
     if (newLine) {
       setStop(!stop);
-      const pointToSend = [point?.x + 40, point?.y , point?.z];
+      const pointToSend = [point?.x + 40, point?.y + 100 , point?.z];
       dispatch(setContextualMenuStatus(true,pointToSend,"neutral"));
       setNewLine(false);
       point = snapToPoint(point, points, storeLines);
@@ -1066,7 +1066,7 @@ export const useDrawing = () => {
     }
 
     if (points.length >= 1) {
-      const pointToSend = [point?.x + 40, point?.y - 20 , point?.z];
+      const pointToSend = [point?.x + 40, point?.y + 100 , point?.z];
       dispatch(setContextualMenuStatus(true,pointToSend, "neutral"));
       addPoint(point, newPoints[newPoints.length - 2]);
     }
@@ -1249,7 +1249,7 @@ export const useDrawing = () => {
       if(line?.points[1]?.y > line?.points[0]?.y){
         idx = 1;
       }
-      if(Math.abs(line?.points[0]?.x - line?.points[1]?.x)<40){
+      if(Math.abs(line?.points[0]?.x - line?.points[1]?.x)< Math.abs(line?.points[0]?.y - line?.points[1]?.y)){
         pointToSend = [line?.points[idx]?.x + 40, line?.points[idx]?.y - 20  , line?.points[idx]?.z];
         position = "right";
       }else{

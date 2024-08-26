@@ -16,22 +16,26 @@ const ContextualMenu = () => {
     (state) => state.Drawing
   );
   
-  const handleWallClick = () => {
+  const handleWallClick = (e) => {
+    e.stopPropagation();
     dispatch(updateLineTypeId(1));
     dispatch(setTypeId(1));
     dispatch(setSelectedLinesState([]));
   };
-  const handleDoorClick = () => {
+  const handleDoorClick = (e) => {
+    e.stopPropagation();
     dispatch(updateLineTypeId(2));
     dispatch(setTypeId(2));
     dispatch(setSelectedLinesState([]));
   };
-  const handleWindowClick = () => {
+  const handleWindowClick = (e) => {
+    e.stopPropagation();
     dispatch(updateLineTypeId(3));
     dispatch(setTypeId(3));
     dispatch(setSelectedLinesState([]));
   };
-  const handleRailingClick = () => {
+  const handleRailingClick = (e) => {
+    e.stopPropagation();
     dispatch(updateLineTypeId(4));
     dispatch(setTypeId(4));
     dispatch(setSelectedLinesState([]));
