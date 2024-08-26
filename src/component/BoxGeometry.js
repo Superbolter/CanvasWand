@@ -245,7 +245,24 @@ useEffect(()=>{
       dispatch(setStoreBoxes(boxes))
     }
   }
-},[])
+  else{
+    const linePoints = new Set();
+    storeLines.forEach(line => {
+      line.points.forEach(point => linePoints.add(point));
+    });
+    const filteredBoxes = storeBoxes.filter(box => {
+    const { p1, p2, p3, p4 } = box;
+      return (
+        linePoints.has(p1) ||
+        linePoints.has(p2) ||
+        linePoints.has(p3) ||
+        linePoints.has(p4)
+      );
+    });
+    dispatch(setStoreBoxes(filteredBoxes))
+  }
+  
+},[storeLines])
 
 if (!start || !end) return null;
 

@@ -1007,6 +1007,8 @@ export const useDrawing = () => {
   const handleClick = (event) => {
     if (selectionMode && !lineClick) {
       setSelectedLines([]);
+      dispatch(setContextualMenuStatus(false));
+      dispatch(setShowPopup(false));
       return;
     }
     if (selectionMode || doorWindowMode || merge || scale) return; // Prevent drawing new lines in selection mode
@@ -1230,8 +1232,10 @@ export const useDrawing = () => {
     setLineClick(true);
     let storeid = [];
     if (merge) {
-      storeid = [...mergeLine, id];
-      setMergeLine([...mergeLine, id]);
+      if(!mergeLine.find(line => line === id)){
+        storeid = [...mergeLine, id];
+        setMergeLine([...mergeLine, id]);
+      }
     }
 
     if (!lineBreak && !merge && !roomSelectorMode) {
@@ -1276,6 +1280,7 @@ export const useDrawing = () => {
         dispatch(setTypeId(selectedLine.typeId || 1));
       } else {
         dispatch(setShowPopup(false));
+        dispatch(setContextualMenuStatus(false))
         dispatch(setTypeId(1));
       }
     }
