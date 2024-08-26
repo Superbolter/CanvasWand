@@ -39,8 +39,10 @@ import {
 } from "../Actions/ApplicationStateAction.js";
 import {
   setContextualMenuStatus,
+  setRedoState,
   setShowPopup,
   setTypeId,
+  setUndoStack,
 } from "../Actions/DrawingActions.js";
 import { handleDownload } from "../component/ConvertToJson.js";
 import Swal from "sweetalert2";
@@ -67,7 +69,7 @@ export const useDrawing = () => {
     lineBreak,
     merge,
   } = useSelector((state) => state.drawing);
-  const { typeId, contextualMenuStatus } = useSelector(
+  const { typeId, contextualMenuStatus, actionHistory, redoStack} = useSelector(
     (state) => state.Drawing
   );
   const {
@@ -106,10 +108,18 @@ export const useDrawing = () => {
 
   const [snappingPoint, setSnappingPoint] = useState([]);
   const [showSnapLine, setShowSnapLine] = useState(false);
-  const [actionHistory, setActionHistory] = useState([]);
-  const [redoStack, setRedoStack] = useState([]);
+  // const [actionHistory, setActionHistory] = useState([]);
+  // const [redoStack, setRedoStack] = useState([]);
   // const [leftPos, setLeftPosState] = useState(new Vector3(-5, 0, 0));
   // const [rightPos, setRightPosState] = useState(new Vector3(5, 0, 0));
+
+  const setActionHistory = (data) =>{
+    dispatch(setUndoStack(data))
+  }
+
+  const setRedoStack = (data) =>{
+    dispatch(setRedoState(data))
+  }
 
   const setSelectedLines = (data) => {
     dispatch(setSelectedLinesState(data));
@@ -402,6 +412,7 @@ export const useDrawing = () => {
       newBoxes: [...storeBoxes],
     });
     setActionHistory(history);
+    setRedoStack([]);
   };
 
   // Function to compare two Vector3 objects
@@ -474,7 +485,8 @@ export const useDrawing = () => {
   };
 
   const undo = () => {
-    const lastAction = actionHistory.pop();
+    const newStack = [...actionHistory];
+    const lastAction = newStack.pop();
     if (!lastAction) return; // No action to undo
 
     const redoStackCopy = [...redoStack, lastAction];
@@ -517,16 +529,22 @@ export const useDrawing = () => {
         dispatch(setPoints([...lastAction.previousPoints]));
         dispatch(setStoreBoxes([...lastAction.previousBoxes]));
         break;
-  
+      
+      case 'replace':
+        dispatch(setStoreLines([...lastAction.previousLines]));
+        break;
+
       default:
         break;
       }
-      setActionHistory([...actionHistory]);
+      setActionHistory(newStack);
+      // setActionHistory([...actionHistory]);
   };
   
 
   const redo = () => {
-    const lastRedoAction = redoStack.pop();
+    const newStack = [...redoStack];
+    const lastRedoAction = newStack.pop();
     if (!lastRedoAction) return; // No action to redo
 
     // Push the redone action back to the undo stack
@@ -580,12 +598,16 @@ export const useDrawing = () => {
         dispatch(setPoints([...lastRedoAction.newPoints]));
         dispatch(setStoreBoxes([...lastRedoAction.newBoxes]));
         break;
+      
+      case 'replace':
+        dispatch(setStoreLines([...lastRedoAction.currentLines]));
+        break;
 
       default:
         break;
     }
-
-    setRedoStack([...redoStack]); // Update the redo stack
+    setRedoStack(newStack);
+    // setRedoStack([...redoStack]); // Update the redo stack
   };
 
   const deleteSelectedLines = () => {
@@ -653,6 +675,7 @@ export const useDrawing = () => {
       deletedBoxes
     });
     setActionHistory(history);
+    setRedoStack([]);
   
     const pointsToKeep = [];
 
@@ -1091,7 +1114,7 @@ export const useDrawing = () => {
     if (selectedLines.length === 0) {
       return;
     } else {
-      let newMergeLines= [...mergeLine]
+      let newMergeLines= []
       selectedLines.forEach((line)=>{
         newMergeLines.push(line)
       })
@@ -1129,10 +1152,11 @@ export const useDrawing = () => {
         Math.abs(idx1 - idx2) === 1 &&
         line1.points[1].equals(line2.points[0])
       ) {
-        if (
-          line1.points[0].x === line2.points[1].x ||
-          line1.points[0].y === line2.points[1].y
-        ) {
+        // if (
+        //   line1.points[0].x === line2.points[1].x ||
+        //   line1.points[0].y === line2.points[1].y
+        // ) {
+        if(line1.typeId=== 1 && line2.typeId=== 1){
           const newline = {
             ...line1,
             points: [line1.points[0], line2.points[1]],
@@ -1155,6 +1179,15 @@ export const useDrawing = () => {
           i = Math.max(0, i - 1); // Re-check from the previous line for further merging
         } else {
           i++;
+          toast(`Some lines were not wall and could not be merged with a wall.`, {
+            icon: '⚠️',
+            style: {
+              color: '#000',
+              boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)',
+              borderRadius: '8px',
+              fontFamily: "'DM Sans', sans-serif",
+            },
+          });
         }
       } else {
         i++;
@@ -1165,8 +1198,10 @@ export const useDrawing = () => {
       dispatch(setStoreLines(updatedLine));
       setMergeLine([]);
       setActionHistory(history);
+      setRedoStack([]);
     }
     setSelectedLines([]);
+    dispatch(setContextualMenuStatus(false));
 
     // Show a hot-toast notification if any lines were locked
     if (lockedCount > 0) {
@@ -1349,6 +1384,7 @@ export const useDrawing = () => {
       newPoint: point, // store the breakpoint location
     });
     setActionHistory(history);
+    setRedoStack([]);
   };
 
   const handleApiCall = () => {

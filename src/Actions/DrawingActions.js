@@ -77,4 +77,12 @@ export const setLineId=(lineId)=>({
   payload:lineId,
 })
 
+export const setUndoStack = (undoStack) => ({
+  type: "UPDATE_UNDO_DATA",
+  payload: undoStack,
+});
 
+export const setRedoState = (undoStack) => ({
+  type: "UPDATE_REDO_DATA",
+  payload: undoStack,
+});
