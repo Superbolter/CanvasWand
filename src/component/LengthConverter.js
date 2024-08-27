@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setMeasured } from '../features/drawing/drwingSlice';
 import { Typography } from '../design_system/StyledComponents/components/Typography';
 import { MenuItem, Select } from '@mui/material';
@@ -15,12 +15,13 @@ const useLengthUnitSelector = () => {
 };
 
  const LengthConverter = () => {
+    const { measured } = useSelector((state) => state.drawing);
     const { handleUnitChange } = useLengthUnitSelector();
 
     return (
         <div>
             <label htmlFor="lengthUnit"><Typography className="thickness-text">Select Length Unit:</Typography></label>
-            <Select id="lengthUnit" onChange={handleUnitChange} defaultValue={"in"} style={{height:"38px", width:"100%"}}>
+            <Select id="lengthUnit" onChange={handleUnitChange} value={measured} defaultValue={measured} style={{height:"38px", width:"100%"}}>
                 <MenuItem value="in"><Typography modifiers={["subtitle2"]}>Inches</Typography></MenuItem>
                 <MenuItem value="m"><Typography modifiers={["subtitle2"]}>Meters</Typography></MenuItem>
                 <MenuItem value="cm"><Typography modifiers={["subtitle2"]}>Centimeters</Typography></MenuItem>

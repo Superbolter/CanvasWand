@@ -19,8 +19,8 @@ const initialState = {
   leftPos: new Vector3(-50, 0, 0),
   rightPos: new Vector3(50, 0, 0),
   userLength: 0,
-  userWidth: 6,
-  userHeight: 120,
+  userWidth: 0,
+  userHeight: 0,
   lineBreak: false,
   merge: false
 };

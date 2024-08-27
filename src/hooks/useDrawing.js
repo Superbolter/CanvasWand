@@ -754,19 +754,19 @@ export const useDrawing = () => {
     let height = userHeight;
     switch (measured){
       case "in":
-        height = 120;
+        height = "120";
         break;
       case "cm":
-        height = 304.8;
+        height = "304.8";
         break;
       case "ft":
-        height = 10;
+        height = "10";
         break;
       case "m":
-        height = 3.05;
+        height = "3.05";
         break;
       case "mm":
-        height = 3048;
+        height = "3048";
         break;
       default:
         break;
@@ -778,7 +778,7 @@ export const useDrawing = () => {
     const hfactor = INITIAL_HEIGHT / height;
     dispatch(setFactor([lfactor, wfactor, hfactor]));
     dispatch(setScale(false));
-    handleApiCall();
+    handleApiCall(height)
   };
 
   const handleMouseMove = (event) => {
@@ -1417,7 +1417,7 @@ export const useDrawing = () => {
     setRedoStack([]);
   };
 
-  const handleApiCall = () => {
+  const handleApiCall = (height = userHeight) => {
     const lines = storeLines;
     const distance = Math.sqrt(
       (rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2
@@ -1428,7 +1428,7 @@ export const useDrawing = () => {
       distance: distance,
       unitLength: userLength,
       userWidth: userWidth,
-      userHeight: userHeight,
+      userHeight: height,
       unitType: measured,
     };
     const data = handleDownload(lines, points, roomSelectors, storeBoxes);
