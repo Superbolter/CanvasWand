@@ -15,6 +15,7 @@ import {
   setUserLength,
   setLineBreakState,
   setMergeState,
+  setUserHeight,
 } from "../features/drawing/drwingSlice.js";
 import {
   uniqueId,
@@ -66,6 +67,7 @@ export const useDrawing = () => {
     rightPos,
     userLength,
     userWidth,
+    userHeight,
     lineBreak,
     merge,
   } = useSelector((state) => state.drawing);
@@ -749,11 +751,31 @@ export const useDrawing = () => {
   };
 
   const handleDoubleClick = async () => {
-    const userHeight = 120; // 10 feet = 120 inches
+    let height = userHeight;
+    switch (measured){
+      case "in":
+        height = 120;
+        break;
+      case "cm":
+        height = 304.8;
+        break;
+      case "ft":
+        height = 10;
+        break;
+      case "m":
+        height = 3.05;
+        break;
+      case "mm":
+        height = 3048;
+        break;
+      default:
+        break;
+    }
+    dispatch(setUserHeight(height))
     dispatch(setUserLength(userLength));
     const lfactor = userLength / leftPos.distanceTo(rightPos);
     const wfactor = INITIAL_BREADTH / userWidth;
-    const hfactor = INITIAL_HEIGHT / userHeight;
+    const hfactor = INITIAL_HEIGHT / height;
     dispatch(setFactor([lfactor, wfactor, hfactor]));
     dispatch(setScale(false));
     handleApiCall();
@@ -1406,8 +1428,8 @@ export const useDrawing = () => {
       distance: distance,
       unitLength: userLength,
       userWidth: userWidth,
-      userHeight: 120,
-      unitType: "inch",
+      userHeight: userHeight,
+      unitType: measured,
     };
     const data = handleDownload(lines, points, roomSelectors, storeBoxes);
     const finalData = {

@@ -5,6 +5,7 @@ import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant";
 import * as THREE from "three";
 import {
   setLeftPosState,
+  setMeasured,
   setRightPosState,
   setRoomSelectors,
   setScale,
@@ -77,6 +78,7 @@ export const drawToolData = (floorplan_id) => {
         dispatch(setStoreBoxes(drawData.storeBoxes));
         if (response.data.scale !== null) {
           const scaleData = JSON.parse(response.data.scale);
+          dispatch(setMeasured(scaleData?.unitType || "in"))
           const userHeight = scaleData?.userHeight;
           const userLength = scaleData.unitLength;
           const userWidth = scaleData?.userWidth
@@ -183,6 +185,7 @@ export const updateLineTypeId = (typeId) => {
         dispatch(setStoreLines(updateLines)) 
         dispatch(setContextualMenuStatus(false))        
     } else {
+      const measured = state.drawing.measured
       const lineIndex = storeLines.length - 1;
       if (lineIndex !== -1) {
         storeLines[lineIndex] = {
@@ -193,8 +196,8 @@ export const updateLineTypeId = (typeId) => {
           type: "SET_PROPERTY_POPUP",
           payload: true,
         });
-        const height = convert(storeLines[lineIndex].height).from('mm').to('in')
-        const width = convert(storeLines[lineIndex].width).from('mm').to('in')
+        const height = convert(storeLines[lineIndex].height).from('mm').to(measured)
+        const width = convert(storeLines[lineIndex].width).from('mm').to(measured)
         dispatch({
           type: "SET_HEIGHT",
           payload: height,
