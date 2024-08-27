@@ -19,6 +19,7 @@ const DoorPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
   const { typeId, showPropertiesPopup } = useSelector((state) => state.Drawing);
   const { height, width, roomSelectorMode } = useSelector((state) => state.ApplicationState);
   const { locked } = useSelector((state) => state.Drawing);
+  const { measured } = useSelector((state) => state.drawing);
   const dispatch = useDispatch();
   const handleCloseClick = () => {
     dispatch(setTypeId(1));
@@ -57,8 +58,8 @@ const DoorPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
             <TextField
               style={{ width: "100%", height: "34px" }}
               id="outlined-required"
-              placeholder="inch"
-              label="inch"
+              placeholder={measured}
+              label={measured}
               variant="outlined"
               size="small"
               required={true}
@@ -72,8 +73,8 @@ const DoorPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
             <TextField
               style={{ width: "100%", height: "34px" }}
               id="outlined-required"
-              placeholder="inch"
-              label="inch"
+              placeholder={measured}
+              label={measured}
               variant="outlined"
               size="small"
               required={true}
