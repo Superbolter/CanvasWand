@@ -102,7 +102,7 @@ const BoxGeometry = ({
 
 
   const { measured, roomSelect,newline } = useSelector((state) => state.drawing);
-  const { storeLines, factor, storeBoxes} = useSelector((state) => state.ApplicationState);
+  const { storeLines, factor, storeBoxes, points} = useSelector((state) => state.ApplicationState);
 
   const textureLoader = useMemo(() => new TextureLoader(), []);
   const windowTexture = useMemo(
@@ -241,28 +241,30 @@ useEffect(()=>{
       // console.log("intersection point found between mid1 and mid2",p1,p2,p3,p4)
       const data={p1,p2,p3,p4}
       const boxes = [...storeBoxes]
-      boxes.push(data)
-      dispatch(setStoreBoxes(boxes))
+      if(!boxes.find(box => box.p1.x === p1.x && box.p1.y === p1.y)){
+        boxes.push(data)
+        dispatch(setStoreBoxes(boxes))
+      }
     }
   }
   else{
-    const linePoints = new Set();
-    storeLines.forEach(line => {
-      line.points.forEach(point => linePoints.add(point));
-    });
+    const has = (p) =>{
+      return points.some(point => point.x === p.x && point.y === p.y);
+    }
     const filteredBoxes = storeBoxes.filter(box => {
     const { p1, p2, p3, p4 } = box;
       return (
-        linePoints.has(p1) ||
-        linePoints.has(p2) ||
-        linePoints.has(p3) ||
-        linePoints.has(p4)
+        has(p1) ||
+        has(p2) ||
+        has(p3) ||
+        has(p4)
       );
     });
+    console.log(filteredBoxes, storeBoxes)
     dispatch(setStoreBoxes(filteredBoxes))
   }
-  
-},[storeLines])
+
+},[points])
 
 if (!start || !end) return null;
 

@@ -651,36 +651,33 @@ export const useDrawing = () => {
       return true; // Keep lines not in selectedLines
     });
     const deletedPoints = [];
-    let deletedBoxes = [];
+    let boxes = new Set();
     deletedLines.forEach((line)=>{
       const deleteLinePoints = line.points;
       // Iterate over storeBoxes and remove the ones that match
-      const result = storeBoxes.filter(
-        (box) =>
-          !shouldRemoveBox([box.p1, box.p2, box.p3, box.p4], deleteLinePoints)
-      );
-      deletedBoxes = storeBoxes.filter(
+      const deletedBoxes = storeBoxes.filter(
         (box) =>
           shouldRemoveBox([box.p1, box.p2, box.p3, box.p4], deleteLinePoints)
       );
-      dispatch(setStoreBoxes(result));
+      deletedBoxes.forEach((box) => boxes.add(box));
       deletedPoints.push(line.points[0], line.points[1]);
     })
+    dispatch(setStoreBoxes(storeBoxes.filter((box) => !boxes.has(box))));
+
 
     const history = [...actionHistory];
     history.push({
       type: 'delete',
       deletedLines,
       deletedPoints,
-      deletedBoxes
+      deletedBoxes: Array.from(boxes),
     });
     setActionHistory(history);
     setRedoStack([]);
   
     const pointsToKeep = [];
-
   
-    if(updatedLines){
+    if(updatedLines.length>0){
       updatedLines.forEach((line) => {
         pointsToKeep.push(line.points[0], line.points[1]);
       });
@@ -691,8 +688,12 @@ export const useDrawing = () => {
     
       dispatch(setStoreLines(updatedLines));
       dispatch(setPoints(updatedPoints));
+    }else{
+      dispatch(setStoreLines([]));
+      dispatch(setPoints([]));
     }
     setSelectedLines([]);
+    dispatch(setContextualMenuStatus(false));
   
     // Show hot-toast with the count of locked lines
     if (lockedCount > 1) {
