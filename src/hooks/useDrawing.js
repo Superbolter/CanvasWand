@@ -793,7 +793,7 @@ export const useDrawing = () => {
       if (
         Math.abs(points[i].x - point.x) < 2 &&
         points[points.length - 1].y !== points[i].y &&
-        points[points.length - 1].x !== points[i].x
+        points[points.length - 1].x !== points[i].x && !selectionMode
       ) {
         cuuPoint.x = points[i].x;
         let newarr = [cuuPoint, points[i]];
@@ -803,7 +803,7 @@ export const useDrawing = () => {
       } else if (
         Math.abs(points[i].y - point.y) < 2 &&
         points[points.length - 1].y !== points[i].y &&
-        points[points.length - 1].x !== points[i].x
+        points[points.length - 1].x !== points[i].x && !selectionMode
       ) {
         cuuPoint.y = points[i].y;
         let newarr = [cuuPoint, points[i]];
@@ -1155,10 +1155,10 @@ export const useDrawing = () => {
         Math.abs(idx1 - idx2) === 1 &&
         line1.points[1].equals(line2.points[0])
       ) {
-        // if (
-        //   line1.points[0].x === line2.points[1].x ||
-        //   line1.points[0].y === line2.points[1].y
-        // ) {
+        if (
+          line1.points[0].x === line2.points[1].x ||
+          line1.points[0].y === line2.points[1].y
+        ) {
         if(line1.typeId=== 1 && line2.typeId=== 1){
           const newline = {
             ...line1,
@@ -1191,6 +1191,8 @@ export const useDrawing = () => {
               fontFamily: "'DM Sans', sans-serif",
             },
           });
+        }}else{
+          i++;
         }
       } else {
         i++;
@@ -1273,7 +1275,7 @@ export const useDrawing = () => {
     if (selectionMode &&!merged) {
       const selected = selectedLines.includes(id)
         ? selectedLines.filter((lineId) => lineId !== id)
-        : [...selectedLines, id];
+        : !merge? [id] :[...selectedLines, id];
       setSelectedLines(selected);
       if (!selectedLines.includes(id)) {
         dispatch(setShowPopup(true));

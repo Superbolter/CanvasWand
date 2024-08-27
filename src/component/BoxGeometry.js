@@ -260,7 +260,6 @@ useEffect(()=>{
         has(p4)
       );
     });
-    console.log(filteredBoxes, storeBoxes)
     dispatch(setStoreBoxes(filteredBoxes))
   }
 
