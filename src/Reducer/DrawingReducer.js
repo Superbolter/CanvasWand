@@ -5,7 +5,9 @@ const initialState = {
     showPropertiesPopup: false,
     locked: false,
     position: [0, 0, 0],
-    positionType: "neutral"
+    positionType: "neutral",
+    actionHistory: [],
+    redoStack: [],
   };
   
   const DrawingReducer = (state = initialState, action) => {
@@ -36,6 +38,16 @@ const initialState = {
         return {
          ...state,
           locked: action.payload
+        }
+      case "UPDATE_UNDO_DATA":
+        return {
+          ...state,
+          actionHistory: action.payload
+        }
+      case "UPDATE_REDO_DATA":
+        return {
+          ...state,
+          redoStack: action.payload
         }
       default:
         return state;

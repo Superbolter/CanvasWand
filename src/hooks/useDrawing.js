@@ -15,6 +15,7 @@ import {
   setUserLength,
   setLineBreakState,
   setMergeState,
+  setUserHeight,
 } from "../features/drawing/drwingSlice.js";
 import {
   uniqueId,
@@ -39,8 +40,10 @@ import {
 } from "../Actions/ApplicationStateAction.js";
 import {
   setContextualMenuStatus,
+  setRedoState,
   setShowPopup,
   setTypeId,
+  setUndoStack,
 } from "../Actions/DrawingActions.js";
 import { handleDownload } from "../component/ConvertToJson.js";
 import Swal from "sweetalert2";
@@ -64,10 +67,11 @@ export const useDrawing = () => {
     rightPos,
     userLength,
     userWidth,
+    userHeight,
     lineBreak,
     merge,
   } = useSelector((state) => state.drawing);
-  const { typeId, contextualMenuStatus } = useSelector(
+  const { typeId, contextualMenuStatus, actionHistory, redoStack} = useSelector(
     (state) => state.Drawing
   );
   const {
@@ -106,12 +110,20 @@ export const useDrawing = () => {
 
   const [snappingPoint, setSnappingPoint] = useState([]);
   const [showSnapLine, setShowSnapLine] = useState(false);
-  const [actionHistory, setActionHistory] = useState([]);
-  const [redoStack, setRedoStack] = useState([]);
-  const [nearPoint, setNearPoint] = useState(false);
-  const [nearVal, setNearVal] = useState(false);
+  // const [actionHistory, setActionHistory] = useState([]);
+  // const [redoStack, setRedoStack] = useState([]);
   // const [leftPos, setLeftPosState] = useState(new Vector3(-5, 0, 0));
   // const [rightPos, setRightPosState] = useState(new Vector3(5, 0, 0));
+  const [nearPoint, setNearPoint] = useState(false);
+  const [nearVal, setNearVal]= useState();
+
+  const setActionHistory = (data) =>{
+    dispatch(setUndoStack(data))
+  }
+
+  const setRedoStack = (data) =>{
+    dispatch(setRedoState(data))
+  }
 
   const setSelectedLines = (data) => {
     dispatch(setSelectedLinesState(data));
@@ -404,6 +416,7 @@ export const useDrawing = () => {
       newBoxes: [...storeBoxes],
     });
     setActionHistory(history);
+    setRedoStack([]);
   };
 
   // Function to compare two Vector3 objects
@@ -476,7 +489,8 @@ export const useDrawing = () => {
   };
 
   const undo = () => {
-    const lastAction = actionHistory.pop();
+    const newStack = [...actionHistory];
+    const lastAction = newStack.pop();
     if (!lastAction) return; // No action to undo
 
     const redoStackCopy = [...redoStack, lastAction];
@@ -519,16 +533,22 @@ export const useDrawing = () => {
         dispatch(setPoints([...lastAction.previousPoints]));
         dispatch(setStoreBoxes([...lastAction.previousBoxes]));
         break;
-  
+      
+      case 'replace':
+        dispatch(setStoreLines([...lastAction.previousLines]));
+        break;
+
       default:
         break;
       }
-      setActionHistory([...actionHistory]);
+      setActionHistory(newStack);
+      // setActionHistory([...actionHistory]);
   };
   
 
   const redo = () => {
-    const lastRedoAction = redoStack.pop();
+    const newStack = [...redoStack];
+    const lastRedoAction = newStack.pop();
     if (!lastRedoAction) return; // No action to redo
 
     // Push the redone action back to the undo stack
@@ -582,12 +602,16 @@ export const useDrawing = () => {
         dispatch(setPoints([...lastRedoAction.newPoints]));
         dispatch(setStoreBoxes([...lastRedoAction.newBoxes]));
         break;
+      
+      case 'replace':
+        dispatch(setStoreLines([...lastRedoAction.currentLines]));
+        break;
 
       default:
         break;
     }
-
-    setRedoStack([...redoStack]); // Update the redo stack
+    setRedoStack(newStack);
+    // setRedoStack([...redoStack]); // Update the redo stack
   };
 
   const deleteSelectedLines = () => {
@@ -631,35 +655,33 @@ export const useDrawing = () => {
       return true; // Keep lines not in selectedLines
     });
     const deletedPoints = [];
-    let deletedBoxes = [];
+    let boxes = new Set();
     deletedLines.forEach((line)=>{
       const deleteLinePoints = line.points;
       // Iterate over storeBoxes and remove the ones that match
-      const result = storeBoxes.filter(
-        (box) =>
-          !shouldRemoveBox([box.p1, box.p2, box.p3, box.p4], deleteLinePoints)
-      );
-      deletedBoxes = storeBoxes.filter(
+      const deletedBoxes = storeBoxes.filter(
         (box) =>
           shouldRemoveBox([box.p1, box.p2, box.p3, box.p4], deleteLinePoints)
       );
-      dispatch(setStoreBoxes(result));
+      deletedBoxes.forEach((box) => boxes.add(box));
       deletedPoints.push(line.points[0], line.points[1]);
     })
+    dispatch(setStoreBoxes(storeBoxes.filter((box) => !boxes.has(box))));
+
 
     const history = [...actionHistory];
     history.push({
       type: 'delete',
       deletedLines,
       deletedPoints,
-      deletedBoxes
+      deletedBoxes: Array.from(boxes),
     });
     setActionHistory(history);
+    setRedoStack([]);
   
     const pointsToKeep = [];
-
   
-    if(updatedLines){
+    if(updatedLines.length>0){
       updatedLines.forEach((line) => {
         pointsToKeep.push(line.points[0], line.points[1]);
       });
@@ -670,8 +692,12 @@ export const useDrawing = () => {
     
       dispatch(setStoreLines(updatedLines));
       dispatch(setPoints(updatedPoints));
+    }else{
+      dispatch(setStoreLines([]));
+      dispatch(setPoints([]));
     }
     setSelectedLines([]);
+    dispatch(setContextualMenuStatus(false));
   
     // Show hot-toast with the count of locked lines
     if (lockedCount > 1) {
@@ -727,14 +753,34 @@ export const useDrawing = () => {
   };
 
   const handleDoubleClick = async () => {
-    const userHeight = 120; // 10 feet = 120 inches
+    let height = userHeight;
+    switch (measured){
+      case "in":
+        height = "120";
+        break;
+      case "cm":
+        height = "304.8";
+        break;
+      case "ft":
+        height = "10";
+        break;
+      case "m":
+        height = "3.05";
+        break;
+      case "mm":
+        height = "3048";
+        break;
+      default:
+        break;
+    }
+    dispatch(setUserHeight(height))
     dispatch(setUserLength(userLength));
     const lfactor = userLength / leftPos.distanceTo(rightPos);
     const wfactor = INITIAL_BREADTH / userWidth;
-    const hfactor = INITIAL_HEIGHT / userHeight;
+    const hfactor = INITIAL_HEIGHT / height;
     dispatch(setFactor([lfactor, wfactor, hfactor]));
     dispatch(setScale(false));
-    handleApiCall();
+    handleApiCall(height)
   };
 
   const handleMouseMove = (event) => {
@@ -784,7 +830,7 @@ export const useDrawing = () => {
       if (
         Math.abs(points[i].x - point.x) < 2 &&
         points[points.length - 1].y !== points[i].y &&
-        points[points.length - 1].x !== points[i].x
+        points[points.length - 1].x !== points[i].x && !selectionMode
       ) {
         cuuPoint.x = points[i].x;
         let newarr = [cuuPoint, points[i]];
@@ -794,7 +840,7 @@ export const useDrawing = () => {
       } else if (
         Math.abs(points[i].y - point.y) < 2 &&
         points[points.length - 1].y !== points[i].y &&
-        points[points.length - 1].x !== points[i].x
+        points[points.length - 1].x !== points[i].x && !selectionMode
       ) {
         cuuPoint.y = points[i].y;
         let newarr = [cuuPoint, points[i]];
@@ -999,6 +1045,8 @@ export const useDrawing = () => {
   const handleClick = (event) => {
     if (selectionMode && !lineClick) {
       setSelectedLines([]);
+      dispatch(setContextualMenuStatus(false));
+      dispatch(setShowPopup(false));
       return;
     }
     if (selectionMode || doorWindowMode || merge || scale) return; // Prevent drawing new lines in selection mode
@@ -1032,7 +1080,7 @@ export const useDrawing = () => {
 
     if (newLine) {
       setStop(!stop);
-      const pointToSend = [point?.x + 40, point?.y , point?.z];
+      const pointToSend = [point?.x + 40, point?.y + 100 , point?.z];
       dispatch(setContextualMenuStatus(true,pointToSend,"neutral"));
       setNewLine(false);
       point = snapToPoint(point, points, storeLines);
@@ -1056,7 +1104,7 @@ export const useDrawing = () => {
     }
 
     if (points.length >= 1) {
-      const pointToSend = [point?.x + 40, point?.y - 20 , point?.z];
+      const pointToSend = [point?.x + 40, point?.y + 100 , point?.z];
       dispatch(setContextualMenuStatus(true,pointToSend, "neutral"));
       addPoint(point, newPoints[newPoints.length - 2]);
     }
@@ -1106,7 +1154,7 @@ export const useDrawing = () => {
     if (selectedLines.length === 0) {
       return;
     } else {
-      let newMergeLines= [...mergeLine]
+      let newMergeLines= []
       selectedLines.forEach((line)=>{
         newMergeLines.push(line)
       })
@@ -1148,6 +1196,7 @@ export const useDrawing = () => {
           line1.points[0].x === line2.points[1].x ||
           line1.points[0].y === line2.points[1].y
         ) {
+        if(line1.typeId=== 1 && line2.typeId=== 1){
           const newline = {
             ...line1,
             points: [line1.points[0], line2.points[1]],
@@ -1170,6 +1219,17 @@ export const useDrawing = () => {
           i = Math.max(0, i - 1); // Re-check from the previous line for further merging
         } else {
           i++;
+          toast(`Some lines were not wall and could not be merged with a wall.`, {
+            icon: '⚠️',
+            style: {
+              color: '#000',
+              boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)',
+              borderRadius: '8px',
+              fontFamily: "'DM Sans', sans-serif",
+            },
+          });
+        }}else{
+          i++;
         }
       } else {
         i++;
@@ -1180,8 +1240,10 @@ export const useDrawing = () => {
       dispatch(setStoreLines(updatedLine));
       setMergeLine([]);
       setActionHistory(history);
+      setRedoStack([]);
     }
     setSelectedLines([]);
+    dispatch(setContextualMenuStatus(false));
 
     // Show a hot-toast notification if any lines were locked
     if (lockedCount > 0) {
@@ -1210,8 +1272,10 @@ export const useDrawing = () => {
     setLineClick(true);
     let storeid = [];
     if (merge) {
-      storeid = [...mergeLine, id];
-      setMergeLine([...mergeLine, id]);
+      if(!mergeLine.find(line => line === id)){
+        storeid = [...mergeLine, id];
+        setMergeLine([...mergeLine, id]);
+      }
     }
 
     if (!lineBreak && !merge && !roomSelectorMode) {
@@ -1225,7 +1289,7 @@ export const useDrawing = () => {
       if(line?.points[1]?.y > line?.points[0]?.y){
         idx = 1;
       }
-      if(Math.abs(line?.points[0]?.x - line?.points[1]?.x)<40){
+      if(Math.abs(line?.points[0]?.x - line?.points[1]?.x)< Math.abs(line?.points[0]?.y - line?.points[1]?.y)){
         pointToSend = [line?.points[idx]?.x + 40, line?.points[idx]?.y - 20  , line?.points[idx]?.z];
         position = "right";
       }else{
@@ -1248,7 +1312,7 @@ export const useDrawing = () => {
     if (selectionMode &&!merged) {
       const selected = selectedLines.includes(id)
         ? selectedLines.filter((lineId) => lineId !== id)
-        : [...selectedLines, id];
+        : !merge? [id] :[...selectedLines, id];
       setSelectedLines(selected);
       if (!selectedLines.includes(id)) {
         dispatch(setShowPopup(true));
@@ -1256,6 +1320,7 @@ export const useDrawing = () => {
         dispatch(setTypeId(selectedLine.typeId || 1));
       } else {
         dispatch(setShowPopup(false));
+        dispatch(setContextualMenuStatus(false))
         dispatch(setTypeId(1));
       }
     }
@@ -1366,9 +1431,10 @@ export const useDrawing = () => {
       newPoint: point, // store the breakpoint location
     });
     setActionHistory(history);
+    setRedoStack([]);
   };
 
-  const handleApiCall = () => {
+  const handleApiCall = (height = userHeight) => {
     const lines = storeLines;
     const distance = Math.sqrt(
       (rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2
@@ -1379,8 +1445,8 @@ export const useDrawing = () => {
       distance: distance,
       unitLength: userLength,
       userWidth: userWidth,
-      userHeight: 120,
-      unitType: "inch",
+      userHeight: height,
+      unitType: measured,
     };
     const data = handleDownload(lines, points, roomSelectors, storeBoxes);
     const finalData = {

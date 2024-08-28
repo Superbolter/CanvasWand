@@ -32,7 +32,7 @@ const WallPropertiesPopup = ({
     setLineBreak(false);
     setMerge(false);
   };
-  const { lineBreak, merge } = useSelector((state) => state.drawing);
+  const { lineBreak, merge, measured } = useSelector((state) => state.drawing);
   const { setLineBreak, setMerge, stop, setStop } = useDrawing();
   const { height, width,roomSelectorMode } = useSelector((state) => state.ApplicationState);
   const { locked } = useSelector((state) => state.Drawing);
@@ -98,8 +98,8 @@ const WallPropertiesPopup = ({
             <TextField
               style={{ width: "100%", height: "34px" }}
               id="outlined-required"
-              placeholder="inch"
-              label="inch"
+              placeholder={measured}
+              label={measured}
               variant="outlined"
               size="small"
               required={true}
@@ -113,8 +113,8 @@ const WallPropertiesPopup = ({
             <TextField
               style={{ width: "100%", height: "34px" }}
               id="outlined-required"
-              placeholder="inch"
-              label="inch"
+              placeholder={measured}
+              label={measured}
               variant="outlined"
               size="small"
               required={true}

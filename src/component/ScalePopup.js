@@ -5,14 +5,15 @@ import "./WallPropertiesPopup.css";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserLength, setUserWidth } from "../features/drawing/drwingSlice.js";
 import { Button } from "../design_system/StyledComponents/components/Button.js";
+import LengthConverter from "./LengthConverter.js";
 
 const ScalePopup = (props) => {
   const dispatch = useDispatch();
-  const { scale, userLength, userWidth } = useSelector((state) => state.drawing);
+  const { scale, userLength, userWidth, measured } = useSelector((state) => state.drawing);
   const [error, setError] = useState(false);
 
   const handleContinueClick = () =>{
-    if(userLength===0 || userWidth===0 || userLength===undefined || userWidth===undefined){
+    if(userLength===0 || userWidth===0 || userLength===undefined || userWidth===undefined || userLength==="" || userWidth===""){
         setError(true);
         return;
     }
@@ -27,7 +28,7 @@ const ScalePopup = (props) => {
 
   return (
     <div>
-      <div className={scale? "popup-container": "popup-container-hidden"}>
+      <div className={scale? "scale-popup-container": "scale-popup-container-hidden"}>
         <div className="header-container">
           <Typography
             modifiers={["header6", "medium"]}
@@ -42,8 +43,8 @@ const ScalePopup = (props) => {
             <TextField
               style={{ width: "100%", height: "34px" }}
               id="outlined-required"
-              placeholder="inch"
-              label="inch"
+              placeholder={measured}
+              label={measured}
               variant="outlined"
               size="small"
               required={true}
@@ -57,8 +58,8 @@ const ScalePopup = (props) => {
             <TextField
               style={{ width: "100%", height: "34px" }}
               id="outlined-required"
-              placeholder="inch"
-              label="inch"
+              placeholder={measured}
+              label={measured}
               variant="outlined"
               size="small"
               required={true}
@@ -67,6 +68,7 @@ const ScalePopup = (props) => {
               onChange={(e)=> dispatch(setUserWidth(e.target.value))}
             />
           </div>
+          <LengthConverter/>
           {error && <Typography modifiers={["warning300", "helpText"]}>Don't leave the feilds empty</Typography>}
           <div className="btn-container" style={{marginTop:"10px"}}>
             <Button onClick={handleContinueClick} className='save-btn' modifiers={["blue","block"]}>Save & continue</Button>

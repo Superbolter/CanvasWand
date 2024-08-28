@@ -20,8 +20,9 @@ export const setShowPopup = (val) => {
       const lastSelectedLineId = selectedLines[selectedLines.length - 1];
       const lastSelectedLine = storeLines.filter(line => lastSelectedLineId === line.id)
       if (lastSelectedLine.length > 0) {
-        const height = convert(lastSelectedLine[0].height).from('mm').to('in')
-        const width = convert(lastSelectedLine[0].width).from('mm').to('in')
+        const measured = state.drawing.measured
+        const height = convert(lastSelectedLine[0].height).from('mm').to(measured)
+        const width = convert(lastSelectedLine[0].width).from('mm').to(measured)
         dispatch({
           type: "SET_HEIGHT",
           payload: height,
@@ -77,4 +78,12 @@ export const setLineId=(lineId)=>({
   payload:lineId,
 })
 
+export const setUndoStack = (undoStack) => ({
+  type: "UPDATE_UNDO_DATA",
+  payload: undoStack,
+});
 
+export const setRedoState = (undoStack) => ({
+  type: "UPDATE_REDO_DATA",
+  payload: undoStack,
+});

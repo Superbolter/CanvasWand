@@ -236,7 +236,7 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
         onDoubleClick={handleDoubleClick}
       >
         <boxGeometry args={[dimensions.l, dimensions.w, dimensions.h]} />
-        <meshBasicMaterial color={"#6360FB"} transparent={true} />
+        <meshBasicMaterial color={"#6360FB"} transparent={true} opacity={0.8}/>
       </mesh>
       {createJawLine(leftJaw.current?.position || new Vector3(), position)}
       {createJawLine(rightJaw.current?.position || new Vector3(), position)}
@@ -248,8 +248,8 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
 >
   <boxGeometry
     args={Math.abs(rightJaw.current?.position.y - leftJaw.current?.position.y) < tolerance
-      ? [3, 30, dimensions.h]  // Vertical
-      : [30, 3, dimensions.h]} // Horizontal
+      ? [5, 30, dimensions.h]  // Vertical
+      : [30, 5, dimensions.h]} // Horizontal
   />
    <meshBasicMaterial color={leftJawActivated ? "red" : "black"} />
 </mesh>
@@ -261,8 +261,8 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
 >
   <boxGeometry
     args={Math.abs(rightJaw.current?.position.y - leftJaw.current?.position.y) < tolerance
-      ? [3, 30, dimensions.h]  // Vertical
-      : [30, 3, dimensions.h]} // Horizontal
+      ? [5, 30, dimensions.h]  // Vertical
+      : [30, 5, dimensions.h]} // Horizontal
   />
    <meshBasicMaterial color={rightJawActivated ? "red" : "black"} />
 </mesh>
