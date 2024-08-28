@@ -9,6 +9,7 @@ import {
   setRightPosState,
   setRoomSelectors,
   setScale,
+  setUserHeight,
   setUserLength,
   setUserWidth,
 } from "../features/drawing/drwingSlice";
@@ -84,6 +85,7 @@ export const drawToolData = (floorplan_id) => {
           const userWidth = scaleData?.userWidth
           dispatch(setUserLength(userLength));
           dispatch(setUserWidth(userWidth));
+          dispatch(setUserHeight(userHeight));
           const left = new THREE.Vector3(
             scaleData.leftPos.x,
             scaleData.leftPos.y,
@@ -217,6 +219,15 @@ export const showRoomNamePopup = (value) => {
   return (dispatch) => {
     dispatch({
       type: "SHOW_ROOM_NAME_POPUP",
+      payload: value,
+    });
+  };
+};
+
+export const setExpandRoomNamePopup = (value) => {
+  return (dispatch) => {
+    dispatch({
+      type: "SET_EXPAND_ROOM_NAME_POPUP",
       payload: value,
     });
   };

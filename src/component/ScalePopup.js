@@ -51,6 +51,15 @@ const ScalePopup = (props) => {
               type="tel"
               value={userLength > 0 ? userLength : ""}
               onChange={(e)=> dispatch(setUserLength(e.target.value))}
+              InputProps={{
+                style: {
+                  fontSize: "16px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: "400",
+                  height: "44px",
+                  borderRadius: "8px",
+                },
+              }}
             />
           </div>
           <div className="thickness-input-container">
@@ -66,6 +75,15 @@ const ScalePopup = (props) => {
               type="tel"
               value={userWidth > 0 ? userWidth : ""}
               onChange={(e)=> dispatch(setUserWidth(e.target.value))}
+              InputProps={{
+                style: {
+                  fontSize: "16px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: "400",
+                  height: "44px",
+                  borderRadius: "8px",
+                },
+              }}
             />
           </div>
           <LengthConverter/>

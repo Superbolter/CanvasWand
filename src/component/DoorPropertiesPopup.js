@@ -66,6 +66,15 @@ const DoorPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
               type="tel"
               value={height > 0 ? height.toFixed(2) : ""}
               disabled
+              InputProps={{
+                style: {
+                  fontSize: "16px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: "400",
+                  height: "44px",
+                  borderRadius: "8px",
+                },
+              }}
             />
           </div>
           <div className="thickness-input-container">
@@ -81,6 +90,15 @@ const DoorPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
               type="tel"
               value={width > 0 ? width.toFixed(2) : ""}
               disabled
+              InputProps={{
+                style: {
+                  fontSize: "16px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: "400",
+                  height: "44px",
+                  borderRadius: "8px",
+                },
+              }}
             />
           </div>
 

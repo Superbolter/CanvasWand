@@ -1,5 +1,3 @@
-import { showRoomNamePopup } from "../Actions/ApplicationStateAction";
-
 const initialState = {
     floorplanId:null,
     drawnBy:null,
@@ -12,6 +10,7 @@ const initialState = {
     points:[],
     factor:[1,1,1],
     roomPopup:false,
+    expandRoomPopup: false,
     storeBoxes: [],
     roomSelectorMode: false,
     selectionMode: false,
@@ -65,7 +64,11 @@ const initialState = {
           ...state,
           roomPopup:action.payload,
         };
-      
+      case "SET_EXPAND_ROOM_NAME_POPUP":
+        return {
+          ...state,
+          expandRoomPopup:action.payload,
+        };
       case "SET_ROOM_SELECTOR_MODE":
         return {
           ...state,

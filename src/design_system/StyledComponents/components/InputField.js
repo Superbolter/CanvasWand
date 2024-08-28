@@ -17,6 +17,15 @@ const InputField = props => (
     shrink: true,
     }}
     variant="outlined"
+    InputProps={{
+        style: {
+          fontSize: "16px",
+          fontFamily: "'DM Sans', sans-serif",
+          fontWeight: "400",
+          height: "44px",
+          borderRadius: "8px",
+        },
+      }}
     />
 )
 

@@ -100,6 +100,7 @@ export const CanvasComponent = () => {
     nearVal, 
     setNearVal,
     setNearPoint,
+    addRoom
   } = useDrawing();
 
   const { leftPos, rightPos, merge, lineBreak } = useSelector((state) => state.drawing)
@@ -122,9 +123,9 @@ export const CanvasComponent = () => {
     if (event.key === "s" || event.key === "S") {
       setStop(!stop);
     }
-    if((event.key === "r" || event.key === "R") && !event.ctrlKey && roomSelectorMode){
-      room();
-    }
+    // if((event.key === "r" || event.key === "R") && !event.ctrlKey && roomSelectorMode){
+    //   room();
+    // }
     if(event.ctrlKey&&(event.key === "z" || event.key === "Z")){
       // deleteLastPoint();
       undo();
@@ -408,7 +409,7 @@ export const CanvasComponent = () => {
           <WallPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines} toggleSelectionMode={toggleSelectionSplitMode} setSelectedLines={setSelectedLines} handleMerge={handleMergeClick} />
           <DoorPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
           <RailingPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
-          <RoomNamePopup />
+          <RoomNamePopup toggleSelectionMode={toggleSelectionMode} addRoom={addRoom} />
           <ButtonComponent setNewLine={escape} selectionMode={selectionMode} toggleSelectionMode={toggleSelectionMode} />
         </div>
       </div>

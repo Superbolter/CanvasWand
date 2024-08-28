@@ -86,7 +86,7 @@ const RoomFiller = ({ roomName, wallIds }) => {
         <meshBasicMaterial attach="material" args={[material]} />
       </mesh>
       <Html
-        position={[centroid.x - 60, centroid.y + 10, centroid.z]}
+        position={[centroid.x, centroid.y, centroid.z]}
       >
         <div style={{
           display: "flex",

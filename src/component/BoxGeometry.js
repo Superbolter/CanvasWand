@@ -296,8 +296,9 @@ const textRotation = angle;
               ? windowTexture
               : typeId === 4
               ? railingTexture
-              : wallTexture
+              : ""
           }
+          color={typeId === 5 ? "orange" : ""}
           width={typeId===4?"10px":"20px"}
           transparent={true}
           opacity={0.9}

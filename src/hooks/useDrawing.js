@@ -83,6 +83,7 @@ export const useDrawing = () => {
     roomSelectorMode,
     selectionMode,
     selectedLines,
+    expandRoomPopup
   } = useSelector((state) => state.ApplicationState);
 
   const [firstTime, setFirstTime] = useState(true);
@@ -789,7 +790,7 @@ export const useDrawing = () => {
       !dragMode
     )
       return; // No point to start from or not in perpendicular mode
-    if(roomSelectorMode) return;
+    // if(roomSelectorMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
     const rect = canvasContainer.getBoundingClientRect();
@@ -861,7 +862,7 @@ export const useDrawing = () => {
     const currentDistance = lastPoint.distanceTo(point);
     setDistance(currentDistance * factor[0]);
 
-    if (draggingPointIndex !== null) {
+    if (draggingPointIndex !== null && !roomSelectorMode) {
       let beforeUpdation = points[draggingPointIndex];
 
       let prevPoint = points[draggingPointIndex - 1];
@@ -1024,6 +1025,17 @@ export const useDrawing = () => {
     // setSelectedLines([]);
     // dispatch(setRoomSelect(false));
   };
+
+  const addRoom = (roomName, roomType) => {
+    const room = {
+      roomId: uniqueId(),
+      roomName: roomName,
+      roomType: roomType,
+      wallIds: [...selectedLines],
+    };
+    dispatch(setRoomSelectors([...roomSelectors, room]));
+    setSelectedLines([]);
+  }
 
   const toggleSelectionSplitMode = () => {
     if (selectionMode) {
@@ -1312,7 +1324,7 @@ export const useDrawing = () => {
     if (selectionMode &&!merged) {
       const selected = selectedLines.includes(id)
         ? selectedLines.filter((lineId) => lineId !== id)
-        : !merge? [id] :[...selectedLines, id];
+        : !merge && !expandRoomPopup? [id] :[...selectedLines, id];
       setSelectedLines(selected);
       if (!selectedLines.includes(id)) {
         dispatch(setShowPopup(true));
@@ -1377,10 +1389,8 @@ export const useDrawing = () => {
     }
     if(storeLines[idx].typeId !==1) return;
     if (idx === -1) return; // Line not found
-    let updatedLine = storeLines[idx];
-   
     setBreakPointLocation(point);
-    
+    let updatedLine = storeLines[idx];
 
     let store = [...storeLines];
     let pointsVal = [...points];
@@ -1464,26 +1474,27 @@ export const useDrawing = () => {
         toggleSelectionMode();
       }
       dispatch(setRoomSelectorMode(true));
-      MySwal.fire({
-        title: "Room Selector Instructions",
-        html: `
-          <p style="text-align: left;">
-            1. <strong>Select all the walls</strong> of a single room.<br><br>
-            2. Once all walls are selected, <strong>press the "R" key</strong> on your keyboard to assign the room.<br><br>
-            3. <strong>Repeat this process</strong> for each additional room you wish to assign.
-          </p>
-        `,
-        icon: "info",
-        confirmButtonText: "Got it!",
-        customClass: {
-          title: "swal2-title-custom",
-          htmlContainer: "swal2-html-custom",
-          confirmButton: "swal2-confirm-button-custom",
-        },
-        width: "600px",
-        padding: "20px",
-        backdrop: true,
-      });
+      dispatch(showRoomNamePopup(true));
+      // MySwal.fire({
+      //   title: "Room Selector Instructions",
+      //   html: `
+      //     <p style="text-align: left;">
+      //       1. <strong>Select all the walls</strong> of a single room.<br><br>
+      //       2. Once all walls are selected, <strong>press the "R" key</strong> on your keyboard to assign the room.<br><br>
+      //       3. <strong>Repeat this process</strong> for each additional room you wish to assign.
+      //     </p>
+      //   `,
+      //   icon: "info",
+      //   confirmButtonText: "Got it!",
+      //   customClass: {
+      //     title: "swal2-title-custom",
+      //     htmlContainer: "swal2-html-custom",
+      //     confirmButton: "swal2-confirm-button-custom",
+      //   },
+      //   width: "600px",
+      //   padding: "20px",
+      //   backdrop: true,
+      // });
     } else {
       handleApiCall();
       setTimeout(() => {
@@ -1576,5 +1587,6 @@ export const useDrawing = () => {
     handleApiCall,
     handleReset,
     handleMergeClick,
+    addRoom
   };
 };
