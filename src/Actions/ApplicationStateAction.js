@@ -79,10 +79,11 @@ export const drawToolData = (floorplan_id) => {
         dispatch(setStoreBoxes(drawData.storeBoxes));
         if (response.data.scale !== null) {
           const scaleData = JSON.parse(response.data.scale);
-          dispatch(setMeasured(scaleData?.unitType || "in"))
-          const userHeight = scaleData?.userHeight;
-          const userLength = scaleData.unitLength;
-          const userWidth = scaleData?.userWidth;
+          const measured = scaleData?.unitType || "mm";
+          dispatch(setMeasured(measured))
+          const userHeight = convert(scaleData?.userHeight).from('mm').to(measured);
+          const userLength = convert(scaleData?.unitLength).from('mm').to(measured);
+          const userWidth = convert(scaleData?.userWidth).from('mm').to(measured);
           dispatch(setUserLength(userLength));
           dispatch(setUserWidth(userWidth));
           dispatch(setUserHeight(userHeight));
