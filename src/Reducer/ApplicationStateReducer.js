@@ -15,6 +15,11 @@ const initialState = {
     roomSelectorMode: false,
     selectionMode: false,
     selectedLines: [],
+    roomEditingMode: false,
+    selectedRoomName: "",
+    selectedRoomType: "",
+    activeRoomButton: "",
+    activeRoomIndex: -1,
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {

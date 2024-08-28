@@ -4,6 +4,8 @@ import { Shape, ShapeGeometry, MeshBasicMaterial, Vector3, Box3 } from "three";
 import { Html } from "@react-three/drei";
 import { useDrawing } from "../hooks/useDrawing";
 import { Typography } from "../design_system/StyledComponents/components/Typography";
+import { useDispatch } from "react-redux";
+import { setActiveRoomIndex, setExpandRoomNamePopup, setRoomDetails, setRoomEditingMode, setRoomName, setSelectedLinesState } from "../Actions/ApplicationStateAction";
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -44,8 +46,9 @@ const calculateBoundingBox = (points) => {
   return box;
 };
 
-const RoomFiller = ({ roomName, wallIds }) => {
+const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
   const { storeLines, points } = useDrawing();
+  const dispatch = useDispatch();
 
   const roomPoints = useMemo(() => {
     let pts = [];
@@ -66,10 +69,20 @@ const RoomFiller = ({ roomName, wallIds }) => {
     return null;
   }
 
+  const handleRoomClick = (e) => {
+    e.stopPropagation();
+    dispatch(setSelectedLinesState(wallIds));
+    dispatch(setExpandRoomNamePopup(true));
+    dispatch(setRoomEditingMode(true));
+    dispatch(setRoomName(roomName));
+    dispatch(setRoomDetails(roomType));
+    dispatch(setActiveRoomIndex(index));
+  }
+
   const sortedPoints = sortPointsClockwise(roomPoints);
   const shape = createShape(sortedPoints);
   const geometry = new ShapeGeometry(shape);
-  const material = new MeshBasicMaterial({ color: "#2E2E2E", transparent: true , opacity: 0.1});
+  const material = new MeshBasicMaterial({ color: "#f4f4f4", transparent: true , opacity: 0.6});
 
   const centroid = getCentroid(sortedPoints);
   const boundingBox = calculateBoundingBox(sortedPoints);
@@ -86,7 +99,7 @@ const RoomFiller = ({ roomName, wallIds }) => {
         <meshBasicMaterial attach="material" args={[material]} />
       </mesh>
       <Html
-        position={[centroid.x, centroid.y, centroid.z]}
+        position={[centroid.x - fontSize, centroid.y, centroid.z]}
       >
         <div style={{
           display: "flex",
@@ -94,10 +107,14 @@ const RoomFiller = ({ roomName, wallIds }) => {
           padding: "8px 12px",
           backgroundColor: "white",
           borderRadius: "4px",
-          width: "100%",
+          width: "max-content",
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
-          fontFamily: "'DM Sans', sans-serif"
-        }}>{roomName}</div>
+          fontFamily: "'DM Sans', sans-serif",
+          fontWeight: "500",
+          fontSize
+        }}
+          onClick={handleRoomClick}
+        >{roomName}</div>
       </Html>
     </>
   );

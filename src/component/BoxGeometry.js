@@ -298,7 +298,7 @@ const textRotation = angle;
               ? railingTexture
               : ""
           }
-          color={typeId === 5 ? "orange" : ""}
+          color={typeId === 5 && !isSelected ? "orange" : typeId === 5 && isSelected ? "#7AA8D2" : ""}
           width={typeId===4?"10px":"20px"}
           transparent={true}
           opacity={0.9}

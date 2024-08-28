@@ -175,7 +175,7 @@ export const CanvasComponent = () => {
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        style={ scale? {cursor:'grab'}: lineBreak ?{cursor:`url(${blade}) 8 8, crosshair`} :selectionMode?{ cursor: "grab"}:{cursor:'crosshair'}}
+        style={ scale? {cursor:'grab'}: lineBreak ?{cursor:`url(${blade}) 8 8, crosshair`} :selectionMode? roomSelectorMode? {cursor:"pointer"} :{ cursor: "grab"}:{cursor:'crosshair'}}
       >
         {/* 2D (Orthographic) Canvas */}
         <Canvas
@@ -261,10 +261,12 @@ export const CanvasComponent = () => {
 
           {!scale && <ContextualMenu/>}
 
-          {!scale && roomSelectorMode && roomSelectors.map((room) =>(<RoomFiller 
+          {!scale && roomSelectorMode && roomSelectors.map((room, index) =>(<RoomFiller 
            key={room.roomId}
            roomName={room.roomName} 
+           roomType={room?.roomType}
            wallIds ={room.wallIds} 
+           index={index}
            />))}
 
           {/* 2D grid */}

@@ -37,6 +37,12 @@ import {
   setRoomSelectorMode,
   setSelectionMode,
   setSelectedLinesState,
+  setExpandRoomNamePopup,
+  setRoomDetails,
+  setRoomEditingMode,
+  setRoomName,
+  setActiveRoomButton,
+  setActiveRoomIndex,
 } from "../Actions/ApplicationStateAction.js";
 import {
   setContextualMenuStatus,
@@ -83,7 +89,9 @@ export const useDrawing = () => {
     roomSelectorMode,
     selectionMode,
     selectedLines,
-    expandRoomPopup
+    expandRoomPopup,
+    roomEditingMode,
+    activeRoomIndex,
   } = useSelector((state) => state.ApplicationState);
 
   const [firstTime, setFirstTime] = useState(true);
@@ -1062,6 +1070,14 @@ export const useDrawing = () => {
       setSelectedLines([]);
       dispatch(setContextualMenuStatus(false));
       dispatch(setShowPopup(false));
+      if(roomSelectorMode){
+        dispatch(setExpandRoomNamePopup(false));
+        dispatch(setRoomDetails(""))
+        dispatch(setRoomName(""))
+        dispatch(setRoomEditingMode(false))
+        dispatch(setActiveRoomButton(""))
+        dispatch(setActiveRoomIndex(-1))
+      }
       return;
     }
     if (selectionMode || doorWindowMode || merge || scale) return; // Prevent drawing new lines in selection mode
@@ -1329,6 +1345,11 @@ export const useDrawing = () => {
         ? selectedLines.filter((lineId) => lineId !== id)
         : !merge && !expandRoomPopup? [id] :[...selectedLines, id];
       setSelectedLines(selected);
+      if(roomSelectorMode && roomEditingMode && activeRoomIndex >= 0){
+        let newRooms = [...roomSelectors];
+        newRooms[activeRoomIndex] = { ...newRooms[activeRoomIndex], wallIds: selected };
+        dispatch(setRoomSelectors(newRooms));
+      }
       if (!selectedLines.includes(id)) {
         dispatch(setShowPopup(true));
         // dispatch(updateLineTypeId(selectedLine.id,selectedLine.typeId || 1))

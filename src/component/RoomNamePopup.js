@@ -9,7 +9,13 @@ import {
   setTypeId,
 } from "../Actions/DrawingActions.js";
 import {
+  setActiveRoomButton,
+  setActiveRoomIndex,
   setExpandRoomNamePopup,
+  setRoomDetails,
+  setRoomEditingMode,
+  setRoomName,
+  setSelectedLinesState,
   showRoomNamePopup,
 } from "../Actions/ApplicationStateAction.js";
 import { useDrawing } from "../hooks/useDrawing.js";
@@ -25,6 +31,7 @@ import {
 import { styled } from "@mui/material/styles";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CheckIcon from "@mui/icons-material/Check";
+import { setRoomSelectors } from "../features/drawing/drwingSlice.js";
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   "label + &": {
@@ -48,30 +55,31 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 }));
 
 const RoomNamePopup = (props) => {
-  const [roomName, setRoomName] = useState("");
-  const [activeMode, setActiveMode] = useState("");
-  const [selected, setSelected] = useState("");
-  const { roomPopup, expandRoomPopup, selectionMode } = useSelector(
+  const { roomPopup, expandRoomPopup, selectionMode, roomEditingMode,selectedRoomName,selectedRoomType, activeRoomButton, activeRoomIndex } = useSelector(
     (state) => state.ApplicationState
   );
   const dispatch = useDispatch();
-  const { room, selectedLines } = useDrawing();
+  const {roomSelectors} = useSelector((state) => state.drawing);
 
   const addRoomClick = () => {
-    setActiveMode("add");
+    dispatch(setActiveRoomButton("add"));
+    dispatch(setTypeId(1));
+    if (!selectionMode) {
+      props.toggleSelectionMode();
+    }
     dispatch(setExpandRoomNamePopup(true));
   };
 
   const divideRoomClick = () => {
-    if (activeMode === "divide") {
-      setActiveMode("");
+    if (activeRoomButton === "divide") {
+      dispatch(setActiveRoomButton(""));
       dispatch(setTypeId(1));
       if (!selectionMode) {
         props.toggleSelectionMode();
       }
       return;
     }
-    setActiveMode("divide");
+    dispatch(setActiveRoomButton("divide"));
     dispatch(setExpandRoomNamePopup(false));
     dispatch(setTypeId(5));
     if (selectionMode) {
@@ -80,17 +88,31 @@ const RoomNamePopup = (props) => {
   };
 
   const handleChange = (event) => {
-    setSelected(event.target.value);
+    dispatch(setRoomDetails(event.target.value));
   };
 
   const handleSaveClick = () => {
-    if(roomName.length>0 && selected.length>0){
-      props.addRoom(roomName, selected);
+    if(selectedRoomName.length>0 && selectedRoomType.length>0){
+      props.addRoom(selectedRoomName, selectedRoomType);
       // setActiveMode("");
-      setSelected("");
-      setRoomName("");
+      dispatch(setRoomDetails(""));
+      dispatch(setRoomName(""))
     }
   };
+
+  const handleDeleteClick = () => {
+    const newRooms = [...roomSelectors]
+    newRooms.splice(activeRoomIndex, 1)
+    dispatch(setRoomSelectors(newRooms))
+    dispatch(setExpandRoomNamePopup(false));
+    dispatch(setRoomDetails(""))
+    dispatch(setRoomName(""))
+    dispatch(setRoomEditingMode(false))
+    dispatch(setActiveRoomButton(""))
+    dispatch(setActiveRoomIndex(-1))
+    dispatch(setSelectedLinesState([]))
+  };
+
 
   return (
     <div>
@@ -103,7 +125,7 @@ const RoomNamePopup = (props) => {
             onClick={divideRoomClick}
             className="room-popup-header-text"
             style={
-              activeMode === "divide" ? { borderColor: "cornflowerblue" } : {}
+              activeRoomButton === "divide" ? { borderColor: "cornflowerblue" } : {}
             }
           >
             <img src={divide} alt="divider" />
@@ -115,7 +137,7 @@ const RoomNamePopup = (props) => {
             onClick={addRoomClick}
             className="room-popup-header-text"
             style={
-              activeMode === "add" ? { borderColor: "cornflowerblue" } : {}
+              activeRoomButton === "add" ? { borderColor: "cornflowerblue" } : {}
             }
           >
             <img src={plus} alt="plus" />
@@ -130,7 +152,8 @@ const RoomNamePopup = (props) => {
               <Typography modifiers={["medium", "black600", "subtitle"]}>
                 Room
               </Typography>
-              <div className="delete-container">
+              {roomEditingMode &&
+              <div className="delete-container" onClick={handleDeleteClick}>
                 <img
                   src={deleteIcon}
                   alt="delete"
@@ -139,11 +162,11 @@ const RoomNamePopup = (props) => {
                 <Typography modifiers={["medium", "black550", "helpText"]}>
                   Delete
                 </Typography>
-              </div>
+              </div>}
             </div>
             <FormControl fullWidth>
               <Select
-                value={selected}
+                value={selectedRoomType}
                 onChange={handleChange}
                 displayEmpty
                 input={<BootstrapInput />}
@@ -160,11 +183,11 @@ const RoomNamePopup = (props) => {
                   },
                 }}
                 IconComponent={KeyboardArrowDownIcon}
-                renderValue={(selected) => {
-                  if (selected.length === 0) {
+                renderValue={(selectedRoomType) => {
+                  if (selectedRoomType === "") {
                     return <Typography modifiers={["subtitle", "black600"]}>Select room type</Typography>; 
                   }
-                  return selected;
+                  return selectedRoomType;
                 }}
               >
                 {[
@@ -180,7 +203,7 @@ const RoomNamePopup = (props) => {
                   <MenuItem
                     key={name}
                     value={name}
-                    selected={selected === name}
+                    selectedRoomType={selectedRoomType === name}
                     style={{
                       padding: "10px 8px 10px 12px",
                       borderRadius: "8px",
@@ -188,13 +211,13 @@ const RoomNamePopup = (props) => {
                       display: "flex",
                       justifyContent: "space-between",
                       backgroundColor:
-                        selected === name ? "#4B73EC" : "",
+                        selectedRoomType === name ? "#4B73EC" : "",
                     }}
                   >
-                    <Typography modifiers={["medium", "black600", "body"]} style={{ color: selected === name? "white": "" }}>
+                    <Typography modifiers={["medium", "black600", "body"]} style={{ color: selectedRoomType === name? "white": "" }}>
                       {name}
                     </Typography>
-                    {selected === name && (
+                    {selectedRoomType === name && (
                       <CheckIcon sx={{ color: "white" }} />
                     )}
                   </MenuItem>
@@ -207,8 +230,8 @@ const RoomNamePopup = (props) => {
               variant="outlined"
               placeholder="Enter room name"
               required={true}
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
+              value={selectedRoomName}
+              onChange={(e) => dispatch(setRoomName(e.target.value))}
               InputProps={{
                 style: {
                   fontSize: "16px",
@@ -220,13 +243,14 @@ const RoomNamePopup = (props) => {
               }}
             />
             <div className="btn-container">
+              {roomEditingMode? null: 
               <Button
                 className="save-btn"
                 modifiers={["blue", "block"]}
                 onClick={handleSaveClick}
               >
                 Save
-              </Button>
+              </Button>}
             </div>
           </div>
         )}

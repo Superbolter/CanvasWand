@@ -19,6 +19,7 @@ const convertToJSON = (lines, points,roomSelectors,storeBoxes) => {
         rooms: roomSelectors.map(room => ({
             roomId: room.roomId,
             roomName: room.roomName,
+            roomType: room.roomType,
             wallIds: room.wallIds,
         })),
         storeBoxes

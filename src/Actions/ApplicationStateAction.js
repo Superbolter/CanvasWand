@@ -233,6 +233,51 @@ export const setExpandRoomNamePopup = (value) => {
   };
 };
 
+export const setRoomEditingMode = (value) => {
+  return (dispatch) => {
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      roomEditingMode: value,
+    });
+  };
+};
+
+export const setRoomName = (value) => {
+  return (dispatch) => {
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      selectedRoomName: value,
+    });
+  };
+};
+
+export const setRoomDetails = (value) => {
+  return (dispatch) => {
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      selectedRoomType: value,
+    });
+  };
+};
+
+export const setActiveRoomButton = (value) => {
+  return (dispatch) => {
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      activeRoomButton: value,
+    });
+  };
+};
+
+export const setActiveRoomIndex = (value) => {
+  return (dispatch) => {
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      activeRoomIndex: value,
+    });
+  };
+};
+
 export const setRoomSelectorMode = (value) => {
   return (dispatch) => {
     dispatch({
