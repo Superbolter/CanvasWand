@@ -102,7 +102,7 @@ const BoxGeometry = ({
 
 
   const { measured, roomSelect,newline } = useSelector((state) => state.drawing);
-  const { storeLines, factor, storeBoxes, points} = useSelector((state) => state.ApplicationState);
+  const { storeLines, factor, storeBoxes, points, roomSelectorMode} = useSelector((state) => state.ApplicationState);
 
   const textureLoader = useMemo(() => new TextureLoader(), []);
   const windowTexture = useMemo(
@@ -320,7 +320,7 @@ const textRotation = angle;
         />
       </mesh>
 
-       {/* Text to display the length of the box */}
+       {roomSelectorMode &&
        <Text
         position={textPosition}
         rotation={[0, 0, textRotation]}
@@ -330,7 +330,7 @@ const textRotation = angle;
         anchorY="middle"
       >
         {`${(length*factor[0]).toFixed(2)} ${measured}`}
-      </Text>
+      </Text>}
 
 
       <mesh position={end}>

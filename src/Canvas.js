@@ -151,7 +151,7 @@ export const CanvasComponent = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [storeLines, selectionMode, selectedLines, points, stop ,leftPos, rightPos,storeBoxes,roomSelectorMode]);
+  }, [storeLines, selectionMode, selectedLines, points, stop ,leftPos, rightPos,storeBoxes,roomSelectorMode, perpendicularLine]);
 
   useEffect(() => {
     // console.log(type_id);
@@ -188,7 +188,8 @@ export const CanvasComponent = () => {
           raycaster={{ params: { Line: { threshold: 5 } } }}
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
-        >{nearPoint&&(<UpdateDistance nearVal={nearVal}/>)}
+        >
+          {nearPoint && lineBreak && (<UpdateDistance nearVal={nearVal}/>)}
 
           {scale && (<Scale/>)}
           {addOn && !scale && (
