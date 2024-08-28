@@ -324,8 +324,8 @@ const textRotation = angle;
        <Text
         position={textPosition}
         rotation={[0, 0, textRotation]}
-        fontSize={12}
-        color="black"
+        fontSize={8.5}
+        color="gray"
         anchorX="center"
         anchorY="middle"
       >
