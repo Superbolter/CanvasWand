@@ -725,6 +725,9 @@ export const useDrawing = () => {
 
   const perpendicularHandler = () => {
     dispatch(setPerpendicularLine(!perpendicularLine));
+    setNewLine(true);
+    setShowSnapLine(false);
+    setStop(true);
   };
 
   const toggleSelectionMode = () => {

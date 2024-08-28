@@ -66,7 +66,6 @@ export const CanvasComponent = () => {
     distance,
     stop,
     roomSelect,
-    perpendicularLine,
     measured,
     information,
     idSelection,
@@ -103,7 +102,7 @@ export const CanvasComponent = () => {
     addRoom
   } = useDrawing();
 
-  const { leftPos, rightPos, merge, lineBreak } = useSelector((state) => state.drawing)
+  const { leftPos, rightPos, merge, lineBreak, perpendicularLine } = useSelector((state) => state.drawing)
   const { storeBoxes, roomSelectorMode, selectionMode,selectedLines} = useSelector((state) => state.ApplicationState);
 
 
@@ -126,6 +125,9 @@ export const CanvasComponent = () => {
     // if((event.key === "r" || event.key === "R") && !event.ctrlKey && roomSelectorMode){
     //   room();
     // }
+    if(event.ctrlKey&&(event.key === "x" || event.key === "X")){
+      perpendicularHandler();
+    }
     if(event.ctrlKey&&(event.key === "z" || event.key === "Z")){
       // deleteLastPoint();
       undo();

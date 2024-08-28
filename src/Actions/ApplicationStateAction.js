@@ -82,7 +82,7 @@ export const drawToolData = (floorplan_id) => {
           dispatch(setMeasured(scaleData?.unitType || "in"))
           const userHeight = scaleData?.userHeight;
           const userLength = scaleData.unitLength;
-          const userWidth = scaleData?.userWidth
+          const userWidth = scaleData?.userWidth;
           dispatch(setUserLength(userLength));
           dispatch(setUserWidth(userWidth));
           dispatch(setUserHeight(userHeight));
