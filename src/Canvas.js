@@ -37,6 +37,7 @@ import RoomFiller from "./component/roomFiller.js";
 import ScalePopup from "./component/ScalePopup.js";
 import blade from "./assets/blade.png"
 import { setShowPopup } from "./Actions/DrawingActions.js";
+import UpdateDistance from "./component/updateDistance.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -94,7 +95,11 @@ export const CanvasComponent = () => {
     showRoomNamePopup,
     handleDoubleClick,
     handleReset,
-    handleMergeClick
+    handleMergeClick,
+    nearPoint, 
+    nearVal, 
+    setNearVal,
+    setNearPoint,
   } = useDrawing();
 
   const { leftPos, rightPos, merge, lineBreak } = useSelector((state) => state.drawing)
@@ -180,7 +185,7 @@ export const CanvasComponent = () => {
           raycaster={{ params: { Line: { threshold: 5 } } }}
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
-        >
+        >{nearPoint&&(<UpdateDistance nearVal={nearVal}/>)}
 
           {scale && (<Scale/>)}
           {addOn && !scale && (

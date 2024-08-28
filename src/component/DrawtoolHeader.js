@@ -4,6 +4,7 @@ import {Button} from "../design_system/StyledComponents/components/Button"
 import Undo from "../assets/Undo.png"
 import Redo from "../assets/Redo.png"
 import  './ButtonComponent.css'
+import { useDrawing } from '../hooks/useDrawing.js'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { drawData, setRoomSelectorMode, updateDrawData } from '../Actions/ApplicationStateAction.js'
@@ -13,6 +14,8 @@ import { setScale } from '../features/drawing/drwingSlice.js'
 const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleReset} ) => {
   const dispatch=useDispatch()
   const {factor,floorplanId,roomSelectorMode}=useSelector((state)=>state.ApplicationState)
+
+  const {perpendicularHandler}= useDrawing();
   const {userLength} = useSelector((state) => state.drawing)
   const {scale} = useSelector((state) => state.drawing)
 
@@ -51,6 +54,15 @@ const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleRes
       <img style={{width:"24px", height:"24px"}}src={Redo} alt="" />
       <Typography>Redo</Typography>
       </Button>
+
+
+      <Button modifiers={["outlineBlack","sm"]} className='undo-redo-btn' onClick={perpendicularHandler}>
+      <img style={{width:"24px", height:"24px"}}src={Redo} alt="" />
+      <Typography>perpendicular</Typography>
+      </Button>
+
+
+
       <Button className='save-btn' modifiers={["blue"]} onClick={handleSaveClick}>Save & next</Button>
       </div>}
     </div>

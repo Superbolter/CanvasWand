@@ -108,6 +108,8 @@ export const useDrawing = () => {
   const [showSnapLine, setShowSnapLine] = useState(false);
   const [actionHistory, setActionHistory] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
+  const [nearPoint, setNearPoint] = useState(false);
+  const [nearVal, setNearVal] = useState(false);
   // const [leftPos, setLeftPosState] = useState(new Vector3(-5, 0, 0));
   // const [rightPos, setRightPosState] = useState(new Vector3(5, 0, 0));
 
@@ -756,12 +758,25 @@ export const useDrawing = () => {
     const posY = y * (cameraHeight / 2);
 
     let point = new Vector3(posX, posY, 0);
+    if(lineBreak){
+      if (findLineForPoint(point, storeLines)) {
+        let { closestPointOnLine,line } = findLineForPoint(point, storeLines);
+        if(closestPointOnLine){
+          setNearPoint(true);
+          setNearVal({line: line, point: closestPointOnLine})
+        }else{
+          setNearPoint(false);
+          setNearVal(null);
+        }
+      } 
+    }
 
-    if (!perpendicularLine && draggingPointIndex === null) {
-      point = calculateAlignedPoint(points[points.length-2]||new Vector3(0,0,0),points[points.length - 1], point);
+    if (perpendicularLine && draggingPointIndex === null) {
+      point = calculateAlignedPoint(points[points.length - 1], point);
     }
 
     setCurrentMousePosition(point);
+    
     let cuuPoint = point;
     // Check for snapping
     let snapFound = false;
@@ -1029,8 +1044,8 @@ export const useDrawing = () => {
       return;
     }
 
-    if (!perpendicularLine && points.length > 0) {
-      point = calculateAlignedPoint(points[points.length-2]||new Vector3(0,0,0),points[points.length - 1], point);
+    if (perpendicularLine && points.length > 0) {
+      point = calculateAlignedPoint(points[points.length - 1], point);
     }
     point = snapToPoint(point, points, storeLines); //snapping
     const newPoints = [...points, point];
@@ -1297,8 +1312,10 @@ export const useDrawing = () => {
     }
     if(storeLines[idx].typeId !==1) return;
     if (idx === -1) return; // Line not found
-    setBreakPointLocation(point);
     let updatedLine = storeLines[idx];
+   
+    setBreakPointLocation(point);
+    
 
     let store = [...storeLines];
     let pointsVal = [...points];
@@ -1449,6 +1466,10 @@ export const useDrawing = () => {
     showSnapLine,
     lineBreak,
     merge,
+    nearPoint, 
+    nearVal, 
+    setNearVal,
+    setNearPoint,
     setMerge,
     setLineBreak,
     setShowSnapLine,

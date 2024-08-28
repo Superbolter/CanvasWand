@@ -7,7 +7,7 @@ const initialState = {
   storeLines: [],
   roomSelect: false,
   roomSelectors: [],
-  perpendicularLine: false,
+  perpendicularLine: true,
   factor: [1, 1, 1],
   measured: "in",
   information: false,
