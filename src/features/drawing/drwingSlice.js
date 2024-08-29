@@ -10,6 +10,7 @@ const initialState = {
   perpendicularLine: true,
   factor: [1, 1, 1],
   measured: "in",
+  linePlacementMode: "midpoint",
   information: false,
   scale:true,
   idSelection: [],
@@ -34,6 +35,9 @@ export const drawingSlice = createSlice({
     },
     setStoreLines: (state, action) => {
       state.storeLines = action.payload;
+    },
+    setLinePlacementMode: (state, action) => {
+      state.linePlacementMode = action.payload;
     },
     setScale: (state, action) => {
       state.scale = action.payload;
@@ -108,6 +112,8 @@ export const {
   setRoomSelectors,
   type,
   setType,
+  linePlacementMode, 
+  setLinePlacementMode,
   scale,
   setScale,
   setSelectedButton,

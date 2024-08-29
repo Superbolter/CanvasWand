@@ -40,6 +40,7 @@
 
 import React, { useMemo } from "react";
 import { extend } from "@react-three/fiber";
+import { useSelector } from "react-redux";
 import { Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
 import Wall from "../assets/Walll.png"
 
@@ -58,12 +59,15 @@ const createQuadrilateral = (p1, p2, p3, p4) => {
 
 const CreateFiller = ({ p1, p2, p3, p4 }) => {
   const textureLoader = useMemo(() => new TextureLoader(), []);
+  const { measured, roomSelect, newline, linePlacementMode } = useSelector(
+    (state) => state.drawing
+  );
 
   const wallTexture = useMemo(
     () => textureLoader.load(Wall), // Replace with the path to your window image
     [textureLoader]
   );
-  if (!p1 || !p2 || !p3 || !p4) {
+  if (!p1 || !p2 || !p3 || !p4||linePlacementMode==="midpoint") {
     // console.error("One or more points are undefined", { p1, p2, p3, p4 });
     return null;
   }

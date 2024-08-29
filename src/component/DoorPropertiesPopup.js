@@ -14,6 +14,7 @@ import {
   setLockForLines,
   setTypeId,
 } from "../Actions/DrawingActions.js";
+
 import Properties from "./Properties.js";
 
 const DoorPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {

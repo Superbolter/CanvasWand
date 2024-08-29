@@ -10,7 +10,7 @@ import withReactContent from "sweetalert2-react-content";
 import { useDispatch, useSelector } from 'react-redux'
 import { drawData, setRoomSelectorMode, showRoomNamePopup, updateDrawData } from '../Actions/ApplicationStateAction.js'
 import { ArrowBack } from '@mui/icons-material'
-import { setScale } from '../features/drawing/drwingSlice.js'
+import { setScale ,setLinePlacementMode} from '../features/drawing/drwingSlice.js'
 import { Switch } from '@mui/material'
 import { setSeeDimensions } from '../Actions/DrawingActions.js'
 
@@ -18,7 +18,7 @@ const MySwal = withReactContent(Swal);
 
 const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleReset,handleResetRooms} ) => {
   const dispatch=useDispatch()
-  const {factor,floorplanId,roomSelectorMode}=useSelector((state)=>state.ApplicationState)
+  const {factor,floorplanId,roomSelectorMode,linePlacementMode}=useSelector((state)=>state.ApplicationState)
   const {userLength,scale} = useSelector((state) => state.drawing)
   const {seeDimensions} = useSelector((state) => state.Drawing)
 
@@ -26,6 +26,15 @@ const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleRes
     dispatch(setScale(true))
     handleReset()
   }
+
+  const handleMidpointClick = () => {
+    dispatch(setLinePlacementMode("midpoint"));
+  };
+
+  const handleBelowClick = () => {
+    dispatch(setLinePlacementMode("below"));
+  };
+
   const handleBackToDrawing = () =>{
     MySwal.fire({
         title: "Are you sure?",
@@ -83,6 +92,13 @@ const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleRes
       <Button modifiers={["outlineBlack","sm"]} className='undo-redo-btn' onClick={redo}>
       <img style={{width:"24px", height:"24px"}}src={Redo} alt="" />
       <Typography>Redo</Typography>
+      </Button>
+
+      <Button onClick={handleMidpointClick} disabled={linePlacementMode === "midpoint"}>
+        Midpoint
+      </Button>
+      <Button onClick={handleBelowClick} disabled={linePlacementMode === "below"}>
+        Below
       </Button>
       <Button className='save-btn' modifiers={["blue"]} onClick={handleSaveClick}>Save & next</Button>
       </div>}
