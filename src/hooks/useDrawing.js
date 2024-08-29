@@ -418,7 +418,11 @@ export const useDrawing = () => {
     });
     dispatch(setPoints(newPoints));
 
-    dispatch(setStoreLines(updatedStoreLines));
+    const finalLines = updatedStoreLines.filter((line) => {
+      return line.length !== 0;
+    });
+
+    dispatch(setStoreLines(finalLines));
     const history = [...actionHistory]
     history.push({
       type: 'addPoint',
