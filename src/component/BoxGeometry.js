@@ -103,6 +103,7 @@ const BoxGeometry = ({
 
   const { measured, roomSelect,newline } = useSelector((state) => state.drawing);
   const { storeLines, factor, storeBoxes, points, roomSelectorMode} = useSelector((state) => state.ApplicationState);
+  const { seeDimensions} = useSelector((state) => state.Drawing);
 
   const textureLoader = useMemo(() => new TextureLoader(), []);
   const windowTexture = useMemo(
@@ -319,7 +320,7 @@ const textRotation = angle;
         />
       </mesh>
 
-       {roomSelectorMode &&
+       {seeDimensions &&
        <Text
         position={textPosition}
         rotation={[0, 0, textRotation]}

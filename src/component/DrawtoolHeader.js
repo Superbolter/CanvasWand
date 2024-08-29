@@ -9,12 +9,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { drawData, setRoomSelectorMode, showRoomNamePopup, updateDrawData } from '../Actions/ApplicationStateAction.js'
 import { ArrowBack } from '@mui/icons-material'
 import { setScale } from '../features/drawing/drwingSlice.js'
+import { Switch } from '@mui/material'
+import { setSeeDimensions } from '../Actions/DrawingActions.js'
 
 const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleReset} ) => {
   const dispatch=useDispatch()
   const {factor,floorplanId,roomSelectorMode}=useSelector((state)=>state.ApplicationState)
-  const {userLength} = useSelector((state) => state.drawing)
-  const {scale} = useSelector((state) => state.drawing)
+  const {userLength,scale} = useSelector((state) => state.drawing)
+  const {seeDimensions} = useSelector((state) => state.Drawing)
 
   const handleBackToScale = () =>{
     dispatch(setScale(true))
@@ -25,6 +27,7 @@ const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleRes
   }
   
   return (
+    <>
     <div style={{position:"fixed", top:"20px", left:"20px", backgroundColor:"white",borderRadius:"12px", width:"79vw", padding:"12px", display:"flex", alignItems:"center", justifyContent:"space-between",boxShadow: "0px 4px 14px -3px #0C0C0D21", zIndex:"2", height:"30px"
         }}>
       <Typography modifiers={["medium", "black600"]} className='header-text'>
@@ -54,6 +57,35 @@ const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleRes
       <Button className='save-btn' modifiers={["blue"]} onClick={handleSaveClick}>Save & next</Button>
       </div>}
     </div>
+    {scale? null:
+      <div className='dimension-setter'>
+        <Typography modifiers={["subtitle2"]}>Dimensions</Typography>
+        {/* <Switch checked={seeDimensions} onChange={()=>dispatch(setSeeDimensions(!seeDimensions))}
+          sx={{
+            '& .MuiSwitch-thumb': {
+              width: 24,
+              height: 24,
+            },
+            '& .MuiSwitch-track': {
+              borderRadius: 16,
+              width: 42,
+              height: 30,
+              position: 'absolute',
+              top: "50%",
+              transform: 'translateY(-50%)',
+              backgroundColor: '#ECECEC',
+              opacity: 1,
+              transition: 'background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+            },
+          }}  
+        /> */}
+        <label class="switch">
+          <input className='dimension-switch' type="checkbox" checked={seeDimensions} onChange={()=>dispatch(setSeeDimensions(!seeDimensions))}/>
+          <span class="slider round"></span>
+        </label>
+      </div>
+    }
+    </>
   )
 }
 

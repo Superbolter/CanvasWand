@@ -73,7 +73,7 @@ body, html {
 }
 
 .button-container1 {
-//flex: 1;
+/* //flex: 1; */
   display: grid;
   grid-template-columns: repeat(3, 1fr); 
   /* display: flex;
@@ -90,4 +90,78 @@ body, html {
   margin: 5px;
   padding: 5px; /* Smaller padding for smaller buttons */
   font-size: 12px; /* Smaller font size for smaller buttons */
+}
+
+.dimension-setter{
+  position: fixed;
+  top: 86px;
+  background-color: white;
+  right: calc(21vw - 40px);
+  padding: 8px 8px 8px 8px;
+  border-radius: 24px;
+  box-shadow: 0 3px 7px 0 #8F8F8F08;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch .dimension-switch { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.dimension-switch:checked + .slider {
+  background-color: #2196F3;
+}
+
+.dimension-switch:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+.dimension-switch:checked + .slider:before {
+  -webkit-transform: translateX(20px);
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }

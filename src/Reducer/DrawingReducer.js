@@ -8,6 +8,7 @@ const initialState = {
     positionType: "neutral",
     actionHistory: [],
     redoStack: [],
+    seeDimensions: false,
   };
   
   const DrawingReducer = (state = initialState, action) => {
@@ -48,6 +49,11 @@ const initialState = {
         return {
           ...state,
           redoStack: action.payload
+        }
+      case "SET_SEE_DIMENSIONS":
+        return {
+          ...state,
+          seeDimensions: action.payload
         }
       default:
         return state;

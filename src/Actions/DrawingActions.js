@@ -87,3 +87,8 @@ export const setRedoState = (undoStack) => ({
   type: "UPDATE_REDO_DATA",
   payload: undoStack,
 });
+
+export const setSeeDimensions = (val) => ({
+  type: "SET_SEE_DIMENSIONS",
+  payload: val,
+});
