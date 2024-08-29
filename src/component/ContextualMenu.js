@@ -82,8 +82,8 @@ const ContextualMenu = (props) => {
   return (
     contextualMenuStatus && (
       <Html position={position} className="contextual-menu-component">
-        <div className={positionType}/>
         <div className="contextual-menu-element-container">
+        <div className={positionType}/>
         <div className="contextual-menu-element" onClick={handleWallClick}>
           <img src={WallIcon} alt="" />
           <Typography className="contextual-menu-text">Wall</Typography>
@@ -102,7 +102,7 @@ const ContextualMenu = (props) => {
         </div>
         </div>
           {positionType !== "neutral" && (
-            <div className="btn-container" style={{justifyContent: typeId === 1 ?"space-around" :"flex-start", width:"100%", marginLeft: typeId === 1 ? "0" : "10px"}}>
+            <div className="btn-container" style={{justifyContent:"flex-start", width:"100%", marginLeft: "18px"}}>
             {typeId===1 ?
             <div
               onClick={handleSplitClick}
