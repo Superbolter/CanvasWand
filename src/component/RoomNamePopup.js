@@ -32,6 +32,7 @@ import { styled } from "@mui/material/styles";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CheckIcon from "@mui/icons-material/Check";
 import { setRoomSelectors } from "../features/drawing/drwingSlice.js";
+import edit from "../assets/edit.svg";
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   "label + &": {
@@ -55,11 +56,19 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 }));
 
 const RoomNamePopup = (props) => {
+  const [error, setError] = useState("");
+  const [roomName, setName] = useState("");
   const { roomPopup, expandRoomPopup, selectionMode, roomEditingMode,selectedRoomName,selectedRoomType, activeRoomButton, activeRoomIndex } = useSelector(
     (state) => state.ApplicationState
   );
   const dispatch = useDispatch();
   const {roomSelectors} = useSelector((state) => state.drawing);
+
+  useEffect(() => {
+    if (selectedRoomName) {
+      setName(selectedRoomName);
+    }
+  }, [selectedRoomName]);
 
   const addRoomClick = () => {
     dispatch(setActiveRoomButton("add"));
@@ -68,6 +77,12 @@ const RoomNamePopup = (props) => {
       props.toggleSelectionMode();
     }
     dispatch(setExpandRoomNamePopup(true));
+    dispatch(setRoomDetails(""))
+    dispatch(setRoomName(""))
+    dispatch(setRoomEditingMode(false))
+    dispatch(setActiveRoomButton(""))
+    dispatch(setActiveRoomIndex(-1))
+    dispatch(setSelectedLinesState([]));
   };
 
   const divideRoomClick = () => {
@@ -92,11 +107,19 @@ const RoomNamePopup = (props) => {
   };
 
   const handleSaveClick = () => {
-    if(selectedRoomName.length>0 && selectedRoomType.length>0){
-      props.addRoom(selectedRoomName, selectedRoomType);
-      // setActiveMode("");
+    if(roomName.length>0 && selectedRoomType.length>0){
+      props.addRoom(roomName, selectedRoomType);
+      setName("")
       dispatch(setRoomDetails(""));
       dispatch(setRoomName(""))
+    }
+    else{
+      if(roomName.length===0){
+        setError("Please enter room name")
+      }
+      else if(selectedRoomType.length===0){
+        setError("Please select room type")
+      }
     }
   };
 
@@ -113,6 +136,34 @@ const RoomNamePopup = (props) => {
     dispatch(setSelectedLinesState([]))
   };
 
+  useEffect(()=>{
+    if(selectedRoomName.length>0 && selectedRoomType.length>0){
+      setError("")
+    }
+  }, [selectedRoomName,selectedRoomType])
+
+  const handleEditClick = () => {
+    if(roomName.length>0 && selectedRoomType.length>0){
+      const newRooms = [...roomSelectors]
+      newRooms[activeRoomIndex] = { ...newRooms[activeRoomIndex], roomName: roomName, roomType: selectedRoomType }
+      setName("")
+      dispatch(setRoomSelectors(newRooms))
+      dispatch(setRoomEditingMode(false))
+      dispatch(setExpandRoomNamePopup(false));
+      dispatch(setRoomDetails(""))
+      dispatch(setRoomName(""))
+      dispatch(setActiveRoomButton(""))
+      dispatch(setActiveRoomIndex(-1))
+      dispatch(setSelectedLinesState([]))
+    }else{
+      if(roomName.length===0){
+        setError("Please enter room name")
+      }
+      else if(selectedRoomType.length===0){
+        setError("Please select room type")
+      }
+    }
+  }
 
   return (
     <div>
@@ -199,6 +250,7 @@ const RoomNamePopup = (props) => {
                   "Kids Room",
                   "Toilet",
                   "Study Room",
+                  "Utility"
                 ].map((name) => (
                   <MenuItem
                     key={name}
@@ -224,24 +276,28 @@ const RoomNamePopup = (props) => {
                 ))}
               </Select>
             </FormControl>
+            <div className="room-popup-header" style={{height: "fit-content", marginBottom: "0px"}}>
             <TextField
-              style={{ width: "100%", height: "34px" }}
+              style={{ width: "100%", height: "54px" }}
               id="outlined-required"
               variant="outlined"
               placeholder="Enter room name"
               required={true}
-              value={selectedRoomName}
-              onChange={(e) => dispatch(setRoomName(e.target.value))}
+              value={roomName}
+              onChange={(e) => setName(e.target.value)}
               InputProps={{
                 style: {
                   fontSize: "16px",
                   fontFamily: "'DM Sans', sans-serif",
                   fontWeight: "400",
-                  height: "44px",
+                  height: "54px",
                   borderRadius: "8px",
                 },
               }}
             />
+            {roomEditingMode && <div onClick={handleEditClick} className="room-name-edit"><img src={edit} alt="edit"/><Typography modifiers={["black600", "helpText"]}>Edit</Typography></div>}
+            </div>
+            {error.length> 0 && <Typography modifiers={["medium", "warning300", "helpText"]}>{error}</Typography>}
             <div className="btn-container">
               {roomEditingMode? null: 
               <Button

@@ -218,4 +218,19 @@ margin-bottom: 4px;
 .height-input-paper fieldset{
     border: 1px solid white !important;
 }
-  
+
+.room-name-edit{
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 2px;
+    border-radius: 8px;
+    border: 1px solid #B6BABD;
+    padding: 8px 6px;
+    align-items: center;
+}
+
+.room-name-edit img{
+    width: 16px;
+    height: 16px;
+}

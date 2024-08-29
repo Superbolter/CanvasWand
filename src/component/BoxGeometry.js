@@ -282,7 +282,7 @@ const textRotation = angle;
   return (
     <>
       <mesh position={adjustedMidpoint} rotation={[0, 0, angle]} onClick={onClick}>
-        <boxGeometry args={[length, width, 0.1]} />
+        <boxGeometry args={[length, typeId===4 ? width/2:width, 0.1]} />
         <meshBasicMaterial
            map={
             isSelected?
@@ -299,9 +299,8 @@ const textRotation = angle;
               : ""
           }
           color={typeId === 5 ? (!isSelected ? "orange" : "#7AA8D2") : ""}
-          width={typeId===4?"10px":"20px"}
-          transparent={true}
-          opacity={0.9}
+          transparent={0.9}
+          opacity={0.95}
         />
       </mesh>
 

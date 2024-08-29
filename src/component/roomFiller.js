@@ -4,8 +4,9 @@ import { Shape, ShapeGeometry, MeshBasicMaterial, Vector3, Box3 } from "three";
 import { Html } from "@react-three/drei";
 import { useDrawing } from "../hooks/useDrawing";
 import { Typography } from "../design_system/StyledComponents/components/Typography";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setActiveRoomIndex, setExpandRoomNamePopup, setRoomDetails, setRoomEditingMode, setRoomName, setSelectedLinesState } from "../Actions/ApplicationStateAction";
+import { Check } from "@mui/icons-material";
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -47,6 +48,7 @@ const calculateBoundingBox = (points) => {
 };
 
 const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
+  const {selectedRoomName} = useSelector((state) => state.ApplicationState);
   const { storeLines, points } = useDrawing();
   const dispatch = useDispatch();
 
@@ -71,6 +73,15 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
 
   const handleRoomClick = (e) => {
     e.stopPropagation();
+    if(selectedRoomName === roomName) {
+      dispatch(setSelectedLinesState([]));
+      dispatch(setExpandRoomNamePopup(false));
+      dispatch(setRoomEditingMode(false));
+      dispatch(setRoomName(""));
+      dispatch(setRoomDetails(""));
+      dispatch(setActiveRoomIndex(-1));
+      return;
+    }
     dispatch(setSelectedLinesState(wallIds));
     dispatch(setExpandRoomNamePopup(true));
     dispatch(setRoomEditingMode(true));
@@ -82,7 +93,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
   const sortedPoints = sortPointsClockwise(roomPoints);
   const shape = createShape(sortedPoints);
   const geometry = new ShapeGeometry(shape);
-  const material = new MeshBasicMaterial({ color: "#f4f4f4", transparent: true , opacity: 0.6});
+  const material = new MeshBasicMaterial({ color: "#2E2E2E", transparent: true , opacity: 0.1});
 
   const centroid = getCentroid(sortedPoints);
   const boundingBox = calculateBoundingBox(sortedPoints);
@@ -105,16 +116,21 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
           display: "flex",
           alignItems: "center",
           padding: "8px 12px",
-          backgroundColor: "white",
-          borderRadius: "4px",
+          backgroundColor: selectedRoomName === roomName? "#4B73EC":"white",
+          borderRadius: "8px",
           width: "max-content",
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
           fontFamily: "'DM Sans', sans-serif",
           fontWeight: "500",
-          fontSize
+          fontSize,
+          color: selectedRoomName === roomName? "white":roomType!==null? "#4B73EC":"black", 
+          border: selectedRoomName === roomName || roomType!==null? "2px solid #4B73EC":"0.7px solid #B6BABD",
         }}
           onClick={handleRoomClick}
-        >{roomName}</div>
+        >
+          {roomType!==null && selectedRoomName !== roomName ? <Check sx={{color: "#4B73EC", fontSize: fontSize + 4, marginRight: "4px"}} /> : null}
+          {roomName}
+        </div>
       </Html>
     </>
   );
