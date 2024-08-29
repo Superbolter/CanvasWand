@@ -53,6 +53,7 @@ export const CanvasComponent = () => {
     handleInformtion,
     deleteLastPoint,
     handleMouseDown,
+    handleMouseUp,
     toggleSelectionMode,
     perpendicularHandler,
     newLine,
@@ -184,40 +185,7 @@ export const CanvasComponent = () => {
   }, []);
 
   // const { camera, scene } = useThree();
-  const handleMouseUp = () => {
-    setDraggingPointIndex(null);
-    if(roomSelectorMode && expandRoomPopup){
-      if (!isSelecting) return;
-    const selectedIds = [];
-    if (startPoint && endPoint) {
-      const minX = Math.min(startPoint.x, endPoint.x);
-      const maxX = Math.max(startPoint.x, endPoint.x);
-      const minY = Math.min(startPoint.y, endPoint.y);
-      const maxY = Math.max(startPoint.y, endPoint.y);
-
-      storeLines.forEach(line => {
-        const startPos = line.points[0]
-
-        const endPos = line.points[1]
-
-        if (
-          startPos.x >= minX && startPos.x <= maxX &&
-          startPos.y >= minY && startPos.y <= maxY &&
-          endPos.x >= minX && endPos.x <= maxX &&
-          endPos.y >= minY && endPos.y <= maxY
-        ) {
-          selectedIds.push(line.id);
-        }
-      });
-
-      dispatch(setSelectedLinesState(selectedIds));
-    }
-
-    setIsSelecting(false);
-    setStartPoint(null);
-    setEndPoint(null);
-    }
-  };
+  
 
   const createQuadrilateral = (p1, p2, p3, p4) => {
     const shape = new Shape();
