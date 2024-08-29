@@ -36,7 +36,7 @@ import RoomNamePopup from "./component/RoomNamePopup.js";
 import RoomFiller from "./component/roomFiller.js";
 import ScalePopup from "./component/ScalePopup.js";
 import blade from "./assets/blade.png"
-import { setShowPopup } from "./Actions/DrawingActions.js";
+import { setContextualMenuStatus, setShowPopup } from "./Actions/DrawingActions.js";
 import UpdateDistance from "./component/updateDistance.js";
 
 export const CanvasComponent = () => {
@@ -125,20 +125,26 @@ export const CanvasComponent = () => {
     // if((event.key === "r" || event.key === "R") && !event.ctrlKey && roomSelectorMode){
     //   room();
     // }
-    if(event.ctrlKey&&(event.key === "x" || event.key === "X")){
+    if((event.ctrlKey || event.metaKey)&&(event.key === "x" || event.key === "X")){
       perpendicularHandler();
     }
-    if(event.ctrlKey&&(event.key === "z" || event.key === "Z")){
+    if((event.ctrlKey || event.metaKey)&&(event.key === "z" || event.key === "Z")){
       // deleteLastPoint();
       undo();
     }
-    if(event.ctrlKey&&(event.key === "y" || event.key === "Y")){
+    if((event.ctrlKey || event.metaKey)&&(event.key === "y" || event.key === "Y")){
       redo();
     }
-    if(event.key === "escape" || event.key === "Escape" && !roomSelectorMode && !merge && !lineBreak){
-      // escape();
-      dispatch(setShowPopup(false))
-      toggleSelectionMode();
+    if(event.key === "escape" || event.key === "Escape" && !merge && !lineBreak){
+      if(!roomSelectorMode){
+        dispatch(setShowPopup(false))
+        toggleSelectionMode()
+      }else if(!selectionMode){
+        setNewLine(true);
+        setStop(true);
+        setShowSnapLine(false);
+        dispatch(setContextualMenuStatus(false))
+      }
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
       deleteSelectedLines();

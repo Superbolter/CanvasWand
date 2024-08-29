@@ -1111,8 +1111,10 @@ export const useDrawing = () => {
 
     if (newLine) {
       setStop(!stop);
-      const pointToSend = [point?.x + 40, point?.y + 100 , point?.z];
-      dispatch(setContextualMenuStatus(true,pointToSend,"neutral"));
+      if(!roomSelectorMode){
+        const pointToSend = [point?.x + 40, point?.y + 100 , point?.z];
+        dispatch(setContextualMenuStatus(true,pointToSend,"neutral"));
+      }
       setNewLine(false);
       point = snapToPoint(point, points, storeLines);
 
@@ -1135,8 +1137,10 @@ export const useDrawing = () => {
     }
 
     if (points.length >= 1) {
-      const pointToSend = [point?.x + 40, point?.y + 100 , point?.z];
-      dispatch(setContextualMenuStatus(true,pointToSend, "neutral"));
+      if(!roomSelectorMode){
+        const pointToSend = [point?.x + 40, point?.y + 100 , point?.z];
+        dispatch(setContextualMenuStatus(true,pointToSend,"neutral"));
+      }
       addPoint(point, newPoints[newPoints.length - 2]);
     }
 
