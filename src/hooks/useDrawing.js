@@ -1483,7 +1483,7 @@ export const useDrawing = () => {
       distance: distance,
       unitLength: convert(userLength).from(measured).to('mm'),
       userWidth: convert(userWidth).from(measured).to('mm'),
-      userHeight: convert(userHeight).from(measured).to('mm'),
+      userHeight: convert(height).from(measured).to('mm'),
       unitType: measured,
     };
     const data = handleDownload(lines, points, roomSelectors, storeBoxes);
