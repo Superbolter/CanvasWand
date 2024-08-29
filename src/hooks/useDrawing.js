@@ -1536,7 +1536,20 @@ export const useDrawing = () => {
     setRedoStack([]);
   };
 
-  const handleApiCall = (height = userHeight) => {
+  const handleResetRooms = () => {
+    const rooms = [];
+    dispatch(setRoomSelectors(rooms));
+    handleApiCall(userHeight,rooms);
+    dispatch(setExpandRoomNamePopup(false));
+    dispatch(setRoomDetails(""))
+    dispatch(setRoomName(""))
+    dispatch(setRoomEditingMode(false))
+    dispatch(setActiveRoomButton(""))
+    dispatch(setActiveRoomIndex(-1))
+    dispatch(setSelectedLinesState([]))
+  };
+
+  const handleApiCall = (height = userHeight, rooms = roomSelectors) => {
     const lines = storeLines;
     const distance = Math.sqrt(
       (rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2
@@ -1547,10 +1560,10 @@ export const useDrawing = () => {
       distance: distance,
       unitLength: userLength,
       userWidth: userWidth,
-      userHeight: userHeight,
+      userHeight: height,
       unitType: measured,
     };
-    const data = handleDownload(lines, points, roomSelectors, storeBoxes);
+    const data = handleDownload(lines, points, rooms, storeBoxes);
     const finalData = {
       floorplan_id: floorplanId,
       draw_data: data,
@@ -1567,6 +1580,8 @@ export const useDrawing = () => {
       }
       dispatch(setRoomSelectorMode(true));
       dispatch(showRoomNamePopup(true));
+      dispatch(setShowPopup(false))
+      dispatch(setContextualMenuStatus(false))  
       // MySwal.fire({
       //   title: "Room Selector Instructions",
       //   html: `
@@ -1687,5 +1702,6 @@ export const useDrawing = () => {
     setIsSelecting,
     setStartPoint,
     setEndPoint,
+    handleResetRooms
   };
 };

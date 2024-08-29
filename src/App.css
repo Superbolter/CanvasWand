@@ -59,10 +59,10 @@ body, html {
   background-color: #e0e0e0; /* Optional: Background color for clarity */
 }
 
-.perspective-canvas {
-  /* flex: 1; Take up 50% of the container height */
+/* .perspective-canvas {
+  flex: 1; Take up 50% of the container height
   
-}
+} */
 
 .buttons {
   flex: 1; /* Take up 50% of the container height */

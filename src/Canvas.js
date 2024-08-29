@@ -110,6 +110,7 @@ export const CanvasComponent = () => {
     setIsSelecting,
     setStartPoint,
     setEndPoint,
+    handleResetRooms
   } = useDrawing();
 
   const { leftPos, rightPos, merge, lineBreak, perpendicularLine } = useSelector((state) => state.drawing)
@@ -309,7 +310,7 @@ export const CanvasComponent = () => {
             <CreateFiller key={index} p1={box.p1} p2={box.p2} p3={box.p3} p4={box.p4} />
           ))}
 
-          {!scale && <ContextualMenu/>}
+          {!scale && <ContextualMenu selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines} toggleSelectionMode={toggleSelectionSplitMode} setSelectedLines={setSelectedLines} handleMerge={handleMergeClick} setMerge={setMerge} setLineBreak={setLineBreak}/>}
 
           {!scale && roomSelectorMode && roomSelectors.map((room, index) =>(<RoomFiller 
            key={room.roomId}
@@ -341,6 +342,7 @@ export const CanvasComponent = () => {
             handleSaveClick={handleSaveClick}
             handleDoubleClick={handleDoubleClick}
             handleReset={handleReset}
+            handleResetRooms={handleResetRooms}
           />
       </div>
       {!scale ?

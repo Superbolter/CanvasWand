@@ -51,8 +51,6 @@ const DownloadJSONButton = ({ lines, points,roomSelectors }) => {
 export default DownloadJSONButton;
 
 export const handleDownload = (lines, points, roomSelectors,storeBoxes) => {
-    console.log(lines);
-    console.log("roomSelectors", roomSelectors, lines);
     const data = convertToJSON(lines, points, roomSelectors,storeBoxes);
     return data;
 };

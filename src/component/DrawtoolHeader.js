@@ -4,6 +4,8 @@ import {Button} from "../design_system/StyledComponents/components/Button"
 import Undo from "../assets/Undo.png"
 import Redo from "../assets/Redo.png"
 import  './ButtonComponent.css'
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 import { useDispatch, useSelector } from 'react-redux'
 import { drawData, setRoomSelectorMode, showRoomNamePopup, updateDrawData } from '../Actions/ApplicationStateAction.js'
@@ -12,7 +14,9 @@ import { setScale } from '../features/drawing/drwingSlice.js'
 import { Switch } from '@mui/material'
 import { setSeeDimensions } from '../Actions/DrawingActions.js'
 
-const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleReset} ) => {
+const MySwal = withReactContent(Swal);
+
+const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleReset,handleResetRooms} ) => {
   const dispatch=useDispatch()
   const {factor,floorplanId,roomSelectorMode}=useSelector((state)=>state.ApplicationState)
   const {userLength,scale} = useSelector((state) => state.drawing)
@@ -21,6 +25,32 @@ const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleRes
   const handleBackToScale = () =>{
     dispatch(setScale(true))
     handleReset()
+  }
+  const handleBackToDrawing = () =>{
+    MySwal.fire({
+        title: "Are you sure?",
+        html: `
+          <p>All your room data will be lost and only the structures will be available to you</p>
+        `,
+        icon: "warning",
+        confirmButtonText: "Yes",
+        showCancelButton: true,
+        customClass: {
+          title: "swal2-title-custom",
+          htmlContainer: "swal2-html-custom",
+          confirmButton: "swal2-confirm-button-custom",
+        },
+        width: "400px",
+        padding: "16px",
+        borderRadius: "16px",
+        backdrop: true,
+    }).then((result)=>{
+      if (result.isConfirmed) {
+        dispatch(setRoomSelectorMode(false)); 
+        dispatch(showRoomNamePopup(false))
+        handleResetRooms();
+      }
+    })
   }
   const handleCancel = () =>{
     dispatch(setScale(false))
@@ -33,7 +63,7 @@ const DrawtoolHeader = ({undo,redo, handleSaveClick,handleDoubleClick, handleRes
       <Typography modifiers={["medium", "black600"]} className='header-text'>
         {roomSelectorMode?
           <div style={{display:"flex", alignItems:"center", gap:"8px"}}>
-            <div style={{backgroundColor:"#F4F4F4", padding:"4px 8px", borderRadius:"8px"}} onClick={()=>{dispatch(setRoomSelectorMode(false)); dispatch(showRoomNamePopup(false))}}><ArrowBack style={{fontSize:"20px", cursor:"pointer", marginTop:"5px"}}/></div>
+            <div style={{backgroundColor:"#F4F4F4", padding:"4px 8px", borderRadius:"8px"}} onClick={handleBackToDrawing}><ArrowBack style={{fontSize:"20px", cursor:"pointer", marginTop:"5px"}}/></div>
             <Typography>Define the rooms</Typography>
           </div>
         : scale? "Select the accurate scale for your floor plan"
