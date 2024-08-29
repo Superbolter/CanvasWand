@@ -80,7 +80,6 @@ const RoomNamePopup = (props) => {
     dispatch(setRoomDetails(""))
     dispatch(setRoomName(""))
     dispatch(setRoomEditingMode(false))
-    dispatch(setActiveRoomButton(""))
     dispatch(setActiveRoomIndex(-1))
     dispatch(setSelectedLinesState([]));
   };
@@ -126,6 +125,7 @@ const RoomNamePopup = (props) => {
   const handleDeleteClick = () => {
     const newRooms = [...roomSelectors]
     newRooms.splice(activeRoomIndex, 1)
+    setName("")
     dispatch(setRoomSelectors(newRooms))
     dispatch(setExpandRoomNamePopup(false));
     dispatch(setRoomDetails(""))

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import "./App.css";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { Grid, Line, Text, OrbitControls } from "@react-three/drei";
 import BoxGeometry from "./component/BoxGeometry.js";
 import WallGeometry from "./component/WallGeometry.js";
@@ -25,7 +25,7 @@ import { DraggableDoor } from "./component/DragDrop.js";
 import { Scale } from "./component/Scale.js";
 import DrawtoolHeader from "./component/DrawtoolHeader.js";
 import { useDispatch, useSelector } from "react-redux";
-import { drawToolData } from "./Actions/ApplicationStateAction.js";
+import { drawToolData, setSelectedLinesState } from "./Actions/ApplicationStateAction.js";
 import ContextualMenu from "./component/ContextualMenu.js";
 import ButtonComponent from "./component/ButtonComponent.js";
 import WallPropertiesPopup from "./component/WallPropertiesPopup.js";
@@ -38,6 +38,9 @@ import ScalePopup from "./component/ScalePopup.js";
 import blade from "./assets/blade.png"
 import { setContextualMenuStatus, setShowPopup } from "./Actions/DrawingActions.js";
 import UpdateDistance from "./component/updateDistance.js";
+import * as THREE from 'three';
+import { Html } from "@react-three/drei";
+import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -50,7 +53,6 @@ export const CanvasComponent = () => {
     handleInformtion,
     deleteLastPoint,
     handleMouseDown,
-    handleMouseUp,
     toggleSelectionMode,
     perpendicularHandler,
     newLine,
@@ -99,11 +101,18 @@ export const CanvasComponent = () => {
     nearVal, 
     setNearVal,
     setNearPoint,
-    addRoom
+    addRoom,
+    isSelecting,
+    startPoint,
+    endPoint,
+    setDraggingPointIndex,
+    setIsSelecting,
+    setStartPoint,
+    setEndPoint,
   } = useDrawing();
 
   const { leftPos, rightPos, merge, lineBreak, perpendicularLine } = useSelector((state) => state.drawing)
-  const { storeBoxes, roomSelectorMode, selectionMode,selectedLines} = useSelector((state) => state.ApplicationState);
+  const { storeBoxes, roomSelectorMode, selectionMode,selectedLines, expandRoomPopup} = useSelector((state) => state.ApplicationState);
 
 
   const getUrlParameter = (name) => {
@@ -174,6 +183,53 @@ export const CanvasComponent = () => {
     dispatch(drawToolData(floorplanId));
   }, []);
 
+  // const { camera, scene } = useThree();
+  const handleMouseUp = () => {
+    setDraggingPointIndex(null);
+    if(roomSelectorMode && expandRoomPopup){
+      if (!isSelecting) return;
+    const selectedIds = [];
+    if (startPoint && endPoint) {
+      const minX = Math.min(startPoint.x, endPoint.x);
+      const maxX = Math.max(startPoint.x, endPoint.x);
+      const minY = Math.min(startPoint.y, endPoint.y);
+      const maxY = Math.max(startPoint.y, endPoint.y);
+
+      storeLines.forEach(line => {
+        const startPos = line.points[0]
+
+        const endPos = line.points[1]
+
+        if (
+          startPos.x >= minX && startPos.x <= maxX &&
+          startPos.y >= minY && startPos.y <= maxY &&
+          endPos.x >= minX && endPos.x <= maxX &&
+          endPos.y >= minY && endPos.y <= maxY
+        ) {
+          selectedIds.push(line.id);
+        }
+      });
+
+      dispatch(setSelectedLinesState(selectedIds));
+    }
+
+    setIsSelecting(false);
+    setStartPoint(null);
+    setEndPoint(null);
+    }
+  };
+
+  const createQuadrilateral = (p1, p2, p3, p4) => {
+    const shape = new Shape();
+    shape.moveTo(p1.x, p1.y);
+    shape.lineTo(p2.x, p2.y);
+    shape.lineTo(p3.x, p3.y);
+    shape.lineTo(p4.x, p4.y);
+    shape.lineTo(p1.x, p1.y); // Close the shape by going back to the first point
+    return shape;
+  };
+
+
   return (
     <div className="container">
       <div
@@ -195,6 +251,26 @@ export const CanvasComponent = () => {
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
         >
+          {isSelecting && startPoint && endPoint && (
+            // <Html position={[startPoint.x, startPoint.y, 0]}>
+            // <div
+            //   style={{
+            //     // position: 'absolute',
+            //     border: '1px solid blue',
+            //     background: 'rgba(0, 0, 255, 0.2)',
+            //     // left: `${Math.min(startPoint.x, endPoint.x) * window.innerWidth}px`,
+            //     // top: `${Math.min(startPoint.y, endPoint.y) * window.innerHeight}px`,
+            //     width: `${Math.abs(endPoint.x - startPoint.x) * window.innerWidth}px`,
+            //     height: `${Math.abs(endPoint.y - startPoint.y) * window.innerHeight}px`,
+            //   }}
+            // />
+            // </Html>
+            <mesh >
+              {/* <boxGeometry args={[Math.abs(startPoint.x - endPoint.x), Math.abs(startPoint.y - startPoint.z), 0]} /> */}
+              <shapeGeometry  attach="geometry" args={[createQuadrilateral(startPoint,new Vector3(endPoint.x, startPoint.y,0) ,endPoint,new Vector3(startPoint.x, endPoint.y,0) )]} />
+              <meshBasicMaterial color={"rgba(0, 0, 255, 0.2)"} transparent={true} opacity={0.2}/>
+            </mesh>
+          )}
           {nearPoint && lineBreak && (<UpdateDistance nearVal={nearVal}/>)}
 
           {scale && (<Scale/>)}

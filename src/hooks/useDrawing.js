@@ -56,6 +56,8 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { toast } from 'react-hot-toast';
 import { fetchWrapper } from "../app/RomeDataManager.js";
+import { useThree } from '@react-three/fiber';
+import * as THREE from 'three';
 
 const MySwal = withReactContent(Swal);
 
@@ -125,6 +127,9 @@ export const useDrawing = () => {
   // const [rightPos, setRightPosState] = useState(new Vector3(5, 0, 0));
   const [nearPoint, setNearPoint] = useState(false);
   const [nearVal, setNearVal]= useState();
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [startPoint, setStartPoint] = useState(null);
+  const [endPoint, setEndPoint] = useState(null);
 
   const setActionHistory = (data) =>{
     dispatch(setUndoStack(data))
@@ -795,7 +800,25 @@ export const useDrawing = () => {
     handleApiCall(height)
   };
 
+
+  const screenToNDC = (clientX, clientY) => {
+    const canvasContainer = document.querySelector(".canvas-container");
+    const rect = canvasContainer.getBoundingClientRect();
+    let x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    let y = -((clientY - rect.top) / rect.height) * 2 + 1;
+    const cameraWidth = rect.width;
+    const cameraHeight = rect.height;
+    const ndcX = x * (cameraWidth / 2);
+    const ndcY = y * (cameraHeight / 2);
+    return new Vector3(ndcX, ndcY);
+  };
+
   const handleMouseMove = (event) => {
+    if(roomSelectorMode && expandRoomPopup){
+      if (!isSelecting) return;
+      const end = screenToNDC(event.clientX, event.clientY);
+      setEndPoint(end);
+    }
     if (
       (points.length === 0 || stop || newLine || doorWindowMode || scale) &&
       !dragMode
@@ -969,6 +992,11 @@ export const useDrawing = () => {
   };
 
   const handleMouseDown = (event) => {
+    if(roomSelectorMode && expandRoomPopup){
+      setIsSelecting(true);
+      const start = screenToNDC(event.clientX, event.clientY);
+      setStartPoint(start);
+    }
     if (!dragMode) return;
 
     const canvasContainer = document.querySelector(".canvas-container");
@@ -991,9 +1019,7 @@ export const useDrawing = () => {
     }
   };
 
-  const handleMouseUp = () => {
-    setDraggingPointIndex(null);
-  };
+  
 
   const room = () => {
     MySwal.fire({
@@ -1066,7 +1092,7 @@ export const useDrawing = () => {
   };
 
   const handleClick = (event) => {
-    if (selectionMode && !lineClick) {
+    if (selectionMode && !lineClick && !expandRoomPopup) {
       setSelectedLines([]);
       dispatch(setContextualMenuStatus(false));
       dispatch(setShowPopup(false));
@@ -1593,7 +1619,7 @@ export const useDrawing = () => {
     setSelectedLines,
     toggleDragMode,
     handleMouseDown,
-    handleMouseUp,
+    // handleMouseUp,
     toggleSelectionMode,
     perpendicularHandler,
     toggleDoorWindowMode,
@@ -1615,6 +1641,13 @@ export const useDrawing = () => {
     handleApiCall,
     handleReset,
     handleMergeClick,
-    addRoom
+    addRoom,
+    isSelecting,
+    startPoint,
+    endPoint,
+    setDraggingPointIndex,
+    setIsSelecting,
+    setStartPoint,
+    setEndPoint,
   };
 };
