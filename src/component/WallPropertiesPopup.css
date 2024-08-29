@@ -104,9 +104,9 @@ line-height: 18.23px;
 letter-spacing: -0.01em;
 text-align: left;
 color:#2E2E2E;
-margin-bottom: 8px;
-
+margin-bottom: 4px;
 }
+
 .thickness-text {
 font-size: 14px;
 font-weight: 400;
@@ -200,3 +200,22 @@ margin-bottom: 4px;
         background-color: #ECECEC;
     }
 }
+
+
+.height-input-paper{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 4px;
+    align-items: center;
+    justify-content: space-between;
+    height: 34px;
+    border-radius: 8px !important;
+    overflow: hidden;
+    border: 1px solid #B6BABD;
+}
+
+.height-input-paper fieldset{
+    border: 1px solid white !important;
+}
+  

@@ -199,11 +199,11 @@ export const updateLineTypeId = (typeId) => {
           type: "SET_PROPERTY_POPUP",
           payload: true,
         });
-        const height = convert(storeLines[lineIndex].height).from('mm').to(measured)
+        const length = convert(storeLines[lineIndex].length).from('mm').to(measured)
         const width = convert(storeLines[lineIndex].width).from('mm').to(measured)
         dispatch({
-          type: "SET_HEIGHT",
-          payload: height,
+          type: "SET_LENGTH",
+          payload: length,
         });
         dispatch({
           type: "SET_WIDTH",

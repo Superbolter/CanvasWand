@@ -1,7 +1,7 @@
 const initialState = {
     floorplanId:null,
     drawnBy:null,
-    height:0,
+    length:0,
     width:0,
     img:null,
     workStatus:0,
@@ -54,10 +54,10 @@ const initialState = {
           ...state,
           factor:action.payload
         };
-      case "SET_HEIGHT":
+      case "SET_LENGTH":
         return {
           ...state,
-          height:action.payload
+          length:action.payload
         };
       case "SET_WIDTH":
         return {

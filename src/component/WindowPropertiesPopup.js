@@ -14,10 +14,13 @@ import {
   setShowPopup,
   setTypeId,
 } from "../Actions/DrawingActions.js";
+import Properties from "./Properties.js";
 
 const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
   const { typeId, showPropertiesPopup } = useSelector((state) => state.Drawing);
-  const { height, width,roomSelectorMode } = useSelector((state) => state.ApplicationState);
+  const { height, width, roomSelectorMode } = useSelector(
+    (state) => state.ApplicationState
+  );
   const { locked } = useSelector((state) => state.Drawing);
   const { measured } = useSelector((state) => state.drawing);
 
@@ -29,7 +32,7 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
   };
   const handleLockClick = () => {
     dispatch(setLockForLines(!locked));
-  }
+  };
   return (
     <div>
       <div
@@ -54,54 +57,7 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
           />
         </div>
         <div className="input-container">
-          <div className="height-input-container">
-            <Typography className="height-text">Height</Typography>
-            <TextField
-              style={{ width: "100%", height: "34px" }}
-              id="outlined-required"
-              placeholder={measured}
-              label={measured}
-              variant="outlined"
-              size="small"
-              required={true}
-              type="tel"
-              value={height > 0 ? height.toFixed(2) : ""}
-              disabled
-              InputProps={{
-                style: {
-                  fontSize: "16px",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: "400",
-                  height: "44px",
-                  borderRadius: "8px",
-                },
-              }}
-            />
-          </div>
-          <div className="thickness-input-container">
-            <Typography className="thickness-text">Width</Typography>
-            <TextField
-              style={{ width: "100%", height: "34px" }}
-              id="outlined-required"
-              placeholder={measured}
-              label={measured}
-              variant="outlined"
-              size="small"
-              required={true}
-              type="tel"
-              value={width > 0 ? width.toFixed(2) : ""}
-              disabled
-              InputProps={{
-                style: {
-                  fontSize: "16px",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: "400",
-                  height: "44px",
-                  borderRadius: "8px",
-                },
-              }}
-            />
-          </div>
+          <Properties />
           {/* <div className="thickness-input-container">
             <Typography className="thickness-text">
               Distance from floor
@@ -132,20 +88,26 @@ const WindowPropertiesPopup = ({ selectionMode, deleteSelectedLines }) => {
               className="btn-container"
               style={{ justifyContent: "flex-start" }}
             >
-              <div className="btn" style={{ border: locked ? "2px solid cornflowerblue" : "" }} onClick={handleLockClick} >
-                  <img src={Unlocked} alt="" />
-                  <Typography className="contextual-btn-text">Lock</Typography>
-                </div>
+              <div
+                className="btn"
+                style={{ border: locked ? "2px solid cornflowerblue" : "" }}
+                onClick={handleLockClick}
+              >
+                <img src={Unlocked} alt="" />
+                <Typography className="contextual-btn-text">Lock</Typography>
+              </div>
               <div className="btn" onClick={deleteSelectedLines}>
                 <img src={Delete} alt="" />
                 <Typography className="contextual-btn-text">Delete</Typography>
               </div>
             </div>
-          ) :
-          <div className="btn-container">
-            <Typography modifiers={["helpText"]}>(Press esc to enter selection mode)</Typography>
-          </div> 
-          }
+          ) : (
+            <div className="btn-container">
+              <Typography modifiers={["helpText"]}>
+                (Press esc to enter selection mode)
+              </Typography>
+            </div>
+          )}
         </div>
       </div>
     </div>

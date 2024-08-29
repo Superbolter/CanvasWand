@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Typography } from "../design_system/StyledComponents/components/Typography.js";
-import TextField from "@mui/material/TextField";
 import split from "../assets/split.png";
 import mergeIcon from "../assets/merge.png";
 import Unlocked from "../assets/Unlocked.png";
@@ -15,13 +14,14 @@ import {
   setTypeId,
 } from "../Actions/DrawingActions.js";
 import { useDrawing } from "../hooks/useDrawing.js";
+import Properties from "./Properties.js";
 
 const WallPropertiesPopup = ({
   selectionMode,
   deleteSelectedLines,
   toggleSelectionMode,
   setSelectedLines,
-  handleMerge
+  handleMerge,
 }) => {
   const { typeId, showPropertiesPopup } = useSelector((state) => state.Drawing);
   const dispatch = useDispatch();
@@ -34,21 +34,23 @@ const WallPropertiesPopup = ({
   };
   const { lineBreak, merge, measured } = useSelector((state) => state.drawing);
   const { setLineBreak, setMerge, stop, setStop } = useDrawing();
-  const { height, width,roomSelectorMode } = useSelector((state) => state.ApplicationState);
+  const { length, width, roomSelectorMode } = useSelector(
+    (state) => state.ApplicationState
+  );
   const { locked } = useSelector((state) => state.Drawing);
 
   const handleMergeClick = () => {
     // setSelectedLines([]);
     handleMerge();
     setLineBreak(false);
-    if(!selectionMode) {
+    if (!selectionMode) {
       toggleSelectionMode();
     }
     setMerge(!merge);
   };
 
   const handleSplitClick = () => {
-    setMerge(false)
+    setMerge(false);
     if (!lineBreak && selectionMode) {
       toggleSelectionMode();
     } else if (lineBreak && !selectionMode) {
@@ -67,13 +69,15 @@ const WallPropertiesPopup = ({
 
   const handleLockClick = () => {
     dispatch(setLockForLines(!locked));
-  }
+  };
 
   return (
     <div>
       <div
         className={
-          (typeId === 1 && showPropertiesPopup && !roomSelectorMode) || lineBreak && !roomSelectorMode || merge && !roomSelectorMode
+          (typeId === 1 && showPropertiesPopup && !roomSelectorMode) ||
+          (lineBreak && !roomSelectorMode) ||
+          (merge && !roomSelectorMode)
             ? "popup-container"
             : "popup-container-hidden"
         }
@@ -93,54 +97,7 @@ const WallPropertiesPopup = ({
           />
         </div>
         <div className="input-container">
-          <div className="height-input-container">
-            <Typography className="height-text">Height</Typography>
-            <TextField
-              style={{ width: "100%", height: "34px" }}
-              id="outlined-required"
-              placeholder={measured}
-              label={measured}
-              variant="outlined"
-              size="small"
-              required={true}
-              type="tel"
-              value={height > 0 ? height.toFixed(2) : ""}
-              disabled
-              InputProps={{
-                style: {
-                  fontSize: "16px",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: "400",
-                  height: "44px",
-                  borderRadius: "8px",
-                },
-              }}
-            />
-          </div>
-          <div className="thickness-input-container">
-            <Typography className="thickness-text">Thickness</Typography>
-            <TextField
-              style={{ width: "100%", height: "34px" }}
-              id="outlined-required"
-              placeholder={measured}
-              label={measured}
-              variant="outlined"
-              size="small"
-              required={true}
-              type="tel"
-              value={width > 0 ? width.toFixed(2) : ""}
-              disabled
-              InputProps={{
-                style: {
-                  fontSize: "16px",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: "400",
-                  height: "44px",
-                  borderRadius: "8px",
-                },
-              }}
-            />
-          </div>
+          <Properties />
           {/* <div className="divider"></div> */}
           {selectionMode || lineBreak || merge ? (
             <div className="btn-container">
@@ -161,25 +118,31 @@ const WallPropertiesPopup = ({
                 <Typography className="contextual-btn-text">Merge</Typography>
               </div>
               {lineBreak || merge ? null : (
-                <div className="btn" style={{ border: locked ? "2px solid cornflowerblue" : "" }} onClick={handleLockClick} >
+                <div
+                  className="btn"
+                  style={{ border: locked ? "2px solid cornflowerblue" : "" }}
+                  onClick={handleLockClick}
+                >
                   <img src={Unlocked} alt="" />
                   <Typography className="contextual-btn-text">Lock</Typography>
                 </div>
               )}
               {lineBreak || merge ? null : (
-                <div className="btn" onClick={handlDeleteClick} >
-                  <img src={Delete} alt=""/>
+                <div className="btn" onClick={handlDeleteClick}>
+                  <img src={Delete} alt="" />
                   <Typography className="contextual-btn-text">
                     Delete
                   </Typography>
                 </div>
               )}
             </div>
-          ) : 
-          <div className="btn-container">
-            <Typography modifiers={["helpText"]}>(Press esc to enter selection mode)</Typography>
-          </div>
-          }
+          ) : (
+            <div className="btn-container">
+              <Typography modifiers={["helpText"]}>
+                (Press esc to enter selection mode)
+              </Typography>
+            </div>
+          )}
         </div>
       </div>
     </div>

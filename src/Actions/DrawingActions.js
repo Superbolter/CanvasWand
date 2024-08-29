@@ -21,11 +21,11 @@ export const setShowPopup = (val) => {
       const lastSelectedLine = storeLines.filter(line => lastSelectedLineId === line.id)
       if (lastSelectedLine.length > 0) {
         const measured = state.drawing.measured
-        const height = convert(lastSelectedLine[0].height).from('mm').to(measured)
+        const length = convert(lastSelectedLine[0].length).from('mm').to(measured)
         const width = convert(lastSelectedLine[0].width).from('mm').to(measured)
         dispatch({
-          type: "SET_HEIGHT",
-          payload: height,
+          type: "SET_LENGTH",
+          payload: length,
         });
         dispatch({
           type: "SET_WIDTH",
