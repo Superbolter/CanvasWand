@@ -3,15 +3,15 @@ import { SNAPPING_THRESHOLD } from "../constant/constant";
  export const snapToPoint = (point,points,storeLines) => {
     // Check against all points and endpoints of existing lines
     for (let p of points) {
-      if (p.distanceTo(point) < SNAPPING_THRESHOLD) {
+      if (p.distanceTo(point) < 5) {
         return p;
       }
     }
     for (let line of storeLines) {
-      if (line.points[0].distanceTo(point) < SNAPPING_THRESHOLD) {
+      if (line.points[0].distanceTo(point) < 5) {
         return line.points[0];
       }
-      if (line.points[1].distanceTo(point) < SNAPPING_THRESHOLD) {
+      if (line.points[1].distanceTo(point) < 5) {
         return line.points[1];
       }
 
@@ -21,7 +21,7 @@ import { SNAPPING_THRESHOLD } from "../constant/constant";
         line.points[1],
         point
       );
-      if (closestPointOnLine.distanceTo(point) < SNAPPING_THRESHOLD) {
+      if (closestPointOnLine.distanceTo(point) < 5) {
         return closestPointOnLine;
       }
     }
