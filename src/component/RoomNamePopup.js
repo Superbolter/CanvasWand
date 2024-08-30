@@ -76,6 +76,7 @@ const RoomNamePopup = (props) => {
     if (!selectionMode) {
       props.toggleSelectionMode();
     }
+    setName("")
     dispatch(setExpandRoomNamePopup(true));
     dispatch(setRoomDetails(""))
     dispatch(setRoomName(""))
@@ -99,6 +100,11 @@ const RoomNamePopup = (props) => {
     if (selectionMode) {
       props.toggleSelectionMode();
     }
+    dispatch(setRoomDetails(""))
+    dispatch(setRoomName(""))
+    dispatch(setRoomEditingMode(false))
+    dispatch(setActiveRoomIndex(-1))
+    dispatch(setSelectedLinesState([]))
   };
 
   const handleChange = (event) => {
@@ -106,7 +112,7 @@ const RoomNamePopup = (props) => {
   };
 
   const handleSaveClick = () => {
-    if(roomName.length>0 && selectedRoomType.length>0){
+    if(roomName.length>0 && selectedRoomType?.length>0){
       props.addRoom(roomName, selectedRoomType);
       setName("")
       dispatch(setRoomDetails(""));
@@ -116,7 +122,7 @@ const RoomNamePopup = (props) => {
       if(roomName.length===0){
         setError("Please enter room name")
       }
-      else if(selectedRoomType.length===0){
+      else if(selectedRoomType?.length===0){
         setError("Please select room type")
       }
     }
@@ -137,13 +143,13 @@ const RoomNamePopup = (props) => {
   };
 
   useEffect(()=>{
-    if(selectedRoomName.length>0 && selectedRoomType.length>0){
+    if(selectedRoomName?.length>0 && selectedRoomType && selectedRoomType?.length>0){
       setError("")
     }
   }, [selectedRoomName,selectedRoomType])
 
   const handleEditClick = () => {
-    if(roomName.length>0 && selectedRoomType.length>0){
+    if(roomName.length>0 && selectedRoomType && selectedRoomType?.length>0){
       const newRooms = [...roomSelectors]
       newRooms[activeRoomIndex] = { ...newRooms[activeRoomIndex], roomName: roomName, roomType: selectedRoomType }
       setName("")
@@ -159,7 +165,7 @@ const RoomNamePopup = (props) => {
       if(roomName.length===0){
         setError("Please enter room name")
       }
-      else if(selectedRoomType.length===0){
+      else if(selectedRoomType?.length===0 || selectedRoomType===null || selectedRoomType=== ""){
         setError("Please select room type")
       }
     }
@@ -235,7 +241,7 @@ const RoomNamePopup = (props) => {
                 }}
                 IconComponent={KeyboardArrowDownIcon}
                 renderValue={(selectedRoomType) => {
-                  if (selectedRoomType === "") {
+                  if (selectedRoomType === "" || selectedRoomType===null) {
                     return <Typography modifiers={["subtitle", "black600"]}>Select room type</Typography>; 
                   }
                   return selectedRoomType;

@@ -111,6 +111,8 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
       </mesh>
       <Html
         position={[centroid.x - fontSize, centroid.y, centroid.z]}
+        zIndexRange={[0, 0]}
+        style={{zIndex:"12"}}
       >
         <div style={{
           display: "flex",
@@ -122,7 +124,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
           fontFamily: "'DM Sans', sans-serif",
           fontWeight: "500",
-          fontSize,
+          fontSize: fontSize < 18? (fontSize > 9? fontSize: "9px"): "18px",
           color: selectedRoomName === roomName? "white":roomType!==null? "#4B73EC":"black", 
           border: selectedRoomName === roomName || roomType!==null? "2px solid #4B73EC":"0.7px solid #B6BABD",
         }}

@@ -1603,11 +1603,18 @@ export const useDrawing = () => {
       //   backdrop: true,
       // });
     } else {
+      toast("Saving, Please Wait ...", {
+        icon: '✔️',
+        style: {
+          fontFamily: "'DM Sans', sans-serif",
+          color: '#000',
+          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)'
+        },
+      })
       handleApiCall();
       setTimeout(() => {
         fetchWrapper.post(`/floorplans/process_draw_data/${floorplanId}`).then((res)=>{
-          console.log(res)
-          // window.location.href = "https://sbst-beta.getsuperbolt.com/my-homes";
+          window.open(`https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`, '_blank');
         })
       }, 1000);
     }
