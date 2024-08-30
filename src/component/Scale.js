@@ -232,8 +232,6 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
         rotation={[0, 0, lineAngle]}
         onPointerDown={handlePointerDownBox}
         onPointerUp={handlePointerUp}
-        onClick={(event) => event.stopPropagation()}
-        onDoubleClick={handleDoubleClick}
       >
         <boxGeometry args={[dimensions.l, dimensions.w, dimensions.h]} />
         <meshBasicMaterial color={"#6360FB"} transparent={true} opacity={0.8}/>
