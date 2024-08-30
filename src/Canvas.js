@@ -20,6 +20,7 @@ import {
   setFactor,
   setInformation,
   setIdSelection,
+  setLinePlacementMode,
 } from "./features/drawing/drwingSlice.js";
 import { DraggableDoor } from "./component/DragDrop.js";
 import { Scale } from "./component/Scale.js";
@@ -113,7 +114,7 @@ export const CanvasComponent = () => {
     handleResetRooms
   } = useDrawing();
 
-  const { leftPos, rightPos, merge, lineBreak, perpendicularLine } = useSelector((state) => state.drawing)
+  const { leftPos, rightPos, merge, lineBreak, perpendicularLine, linePlacementMode } = useSelector((state) => state.drawing)
   const { storeBoxes, roomSelectorMode, selectionMode,selectedLines, expandRoomPopup} = useSelector((state) => state.ApplicationState);
 
 
@@ -145,6 +146,13 @@ export const CanvasComponent = () => {
     }
     if((event.ctrlKey || event.metaKey)&&(event.key === "y" || event.key === "Y")){
       redo();
+    }
+    if((event.ctrlKey || event.metaKey) && (event.key === "b" || event.key === "B")){
+      if(linePlacementMode === "midpoint"){
+        dispatch(setLinePlacementMode("below"))
+      }else{
+        dispatch(setLinePlacementMode("midpoint"))
+      }
     }
     if(event.key === "escape" || event.key === "Escape" && !merge && !lineBreak){
       if(!roomSelectorMode){
