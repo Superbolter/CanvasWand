@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Canvas, extend } from "@react-three/fiber";
 import {
   Vector3,
@@ -100,11 +100,13 @@ const BoxGeometry = ({
   opacity = 0.5,
 }) => {
   const dispatch = useDispatch();
+  const [hovered, setHovered] = useState(false);
+
 
   const { measured, roomSelect, newline, linePlacementMode } = useSelector(
     (state) => state.drawing
   );
-  const { storeLines, factor, storeBoxes, points, roomSelectorMode } =
+  const { storeLines, factor, storeBoxes, points, roomSelectorMode, selectionMode } =
     useSelector((state) => state.ApplicationState);
   const { seeDimensions } = useSelector((state) => state.Drawing);
 
@@ -279,28 +281,32 @@ const BoxGeometry = ({
   // Calculate the rotation angle for the text based on the line angle
   const textRotation = angle;
 
+  // State to manage hover state
+
+  // State to manage the current texture
+  const getTexture = () => {
+    if (hovered && selectionMode && !roomSelectorMode) return newTexture; // Replace with your hover texture
+    if (isSelected) return newTexture;
+    if (typeId === 1) return wallTexture;
+    if (typeId === 2) return doorTexture;
+    if (typeId === 3) return windowTexture;
+    if (typeId === 4) return railingTexture;
+    return "";
+  };
+
   //linePlacementMode === "midpoint" ? adjustedMidpoint : middlepoint
   return (
     <>
-      <mesh position={midpoint} rotation={[0, 0, angle]} onClick={onClick}>
+      <mesh position={midpoint} rotation={[0, 0, angle]} onClick={onClick}
+        onPointerOver={() => setHovered(true)}  // Set hovered to true on mouse over
+        onPointerOut={() => setHovered(false)}  // Set hovered to false on mouse out
+      >
         <boxGeometry args={[length, typeId === 4 ? width / 2 : width, 0.1]} />
         <meshBasicMaterial
-          map={
-            isSelected
-              ? newTexture
-              : typeId === 1
-              ? wallTexture
-              : typeId === 2
-              ? doorTexture
-              : typeId === 3
-              ? windowTexture
-              : typeId === 4
-              ? railingTexture
-              : ""
-          }
+          map={getTexture()}
           color={typeId === 5 ? (!isSelected ? "orange" : "#7AA8D2") : ""}
-          transparent={0.9}
-          opacity={0.95}
+          transparent={true}
+          opacity={0.9}
         />
       </mesh>
 

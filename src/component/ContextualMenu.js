@@ -47,7 +47,8 @@ const ContextualMenu = (props) => {
     dispatch(setSelectedLinesState([]));
   };
 
-  const handleMergeClick = () => {
+  const handleMergeClick = (e) => {
+    e.stopPropagation()
     // setSelectedLines([]);
     props.handleMerge();
     props.setLineBreak(false);
@@ -57,7 +58,8 @@ const ContextualMenu = (props) => {
     props.setMerge(!merge);
   };
 
-  const handleSplitClick = () => {
+  const handleSplitClick = (e) => {
+    e.stopPropagation()
     props.setMerge(false);
     if (!lineBreak && props.selectionMode) {
       props.toggleSelectionMode();
@@ -67,7 +69,8 @@ const ContextualMenu = (props) => {
     props.setLineBreak(!lineBreak);
   };
 
-  const handlDeleteClick = () => {
+  const handlDeleteClick = (e) => {
+    e.stopPropagation()
     if (!props.selectionMode) {
       props.toggleSelectionMode();
     } else {
@@ -75,7 +78,8 @@ const ContextualMenu = (props) => {
     }
   };
 
-  const handleLockClick = () => {
+  const handleLockClick = (e) => {
+    e.stopPropagation()
     dispatch(setLockForLines(!locked));
   };
 
