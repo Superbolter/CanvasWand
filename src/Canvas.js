@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { Canvas, useThree } from "@react-three/fiber";
 import { Grid, Line, Text, OrbitControls, OrthographicCamera } from "@react-three/drei";
@@ -41,6 +41,8 @@ import { setContextualMenuStatus, setShowPopup } from "./Actions/DrawingActions.
 import UpdateDistance from "./component/updateDistance.js";
 import * as THREE from 'three';
 import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -129,6 +131,15 @@ export const CanvasComponent = () => {
     (state) => state.ApplicationState
   );
 
+  const [zoom, setZoom] = useState(1);
+
+  const handleWheel = (event) => {
+    event.preventDefault();
+    const zoomSensitivity = 0.001; // Adjust this value to change zoom sensitivity
+    const newZoom = zoom * (1 - event.deltaY * zoomSensitivity);
+    setZoom(Math.max(1, Math.min(4.5, newZoom))); // Limit zoom between 0.1 and 10
+  };
+
   const handleKeyDown = (event) => {
     if (event.key === "s" || event.key === "S") {
       setStop(!stop);
@@ -206,6 +217,8 @@ export const CanvasComponent = () => {
   };
 
 
+  
+
   return (
     <div className="container">
       <div
@@ -213,6 +226,7 @@ export const CanvasComponent = () => {
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
+        onWheel={handleWheel}
         style={ scale? {cursor:'grab'}: lineBreak ?{cursor:`url(${blade}) 8 8, crosshair`} :selectionMode? roomSelectorMode? {cursor:"pointer"} :{ cursor: "grab"}:{cursor:'crosshair'}}
       >
         {/* 2D (Orthographic) Canvas */}
@@ -227,6 +241,8 @@ export const CanvasComponent = () => {
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
         >
+
+          <CameraController zoom={zoom} />
           {isSelecting && startPoint && endPoint && (
             <mesh >
               <shapeGeometry  attach="geometry" args={[createQuadrilateral(startPoint,new Vector3(endPoint.x, startPoint.y,0) ,endPoint,new Vector3(startPoint.x, endPoint.y,0) )]} />
@@ -316,10 +332,10 @@ export const CanvasComponent = () => {
           {/* 2D grid */}
           <Grid
             rotation={[Math.PI / 2, 0, 0]}
-            cellSize={100}
+            cellSize={10}
             cellThickness={0}
             //cellColor="gray"
-            sectionSize={40}
+            sectionSize={10}
             //sectionThickness={1.5}
             sectionColor="white"
             fadeDistance={10000}
@@ -327,7 +343,12 @@ export const CanvasComponent = () => {
             fadeStrength={1}
             fadeFrom={1}
           />
-          
+          {/* <OrbitControls enablePan={false} // Disable panning if needed
+              maxPolarAngle={Math.PI / 2} // Limit vertical rotation to 90 degrees (horizontal plane)
+              minPolarAngle={Math.PI / 2} // Limit vertical rotation to 90 degrees (horizontal plane)
+              maxAzimuthAngle={Math.PI / 100} // Optional: Limit horizontal rotation range if needed
+              minAzimuthAngle={-Math.PI / 100} // Optional: Limit horizontal rotation range if needed
+            /> */}
         </Canvas>
         <DrawtoolHeader
             undo={undo}
@@ -337,6 +358,7 @@ export const CanvasComponent = () => {
             handleReset={handleReset}
             handleResetRooms={handleResetRooms}
           />
+        <ZoomComponent zoom={zoom} setZoom={setZoom}/>          
       </div>
       {!scale ?
       <div className="button-container">
@@ -419,3 +441,30 @@ export const CanvasComponent = () => {
 };
 
 export default CanvasComponent;
+
+const CameraController = ({ zoom }) => {
+  const { camera } = useThree();
+  
+  useEffect(() => {
+    camera.zoom = zoom;
+    camera.updateProjectionMatrix();
+  }, [zoom, camera]);
+
+  return null;
+};
+
+const ZoomComponent = ({ zoom, setZoom }) => {
+  return (
+    <div className="zoom-container">
+      <button onClick={() => setZoom(Math.max((zoom - 0.5), 1))}>
+        <ZoomOutIcon />
+      </button>
+      <input className="zoom-slider" type="range" min="1" max="4.5" step="0.1" value={zoom} onChange={(e) => setZoom(parseFloat(e.target.value))} style={{
+        background: `linear-gradient(to right, #007AFF 0%, #007AFF ${(zoom - 1) / 3.5 * 100}%, #0000000D ${(zoom - 1) / 3.5 * 100}%, #0000000D 100%)`
+      }}/>
+      <button onClick={() => setZoom(Math.min((zoom + 0.5), 4.5))}>
+        <ZoomInIcon />
+      </button>
+    </div>
+  );
+}
