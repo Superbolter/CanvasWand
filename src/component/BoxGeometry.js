@@ -329,7 +329,7 @@ const BoxGeometry = ({
         />
       </mesh>
 
-      {seeDimensions && (
+      {seeDimensions && typeId !== 5 && (
         <Text
           position={textPosition}
           rotation={[0, 0, textRotation]}

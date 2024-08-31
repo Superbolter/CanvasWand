@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import "./App.css";
 import { Canvas, useThree } from "@react-three/fiber";
-import { Grid, Line, Text, OrbitControls } from "@react-three/drei";
+import { Grid, Line, Text, OrbitControls, OrthographicCamera } from "@react-three/drei";
 import BoxGeometry from "./component/BoxGeometry.js";
 import WallGeometry from "./component/WallGeometry.js";
 import DownloadJSONButton from "./component/ConvertToJson.js";
@@ -40,7 +40,6 @@ import blade from "./assets/blade.png"
 import { setContextualMenuStatus, setShowPopup } from "./Actions/DrawingActions.js";
 import UpdateDistance from "./component/updateDistance.js";
 import * as THREE from 'three';
-import { Html } from "@react-three/drei";
 import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
 
 export const CanvasComponent = () => {
@@ -229,21 +228,7 @@ export const CanvasComponent = () => {
           onClick={handleClick}
         >
           {isSelecting && startPoint && endPoint && (
-            // <Html position={[startPoint.x, startPoint.y, 0]}>
-            // <div
-            //   style={{
-            //     // position: 'absolute',
-            //     border: '1px solid blue',
-            //     background: 'rgba(0, 0, 255, 0.2)',
-            //     // left: `${Math.min(startPoint.x, endPoint.x) * window.innerWidth}px`,
-            //     // top: `${Math.min(startPoint.y, endPoint.y) * window.innerHeight}px`,
-            //     width: `${Math.abs(endPoint.x - startPoint.x) * window.innerWidth}px`,
-            //     height: `${Math.abs(endPoint.y - startPoint.y) * window.innerHeight}px`,
-            //   }}
-            // />
-            // </Html>
             <mesh >
-              {/* <boxGeometry args={[Math.abs(startPoint.x - endPoint.x), Math.abs(startPoint.y - startPoint.z), 0]} /> */}
               <shapeGeometry  attach="geometry" args={[createQuadrilateral(startPoint,new Vector3(endPoint.x, startPoint.y,0) ,endPoint,new Vector3(startPoint.x, endPoint.y,0) )]} />
               <meshBasicMaterial color={"rgba(0, 0, 255, 0.2)"} transparent={true} opacity={0.2}/>
             </mesh>
@@ -355,70 +340,6 @@ export const CanvasComponent = () => {
       </div>
       {!scale ?
       <div className="button-container">
-        {/* 3D (Perspective) Canvas */}
-        {/* <div className="perspective-canvas">
-          
-        </div> */}
-
-        {/* Buttons for interaction */}
-         {/* <div className="button-container1">
-          <button onClick={deleteLastPoint}>Delete Last Point</button>
-          <button onClick={toggleSelectionroomMood}>
-            {roomSelect ? "selectingRoom" : "roomSelecter"}
-          </button>
-          <button onClick={() => {setNewLine(!newLine)
-            setStop(!stop);
-          }}>
-            {newLine ? "NewLineAdded" : "Add New Line"}
-          </button>
-          <button onClick={() =>{ setLineBreak(!lineBreak)
-            setStop(!stop);
-          }}>
-            {lineBreak ? "breaking start" : "Break"}
-          </button>
-          {/*check setNewLine(true); *
-          <button onClick={perpendicularHandler}>
-            {perpendicularLine
-              ? "Perpendicular Line"
-              : "Not Perpendicular Line"}
-          </button>
-          <button onClick={toggleSelectionMode}>
-            {selectionMode && !roomSelect
-              ? "Cancel Select and Delete"
-              : "Select and Delete"}
-          </button>
-          <button onClick={toggleDragMode}>
-            {dragMode ? "Disable Drag Mode" : "Enable Drag Mode"}
-          </button>
-          <button onClick={() =>{ setMerge(!merge)
-            setStop(!stop);
-          }}>{merge?"merge active":"merge"}</button>
-          <button onClick={handleInformtion}>Information</button>
-          <button onClick={() => dispatch(setScale(!scale))}>Scale</button>
-          <button onClick={handlemode}>
-            {type === "imaginary" ? "imaginary line" : "real line"}
-          </button>
-          <button onClick={toggleDoorWindowMode}>
-            {doorWindowMode === "none"
-              ? "Add Door"
-              : doorWindowMode === "door"
-              ? "Place Door"
-              : "Door Mode"}
-          </button>
-          <DownloadJSONButton
-            lines={storeLines}
-            points={points}
-            roomSelectors={roomSelectors}
-          />
-          <LengthConverter />
-          {information && (
-            <LineEditForm
-              selectedLines={selectedLines}
-              setSelectedLines={setSelectedLines}
-              setSelectionMode={setSelectionMode}
-            />
-          )}
-        </div>  */}
         <div style={{ position: "relative" }}>
           <div
           className="perspective-canvas"
@@ -435,8 +356,11 @@ export const CanvasComponent = () => {
         >
           <Canvas
             style={{ height: "100%", width: "100%" }}
-            camera={{ position: [0, 0, 800], fov: 75 }}
+            orthographic
+            camera={{ position: [0, 0, 800], fov: 75, }}
           >
+            <OrthographicCamera makeDefault zoom={0.3} position={[0, 0, 800]} />
+
             {/* Render lines in 3D view */}
             {storeLines.map((line) => (
               <WallGeometry
@@ -447,6 +371,7 @@ export const CanvasComponent = () => {
                 widthchange={line.widthchange}
                 widthchangetype={line.widthchangetype}
                 type={line.type}
+                typeId={line.typeId}
                 isSelected={selectedLines.includes(line.id)}
                 isChoose={idSelection.includes(line.id)}
                 onClick={(e) => handleLineClick(e,line.id)}
@@ -467,7 +392,13 @@ export const CanvasComponent = () => {
             /> 
 
             {/* Orbit controls for 3D view */}
-            <OrbitControls />
+            <OrbitControls
+              enablePan={false} // Disable panning if needed
+              // maxPolarAngle={Math.PI / 2} // Limit vertical rotation to 90 degrees (horizontal plane)
+              // minPolarAngle={Math.PI / 2} // Limit vertical rotation to 90 degrees (horizontal plane)
+              maxAzimuthAngle={Math.PI / 3} // Optional: Limit horizontal rotation range if needed
+              minAzimuthAngle={-Math.PI / 3} // Optional: Limit horizontal rotation range if needed
+            />
           </Canvas>
         </div>
           <WindowPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>

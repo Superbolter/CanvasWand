@@ -286,7 +286,7 @@ export const useDrawing = () => {
     const previousLines = [...storeLines];
     const previousPoints = [...points];
     const previousBoxes = [...storeBoxes];
-    let type = typeId === 1 ? "wall" : typeId===2? "door": typeId === 3 ? "window" : typeId === 4? "railing": "";
+    let type = typeId === 1 ? "wall" : typeId===2? "door": typeId === 3 ? "window" : typeId === 4? "railing": typeId === 5? "imaginary": ""
     let newLine = {
       id: uniqueId(),
       points: [startPoint, newPoint],

@@ -48,7 +48,6 @@ const ScalePopup = (props) => {
               variant="outlined"
               size="small"
               required={true}
-              type="tel"
               value={userLength > 0 ? userLength : ""}
               onChange={(e)=> dispatch(setUserLength(e.target.value))}
               InputProps={{
@@ -72,7 +71,6 @@ const ScalePopup = (props) => {
               variant="outlined"
               size="small"
               required={true}
-              type="tel"
               value={userWidth > 0 ? userWidth : ""}
               onChange={(e)=> dispatch(setUserWidth(e.target.value))}
               InputProps={{
