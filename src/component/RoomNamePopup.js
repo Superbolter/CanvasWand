@@ -33,6 +33,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CheckIcon from "@mui/icons-material/Check";
 import { setRoomSelectors } from "../features/drawing/drwingSlice.js";
 import edit from "../assets/edit.svg";
+import { Check } from "@mui/icons-material";
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   "label + &": {
@@ -58,6 +59,7 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 const RoomNamePopup = (props) => {
   const [error, setError] = useState("");
   const [roomName, setName] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
   const { roomPopup, expandRoomPopup, selectionMode, roomEditingMode,selectedRoomName,selectedRoomType, activeRoomButton, activeRoomIndex } = useSelector(
     (state) => state.ApplicationState
   );
@@ -67,6 +69,8 @@ const RoomNamePopup = (props) => {
   useEffect(() => {
     if (selectedRoomName) {
       setName(selectedRoomName);
+      setIsEditing(false);
+      setError(false)
     }
   }, [selectedRoomName]);
 
@@ -109,6 +113,7 @@ const RoomNamePopup = (props) => {
 
   const handleChange = (event) => {
     dispatch(setRoomDetails(event.target.value));
+    setName(event.target.value)
   };
 
   const handleSaveClick = () => {
@@ -148,11 +153,12 @@ const RoomNamePopup = (props) => {
     }
   }, [selectedRoomName,selectedRoomType])
 
-  const handleEditClick = () => {
+  const handleEditSaveClick = () => {
     if(roomName.length>0 && selectedRoomType && selectedRoomType?.length>0){
       const newRooms = [...roomSelectors]
       newRooms[activeRoomIndex] = { ...newRooms[activeRoomIndex], roomName: roomName, roomType: selectedRoomType }
       setName("")
+      setIsEditing(false)
       dispatch(setRoomSelectors(newRooms))
       dispatch(setRoomEditingMode(false))
       dispatch(setExpandRoomNamePopup(false));
@@ -169,6 +175,10 @@ const RoomNamePopup = (props) => {
         setError("Please select room type")
       }
     }
+  }
+
+  const handleEditClick = () =>{
+    setIsEditing(true);
   }
 
   return (
@@ -226,6 +236,7 @@ const RoomNamePopup = (props) => {
                 value={selectedRoomType}
                 onChange={handleChange}
                 displayEmpty
+                disabled={roomEditingMode && !isEditing}
                 input={<BootstrapInput />}
                 MenuProps={{
                   PaperProps: {
@@ -290,6 +301,7 @@ const RoomNamePopup = (props) => {
               placeholder="Enter room name"
               required={true}
               value={roomName}
+              disabled={roomEditingMode && !isEditing}
               onChange={(e) => setName(e.target.value)}
               InputProps={{
                 style: {
@@ -301,7 +313,10 @@ const RoomNamePopup = (props) => {
                 },
               }}
             />
-            {roomEditingMode && <div onClick={handleEditClick} className="room-name-edit"><img src={edit} alt="edit"/><Typography modifiers={["black600", "helpText"]}>Edit</Typography></div>}
+            {roomEditingMode && <div onClick={isEditing?handleEditSaveClick:handleEditClick } className="room-name-edit">
+              {isEditing ? <Check style={{color:"#4B73EC", fontSize:"16px"}}/> : <img src={edit} alt="edit"/>}
+              {isEditing ? <Typography modifiers={["helpText"]}  style={{color:"#4B73EC"}}>Save</Typography>: <Typography modifiers={["black600", "helpText"]}>Edit</Typography>}
+            </div>}
             </div>
             {error.length> 0 && <Typography modifiers={["medium", "warning300", "helpText"]}>{error}</Typography>}
             <div className="btn-container">

@@ -333,6 +333,8 @@ const BoxGeometry = ({
               ? "skyblue"
               : typeId === 4
               ? "violet"
+              : typeId === 4 
+              ? "#E6AB4A"
               : "black"
           }
           transparent={true}
@@ -363,6 +365,8 @@ const BoxGeometry = ({
               ? "skyblue"
               : typeId === 4
               ? "violet"
+              : typeId === 4 
+              ? "#E6AB4A"
               : "black"
           }
           transparent={true}
