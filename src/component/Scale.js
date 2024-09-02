@@ -1,7 +1,16 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Vector3, Matrix4, BufferGeometry, LineBasicMaterial, LineSegments } from "three";
+import {
+  Vector3,
+  Matrix4,
+  BufferGeometry,
+  LineBasicMaterial,
+  LineSegments,
+} from "three";
 
-import { setLeftPosState, setRightPosState } from "../features/drawing/drwingSlice.js";
+import {
+  setLeftPosState,
+  setRightPosState,
+} from "../features/drawing/drwingSlice.js";
 import { useDispatch, useSelector } from "react-redux";
 import { useDrawing } from "../hooks/useDrawing.js";
 
@@ -20,12 +29,14 @@ export const Scale = () => {
   const { handleDoubleClick, setLeftPos, setRightPos } = useDrawing();
   const { leftPos, rightPos } = useSelector((state) => state.drawing);
   const [leftJawActivated, setLeftJawActivated] = useState(false);
-const [rightJawActivated, setRightJawActivated] = useState(false);
+  const [rightJawActivated, setRightJawActivated] = useState(false);
   const tolerance = 1e-3;
 
-  useEffect(()=>{
+  useEffect(() => {
     const updateMesh = (pointA, pointB) => {
-      const midpoint = new Vector3().addVectors(pointA, pointB).multiplyScalar(0.5);
+      const midpoint = new Vector3()
+        .addVectors(pointA, pointB)
+        .multiplyScalar(0.5);
       setPosition(midpoint);
 
       const angle = Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x);
@@ -35,18 +46,20 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
       mesh.current.position.set(midpoint.x, midpoint.y, 0);
     };
 
-
-    if(firstLoad){
-      setFirstLoad(false)
-      updateMesh(leftPos, rightPos)
-      const l = Math.abs(rightPos.x - leftPos.x) < 15 ? Math.abs(rightPos.y - leftPos.y) : Math.abs(rightPos.x - leftPos.x);
+    if (firstLoad) {
+      setFirstLoad(false);
+      updateMesh(leftPos, rightPos);
+      const l =
+        Math.abs(rightPos.x - leftPos.x) < 15
+          ? Math.abs(rightPos.y - leftPos.y)
+          : Math.abs(rightPos.x - leftPos.x);
       const w = 15;
       const h = 0;
-      setDimensions({l,w,h})
+      setDimensions({ l, w, h });
       // dispatch(setLeftPosState(new Vector3(-50, 0, 0)))
       // dispatch(setRightPosState(new Vector3(50, 0, 0)))
     }
-  },[firstLoad])
+  }, [firstLoad]);
 
   useEffect(() => {
     const canvasContainer = document.querySelector(".canvas-container");
@@ -86,18 +99,19 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
           if (Math.abs(newPoint.y - rightPosition.y) < 100) {
             // Align horizontally
             adjustedY = rightPosition.y;
-          } else if(Math.abs(newPoint.x - rightPosition.x) < 100){
+          } else if (Math.abs(newPoint.x - rightPosition.x) < 100) {
             // Align vertically
             adjustedX = rightPosition.x;
-          }
-          else{
+          } else {
             adjustedX = rightPosition.x;
           }
 
           leftJaw.current.position.set(adjustedX, adjustedY, 0);
           setLeftPos(new Vector3(adjustedX, adjustedY, 0));
 
-          const length = rightJaw.current.position.distanceTo(leftJaw.current.position);
+          const length = rightJaw.current.position.distanceTo(
+            leftJaw.current.position
+          );
           setDimensions((prev) => ({ ...prev, l: length }));
 
           updateMesh(leftJaw.current.position, rightJaw.current.position);
@@ -109,17 +123,19 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
           if (Math.abs(newPoint.y - leftPosition.y) < 100) {
             // Align horizontally
             adjustedY = leftPosition.y;
-          } else if(Math.abs(newPoint.x - leftPosition.x) < 100) {
+          } else if (Math.abs(newPoint.x - leftPosition.x) < 100) {
             // Align vertically
             adjustedX = leftPosition.x;
-          }else{
+          } else {
             adjustedX = leftPosition.x;
           }
 
           rightJaw.current.position.set(adjustedX, adjustedY, 0);
           setRightPos(new Vector3(adjustedX, adjustedY, 0));
 
-          const length = rightJaw.current.position.distanceTo(leftJaw.current.position);
+          const length = rightJaw.current.position.distanceTo(
+            leftJaw.current.position
+          );
           setDimensions((prev) => ({ ...prev, l: length }));
 
           updateMesh(leftJaw.current.position, rightJaw.current.position);
@@ -128,7 +144,9 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
     };
 
     const updateMesh = (pointA, pointB) => {
-      const midpoint = new Vector3().addVectors(pointA, pointB).multiplyScalar(0.5);
+      const midpoint = new Vector3()
+        .addVectors(pointA, pointB)
+        .multiplyScalar(0.5);
       setPosition(midpoint);
 
       const angle = Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x);
@@ -160,8 +178,14 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
       cancelAnimationFrame(frameId);
       canvasContainer.removeEventListener("pointermove", handlePointerMove);
     };
-  }, [isDraggingBox, dragging, dimensions.l, position, lineAngle, isPointerMoving]);
-
+  }, [
+    isDraggingBox,
+    dragging,
+    dimensions.l,
+    position,
+    lineAngle,
+    isPointerMoving,
+  ]);
 
   const isWithinRange = (clickPosition, jawPosition, range = 10) => {
     return clickPosition.distanceTo(jawPosition) <= range;
@@ -174,6 +198,7 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
   };
 
   const handlePointerDownJaw = (event, jawRef) => {
+    document.getElementsByClassName('canvas-container')[0].style.cursor = "col-resize"
     const canvasContainer = document.querySelector(".canvas-container");
     const rect = canvasContainer.getBoundingClientRect();
     const cameraWidth = rect.width;
@@ -203,9 +228,9 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
 
     event.stopPropagation();
   };
-  
 
   const handlePointerUp = (event) => {
+    document.getElementsByClassName('canvas-container')[0].style.cursor = "grab"
     setDragging(null);
     setIsDraggingBox(false);
     setLeftJawActivated(false);
@@ -216,11 +241,18 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
   // Create line segments for jaws with increased length
   const createJawLine = (start, end, lengthMultiplier = 2) => {
     const direction = new Vector3().subVectors(end, start).normalize();
-    const extendedStart = start.clone().add(direction.clone().multiplyScalar(-lengthMultiplier));
-    const extendedEnd = end.clone().add(direction.clone().multiplyScalar(lengthMultiplier));
-    
-    const geometry = new BufferGeometry().setFromPoints([extendedStart, extendedEnd]);
-    const material = new LineBasicMaterial({ color: 'brown' });
+    const extendedStart = start
+      .clone()
+      .add(direction.clone().multiplyScalar(-lengthMultiplier));
+    const extendedEnd = end
+      .clone()
+      .add(direction.clone().multiplyScalar(lengthMultiplier));
+
+    const geometry = new BufferGeometry().setFromPoints([
+      extendedStart,
+      extendedEnd,
+    ]);
+    const material = new LineBasicMaterial({ color: "brown" });
     return <lineSegments args={[geometry, material]} />;
   };
 
@@ -234,36 +266,48 @@ const [rightJawActivated, setRightJawActivated] = useState(false);
         onPointerUp={handlePointerUp}
       >
         <boxGeometry args={[dimensions.l, dimensions.w, dimensions.h]} />
-        <meshBasicMaterial color={"#6360FB"} transparent={true} opacity={0.8}/>
+        <meshBasicMaterial color={"#6360FB"} transparent={true} opacity={0.8} />
       </mesh>
       {createJawLine(leftJaw.current?.position || new Vector3(), position)}
       {createJawLine(rightJaw.current?.position || new Vector3(), position)}
       <mesh
-  ref={leftJaw}
-  position={leftPos.toArray()}
-  onPointerDown={(event) => handlePointerDownJaw(event, leftJaw)}
-  onPointerUp={handlePointerUp}
->
-  <boxGeometry
-    args={Math.abs(rightJaw.current?.position.y - leftJaw.current?.position.y) < tolerance
-      ? [5, 30, dimensions.h]  // Vertical
-      : [30, 5, dimensions.h]} // Horizontal
-  />
-   <meshBasicMaterial color={leftJawActivated ? "red" : "black"} />
-</mesh>
-<mesh
-  ref={rightJaw}
-  position={rightPos.toArray()}
-  onPointerDown={(event) => handlePointerDownJaw(event, rightJaw)}
-  onPointerUp={handlePointerUp}
->
-  <boxGeometry
-    args={Math.abs(rightJaw.current?.position.y - leftJaw.current?.position.y) < tolerance
-      ? [5, 30, dimensions.h]  // Vertical
-      : [30, 5, dimensions.h]} // Horizontal
-  />
-   <meshBasicMaterial color={rightJawActivated ? "red" : "black"} />
-</mesh>
+        ref={leftJaw}
+        position={[leftPos.x + 1.5, leftPos.y, 3]}
+        onPointerDown={(event) => handlePointerDownJaw(event, leftJaw)}
+        onPointerUp={handlePointerUp}
+        onPointerOver={() => document.getElementsByClassName('canvas-container')[0].style.cursor = "col-resize"}
+        onPointerOut={() => { if(!leftJawActivated) document.getElementsByClassName('canvas-container')[0].style.cursor = "grab"}}
+      >
+        <boxGeometry
+          args={
+            Math.abs(
+              rightJaw.current?.position.y - leftJaw.current?.position.y
+            ) < tolerance
+              ? [3, 30, dimensions.h] // Vertical
+              : [30, 3, dimensions.h]
+          } // Horizontal
+        />
+        <meshBasicMaterial color={leftJawActivated ? "red" : "black"} />
+      </mesh>
+      <mesh
+        ref={rightJaw}
+        position={[rightPos.x - 1.5, rightPos.y, 3]}
+        onPointerDown={(event) => handlePointerDownJaw(event, rightJaw)}
+        onPointerUp={handlePointerUp}
+        onPointerOver={() => document.getElementsByClassName('canvas-container')[0].style.cursor = "col-resize"}
+        onPointerOut={() => {if(!rightJawActivated) document.getElementsByClassName('canvas-container')[0].style.cursor = "grab"}}
+      >
+        <boxGeometry
+          args={
+            Math.abs(
+              rightJaw.current?.position.y - leftJaw.current?.position.y
+            ) < tolerance
+              ? [3, 30, dimensions.h] // Vertical
+              : [30, 3, dimensions.h]
+          } // Horizontal
+        />
+        <meshBasicMaterial color={rightJawActivated ? "red" : "black"} />
+      </mesh>
     </>
   );
 };
