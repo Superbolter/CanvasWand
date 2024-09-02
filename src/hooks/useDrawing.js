@@ -809,15 +809,18 @@ export const useDrawing = () => {
 
 
   const screenToNDC = (clientX, clientY) => {
-    const canvasContainer = document.querySelector(".canvas-container");
-    const rect = canvasContainer.getBoundingClientRect();
-    let x = ((clientX - rect.left) / rect.width) * 2 - 1;
-    let y = -((clientY - rect.top) / rect.height) * 2 + 1;
-    const cameraWidth = rect.width;
-    const cameraHeight = rect.height;
-    const ndcX = x * (cameraWidth / 2);
-    const ndcY = y * (cameraHeight / 2);
-    return new Vector3(ndcX, ndcY);
+    mouse.current.x = (clientX / window.innerWidth) * 2 - 1;
+    mouse.current.y = -(clientY / window.innerHeight) * 2 + 1;
+
+    // Update the raycaster with the camera and mouse position
+    raycaster.current.setFromCamera(mouse.current, cameraContext);
+
+    // Define a plane at z = 0 and find the intersection point
+    const plane = new THREE.Plane(new Vector3(0, 0, 1), 0);
+    const intersectionPoint = new Vector3();
+    raycaster.current.ray.intersectPlane(plane, intersectionPoint);
+
+    return new Vector3(intersectionPoint.x, intersectionPoint.y, 0);
   };
 
   const handleMouseMove = (event) => {
