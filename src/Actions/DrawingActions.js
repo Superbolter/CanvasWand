@@ -92,3 +92,8 @@ export const setSeeDimensions = (val) => ({
   type: "SET_SEE_DIMENSIONS",
   payload: val,
 });
+
+export const setCameraContext = (val) => ({
+  type: "SET_CAMERA_CONTEXT",
+  payload: val,
+});

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Grid, Line, Text, OrbitControls, OrthographicCamera, Html } from "@react-three/drei";
@@ -37,12 +37,13 @@ import RoomNamePopup from "./component/RoomNamePopup.js";
 import RoomFiller from "./component/roomFiller.js";
 import ScalePopup from "./component/ScalePopup.js";
 import blade from "./assets/blade.png"
-import { setContextualMenuStatus, setShowPopup } from "./Actions/DrawingActions.js";
+import { setCameraContext, setContextualMenuStatus, setShowPopup } from "./Actions/DrawingActions.js";
 import UpdateDistance from "./component/updateDistance.js";
 import * as THREE from 'three';
 import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
+
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -112,7 +113,9 @@ export const CanvasComponent = () => {
     setIsSelecting,
     setStartPoint,
     setEndPoint,
-    handleResetRooms
+    handleResetRooms,
+    raycaster,
+    mouse
   } = useDrawing();
 
   const { leftPos, rightPos, merge, lineBreak, perpendicularLine, linePlacementMode } = useSelector((state) => state.drawing)
@@ -215,8 +218,6 @@ export const CanvasComponent = () => {
     shape.lineTo(p1.x, p1.y); // Close the shape by going back to the first point
     return shape;
   };
-
-
   
 
   return (
@@ -240,6 +241,7 @@ export const CanvasComponent = () => {
           raycaster={{ params: { Line: { threshold: 5 } } }}
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
+
         >
 
           <CameraController zoom={zoom} setZoom={setZoom}/>
@@ -251,7 +253,7 @@ export const CanvasComponent = () => {
           )}
           {nearPoint && lineBreak && (<UpdateDistance nearVal={nearVal}/>)}
 
-          {scale && (<Scale/>)}
+          {scale && (<Scale raycaster={raycaster}  mouse={mouse} />)}
           {addOn && !scale && (
             <DraggableDoor
               doorPosition={doorPosition}
@@ -439,6 +441,13 @@ export default CanvasComponent;
 
 const CameraController = ({zoom, setZoom }) => {
   const { camera } = useThree();
+  const dispatch = useDispatch();
+  const {cameraContext} = useSelector((state) => state.Drawing);
+  useEffect(() => {
+    if(Object.keys(cameraContext).length === 0) {
+      dispatch(setCameraContext(camera));
+    }
+  }, []);
   const controlsRef = useRef();
 
   useEffect(() => {
@@ -454,6 +463,8 @@ const CameraController = ({zoom, setZoom }) => {
   useEffect(() => {
       camera.zoom = zoom;
       camera.updateProjectionMatrix();
+      const newContext = camera.clone();
+      dispatch(setCameraContext(newContext));
   }, [zoom]);
 
   const handleControlsChange = () => {

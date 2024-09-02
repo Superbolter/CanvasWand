@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import convert from "convert-units";
 import { Vector3 } from "three";
@@ -79,7 +79,7 @@ export const useDrawing = () => {
     lineBreak,
     merge,
   } = useSelector((state) => state.drawing);
-  const { typeId, contextualMenuStatus, actionHistory, redoStack} = useSelector(
+  const { typeId, contextualMenuStatus, actionHistory, redoStack, cameraContext} = useSelector(
     (state) => state.Drawing
   );
   const {
@@ -130,6 +130,9 @@ export const useDrawing = () => {
   const [isSelecting, setIsSelecting] = useState(false);
   const [startPoint, setStartPoint] = useState(null);
   const [endPoint, setEndPoint] = useState(null);
+
+  const raycaster = useRef(new THREE.Raycaster());
+  const mouse = useRef(new THREE.Vector2());
 
   const setActionHistory = (data) =>{
     dispatch(setUndoStack(data))
@@ -843,6 +846,22 @@ export const useDrawing = () => {
     const posY = y * (cameraHeight / 2);
 
     let point = new Vector3(posX, posY, 0);
+
+    mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Update the raycaster with the camera and mouse position
+    raycaster.current.setFromCamera(mouse.current, cameraContext);
+
+    // Define a plane at z = 0 and find the intersection point
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const intersectionPoint = new THREE.Vector3();
+    raycaster.current.ray.intersectPlane(plane, intersectionPoint);
+
+    // Add the intersection point to the array of points
+
+    point = intersectionPoint;
+
     if(lineBreak){
       if (findLineForPoint(point, storeLines)) {
         let { closestPointOnLine,line } = findLineForPoint(point, storeLines);
@@ -1129,6 +1148,7 @@ export const useDrawing = () => {
     dispatch(setSelectionMode(!selectionMode));
   };
 
+
   const handleClick = (event) => {
     if (selectionMode && !lineClick && !expandRoomPopup) {
       setSelectedLines([]);
@@ -1160,6 +1180,23 @@ export const useDrawing = () => {
     const posY = y * (cameraHeight / 2);
 
     let point = new Vector3(posX, posY, 0);
+
+    mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Update the raycaster with the camera and mouse position
+    raycaster.current.setFromCamera(mouse.current, cameraContext);
+
+    // Define a plane at z = 0 and find the intersection point
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const intersectionPoint = new THREE.Vector3();
+    raycaster.current.ray.intersectPlane(plane, intersectionPoint);
+
+    // Add the intersection point to the array of points
+
+    point = intersectionPoint;
+
+
     if (lineBreak) {
       if (findLineForPoint(point, storeLines)) {
         let { closestPointOnLine } = findLineForPoint(point, storeLines);
@@ -1710,6 +1747,8 @@ export const useDrawing = () => {
     setIsSelecting,
     setStartPoint,
     setEndPoint,
-    handleResetRooms
+    handleResetRooms,
+    raycaster,
+    mouse
   };
 };

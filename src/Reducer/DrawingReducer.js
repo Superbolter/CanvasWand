@@ -9,6 +9,7 @@ const initialState = {
     actionHistory: [],
     redoStack: [],
     seeDimensions: false,
+    cameraContext: {},
   };
   
   const DrawingReducer = (state = initialState, action) => {
@@ -54,6 +55,11 @@ const initialState = {
         return {
           ...state,
           seeDimensions: action.payload
+        }
+      case "SET_CAMERA_CONTEXT":
+        return {
+          ...state,
+          cameraContext: action.payload
         }
       default:
         return state;
