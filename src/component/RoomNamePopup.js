@@ -22,12 +22,7 @@ import { useDrawing } from "../hooks/useDrawing.js";
 import plus from "../assets/plus.svg";
 import divide from "../assets/divide.svg";
 import deleteIcon from "../assets/Delete.png";
-import {
-  FormControl,
-  MenuItem,
-  Select,
-  InputBase,
-} from "@mui/material";
+import { FormControl, MenuItem, Select, InputBase } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CheckIcon from "@mui/icons-material/Check";
@@ -64,26 +59,30 @@ const RoomNamePopup = (props) => {
     (state) => state.ApplicationState
   );
   const dispatch = useDispatch();
-  const {roomSelectors} = useSelector((state) => state.drawing);
+  const { roomSelectors } = useSelector((state) => state.drawing);
 
   useEffect(() => {
     if (selectedRoomName) {
       setName(selectedRoomName);
       setIsEditing(false);
-      setError(false)
+      setError(false);
     }
   }, [selectedRoomName]);
+
+  const handleReset = (val) => {
+    dispatch(setRoomDetails(""));
+    dispatch(setRoomName(""));
+    dispatch(setRoomEditingMode(false));
+    dispatch(setActiveRoomIndex(-1));
+    dispatch(setSelectedLinesState([]));
+    dispatch(setExpandRoomNamePopup(val));
+  };
 
   const addRoomClick = () => {
     if (activeRoomButton === "add") {
       dispatch(setActiveRoomButton(""));
-      setName("")
-      dispatch(setExpandRoomNamePopup(false));
-      dispatch(setRoomDetails(""))
-      dispatch(setRoomName(""))
-      dispatch(setRoomEditingMode(false))
-      dispatch(setActiveRoomIndex(-1))
-      dispatch(setSelectedLinesState([]));
+      setName("");
+      handleReset(false);
       return;
     }
     dispatch(setActiveRoomButton("add"));
@@ -91,13 +90,8 @@ const RoomNamePopup = (props) => {
     if (!selectionMode) {
       props.toggleSelectionMode();
     }
-    setName("")
-    dispatch(setExpandRoomNamePopup(true));
-    dispatch(setRoomDetails(""))
-    dispatch(setRoomName(""))
-    dispatch(setRoomEditingMode(false))
-    dispatch(setActiveRoomIndex(-1))
-    dispatch(setSelectedLinesState([]));
+    setName("");
+    handleReset(true);
   };
 
   const divideRoomClick = () => {
@@ -110,93 +104,93 @@ const RoomNamePopup = (props) => {
       return;
     }
     dispatch(setActiveRoomButton("divide"));
-    dispatch(setExpandRoomNamePopup(false));
     dispatch(setTypeId(5));
     if (selectionMode) {
       props.toggleSelectionMode();
     }
-    dispatch(setRoomDetails(""))
-    dispatch(setRoomName(""))
-    dispatch(setRoomEditingMode(false))
-    dispatch(setActiveRoomIndex(-1))
-    dispatch(setSelectedLinesState([]))
+    handleReset(false);
   };
 
   const handleChange = (event) => {
     dispatch(setRoomDetails(event.target.value));
-    const length = roomSelectors.filter((room)=> room.roomName === event.target.value).length
-    if( length > 0){
+    const length = roomSelectors.filter((room) =>
+      room.roomName.includes(event.target.value)
+    ).length;
+    if (length > 0) {
       const name = event.target.value + " " + (length + 1);
-      setName(name)
-    }else{
-      setName(event.target.value)
+      setName(name);
+    } else {
+      setName(event.target.value);
     }
   };
 
   const handleSaveClick = () => {
-    if(roomName.length>0 && selectedRoomType?.length>0){
+    if (roomName.length > 0 && selectedRoomType?.length > 0) {
       props.addRoom(roomName, selectedRoomType);
-      setName("")
+      setName("");
       dispatch(setRoomDetails(""));
-      dispatch(setRoomName(""))
-    }
-    else{
-      if(roomName.length===0){
-        setError("Please enter room name")
-      }
-      else if(selectedRoomType?.length===0){
-        setError("Please select room type")
+      dispatch(setRoomName(""));
+    } else {
+      if (roomName.length === 0) {
+        setError("Please enter room name");
+      } else if (selectedRoomType?.length === 0) {
+        setError("Please select room type");
       }
     }
   };
 
   const handleDeleteClick = () => {
-    const newRooms = [...roomSelectors]
-    newRooms.splice(activeRoomIndex, 1)
-    setName("")
-    dispatch(setRoomSelectors(newRooms))
-    dispatch(setExpandRoomNamePopup(false));
-    dispatch(setRoomDetails(""))
-    dispatch(setRoomName(""))
-    dispatch(setRoomEditingMode(false))
-    dispatch(setActiveRoomButton(""))
-    dispatch(setActiveRoomIndex(-1))
-    dispatch(setSelectedLinesState([]))
+    const newRooms = [...roomSelectors];
+    newRooms.splice(activeRoomIndex, 1);
+    setName("");
+    dispatch(setRoomSelectors(newRooms));
+    dispatch(setActiveRoomButton(""));
+    handleReset(false);
   };
 
-  useEffect(()=>{
-    if(selectedRoomName?.length>0 && selectedRoomType && selectedRoomType?.length>0){
-      setError("")
+  useEffect(() => {
+    if (
+      selectedRoomName?.length > 0 &&
+      selectedRoomType &&
+      selectedRoomType?.length > 0
+    ) {
+      setError("");
     }
-  }, [selectedRoomName,selectedRoomType])
+  }, [selectedRoomName, selectedRoomType]);
 
   const handleEditSaveClick = () => {
-    if(roomName.length>0 && selectedRoomType && selectedRoomType?.length>0){
-      const newRooms = [...roomSelectors]
-      newRooms[activeRoomIndex] = { ...newRooms[activeRoomIndex], roomName: roomName, roomType: selectedRoomType }
-      setName("")
-      setIsEditing(false)
-      dispatch(setRoomSelectors(newRooms))
-      dispatch(setRoomEditingMode(false))
-      dispatch(setExpandRoomNamePopup(false));
-      dispatch(setRoomDetails(""))
-      dispatch(setRoomName(""))
-      dispatch(setActiveRoomButton(""))
-      dispatch(setActiveRoomIndex(-1))
-      dispatch(setSelectedLinesState([]))
-    }else{
-      if(roomName.length===0){
-        setError("Please enter room name")
-      }
-      else if(selectedRoomType?.length===0 || selectedRoomType===null || selectedRoomType=== ""){
-        setError("Please select room type")
+    if (
+      roomName.length > 0 &&
+      selectedRoomType &&
+      selectedRoomType?.length > 0
+    ) {
+      const newRooms = [...roomSelectors];
+      newRooms[activeRoomIndex] = {
+        ...newRooms[activeRoomIndex],
+        roomName: roomName,
+        roomType: selectedRoomType,
+      };
+      setName("");
+      setIsEditing(false);
+      dispatch(setActiveRoomButton(""));
+      dispatch(setRoomSelectors(newRooms));
+      handleReset(false);
+    } else {
+      if (roomName.length === 0) {
+        setError("Please enter room name");
+      } else if (
+        selectedRoomType?.length === 0 ||
+        selectedRoomType === null ||
+        selectedRoomType === ""
+      ) {
+        setError("Please select room type");
       }
     }
-  }
+  };
 
-  const handleEditClick = () =>{
+  const handleEditClick = () => {
     setIsEditing(true);
-  }
+  };
 
   return (
     <div>
@@ -209,7 +203,9 @@ const RoomNamePopup = (props) => {
             onClick={divideRoomClick}
             className="room-popup-header-text"
             style={
-              activeRoomButton === "divide" ? { borderColor: "cornflowerblue" } : {}
+              activeRoomButton === "divide"
+                ? { borderColor: "cornflowerblue" }
+                : {}
             }
           >
             <img src={divide} alt="divider" />
@@ -221,7 +217,9 @@ const RoomNamePopup = (props) => {
             onClick={addRoomClick}
             className="room-popup-header-text"
             style={
-              activeRoomButton === "add" ? { borderColor: "cornflowerblue" } : {}
+              activeRoomButton === "add"
+                ? { borderColor: "cornflowerblue" }
+                : {}
             }
           >
             <img src={plus} alt="plus" />
@@ -236,17 +234,18 @@ const RoomNamePopup = (props) => {
               <Typography modifiers={["medium", "black600", "subtitle"]}>
                 Room
               </Typography>
-              {roomEditingMode &&
-              <div className="delete-container" onClick={handleDeleteClick}>
-                <img
-                  src={deleteIcon}
-                  alt="delete"
-                  style={{ height: "20px", width: "20px" }}
-                />
-                <Typography modifiers={["medium", "black550", "helpText"]}>
-                  Delete
-                </Typography>
-              </div>}
+              {roomEditingMode && (
+                <div className="delete-container" onClick={handleDeleteClick}>
+                  <img
+                    src={deleteIcon}
+                    alt="delete"
+                    style={{ height: "20px", width: "20px" }}
+                  />
+                  <Typography modifiers={["medium", "black550", "helpText"]}>
+                    Delete
+                  </Typography>
+                </div>
+              )}
             </div>
             <FormControl fullWidth>
               <Select
@@ -263,14 +262,18 @@ const RoomNamePopup = (props) => {
                   },
                   MenuListProps: {
                     sx: {
-                      padding: '4px',
+                      padding: "4px",
                     },
                   },
                 }}
                 IconComponent={KeyboardArrowDownIcon}
                 renderValue={(selectedRoomType) => {
-                  if (selectedRoomType === "" || selectedRoomType===null) {
-                    return <Typography modifiers={["subtitle", "black600"]}>Select room type</Typography>; 
+                  if (selectedRoomType === "" || selectedRoomType === null) {
+                    return (
+                      <Typography modifiers={["subtitle", "black600"]}>
+                        Select room type
+                      </Typography>
+                    );
                   }
                   return selectedRoomType;
                 }}
@@ -284,7 +287,26 @@ const RoomNamePopup = (props) => {
                   "Kids Room",
                   "Toilet",
                   "Study Room",
-                  "Utility"
+                  "Utility",
+                  "Pooja",
+                  "Foyer",
+                  "Dress",
+                  "Drawing",
+                  "Wash",
+                  "Walk in wardrobe",
+                  "Entrance",
+                  "Study Room",
+                  "Powder Room",
+                  "Store",
+                  "Lift",
+                  "Maid room",
+                  "Rest Room",
+                  "DG Room",
+                  "Pet room",
+                  "Common Area",
+                  "Passage Area",
+                  "Garden Area",
+                  "Parking Area",
                 ].map((name) => (
                   <MenuItem
                     key={name}
@@ -300,7 +322,12 @@ const RoomNamePopup = (props) => {
                         selectedRoomType === name ? "#4B73EC" : "",
                     }}
                   >
-                    <Typography modifiers={["medium", "black600", "body"]} style={{ color: selectedRoomType === name? "white": "" }}>
+                    <Typography
+                      modifiers={["medium", "black600", "body"]}
+                      style={{
+                        color: selectedRoomType === name ? "white" : "",
+                      }}
+                    >
                       {name}
                     </Typography>
                     {selectedRoomType === name && (
@@ -310,41 +337,69 @@ const RoomNamePopup = (props) => {
                 ))}
               </Select>
             </FormControl>
-            <div className="room-popup-header" style={{height: "fit-content", marginBottom: "0px"}}>
-            <TextField
-              style={{ width: "100%", height: "54px" }}
-              id="outlined-required"
-              variant="outlined"
-              placeholder="Enter room name"
-              required={true}
-              value={roomName}
-              disabled={roomEditingMode && !isEditing}
-              onChange={(e) => setName(e.target.value)}
-              InputProps={{
-                style: {
-                  fontSize: "16px",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: "400",
-                  height: "54px",
-                  borderRadius: "8px",
-                },
-              }}
-            />
-            {roomEditingMode && <div onClick={isEditing?handleEditSaveClick:handleEditClick } className="room-name-edit">
-              {isEditing ? <Check style={{color:"#4B73EC", fontSize:"16px"}}/> : <img src={edit} alt="edit"/>}
-              {isEditing ? <Typography modifiers={["helpText"]}  style={{color:"#4B73EC"}}>Save</Typography>: <Typography modifiers={["black600", "helpText"]}>Edit</Typography>}
-            </div>}
+            <div
+              className="room-popup-header"
+              style={{ height: "fit-content", marginBottom: "0px" }}
+            >
+              <TextField
+                style={{ width: "100%", height: "54px" }}
+                id="outlined-required"
+                variant="outlined"
+                placeholder="Enter room name"
+                required={true}
+                value={roomName}
+                disabled={roomEditingMode && !isEditing}
+                onChange={(e) => setName(e.target.value)}
+                InputProps={{
+                  style: {
+                    fontSize: "16px",
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: "400",
+                    height: "54px",
+                    borderRadius: "8px",
+                  },
+                }}
+              />
+              {roomEditingMode && (
+                <div
+                  onClick={isEditing ? handleEditSaveClick : handleEditClick}
+                  className="room-name-edit"
+                >
+                  {isEditing ? (
+                    <Check style={{ color: "#4B73EC", fontSize: "16px" }} />
+                  ) : (
+                    <img src={edit} alt="edit" />
+                  )}
+                  {isEditing ? (
+                    <Typography
+                      modifiers={["helpText"]}
+                      style={{ color: "#4B73EC" }}
+                    >
+                      Save
+                    </Typography>
+                  ) : (
+                    <Typography modifiers={["black600", "helpText"]}>
+                      Edit
+                    </Typography>
+                  )}
+                </div>
+              )}
             </div>
-            {error.length> 0 && <Typography modifiers={["medium", "warning300", "helpText"]}>{error}</Typography>}
+            {error.length > 0 && (
+              <Typography modifiers={["medium", "warning300", "helpText"]}>
+                {error}
+              </Typography>
+            )}
             <div className="btn-container">
-              {roomEditingMode? null: 
-              <Button
-                className="save-btn"
-                modifiers={["blue", "block"]}
-                onClick={handleSaveClick}
-              >
-                Save
-              </Button>}
+              {roomEditingMode ? null : (
+                <Button
+                  className="save-btn"
+                  modifiers={["blue", "block"]}
+                  onClick={handleSaveClick}
+                >
+                  Save
+                </Button>
+              )}
             </div>
           </div>
         )}
