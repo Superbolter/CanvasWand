@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { extend } from "@react-three/fiber";
 import { Shape, ShapeGeometry, MeshBasicMaterial, Vector3, Box3 } from "three";
 import { Html } from "@react-three/drei";
@@ -48,9 +48,10 @@ const calculateBoundingBox = (points) => {
 };
 
 const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
-  const {selectedRoomName} = useSelector((state) => state.ApplicationState);
+  const {selectedRoomName, activeRoomButton} = useSelector((state) => state.ApplicationState);
   const { storeLines, points } = useDrawing();
   const dispatch = useDispatch();
+  const [ ishover, setHover ] = useState(false);
 
   const roomPoints = useMemo(() => {
     let pts = [];
@@ -93,7 +94,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
   const sortedPoints = sortPointsClockwise(roomPoints);
   const shape = createShape(sortedPoints);
   const geometry = new ShapeGeometry(shape);
-  const material = new MeshBasicMaterial({ color: "#2E2E2E", transparent: true , opacity: 0.1});
+  const material = new MeshBasicMaterial({ color: "#4B73EC", transparent: true , opacity: 0.1});
 
   const centroid = getCentroid(sortedPoints);
   const boundingBox = calculateBoundingBox(sortedPoints);
@@ -102,13 +103,14 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
 
   // Adjust font size based on bounding box dimensions
   const fontSize = Math.min(boxSize.x, boxSize.y) * 0.1;
-
+  console.log(ishover)
   return (
     <>
-      <mesh>
+      <mesh onPointerOver={() => setHover(true)}  // Set hovered to true on mouse over
+        onPointerOut={() => setHover(false)}>
         <shapeGeometry attach="geometry" args={[shape]} />
         <meshBasicMaterial attach="material" args={[material]} />
-      </mesh>
+        {activeRoomButton === "divide" ? null:  
       <Html
         position={[centroid.x - fontSize, centroid.y, centroid.z]}
         zIndexRange={[0, 0]}
@@ -127,6 +129,8 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
           fontSize: fontSize < 18? (fontSize > 9? fontSize: "9px"): "18px",
           color: selectedRoomName === roomName? "white":roomType!==null? "#4B73EC":"black", 
           border: selectedRoomName === roomName || roomType!==null? "2px solid #4B73EC":"0.7px solid #B6BABD",
+          pointerEvents: activeRoomButton === "add" ? "none":"auto",
+          opacity: ishover && activeRoomButton === "add"? 0.5: 1,
         }}
           onClick={handleRoomClick}
         >
@@ -134,6 +138,8 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
           {roomName}
         </div>
       </Html>
+      }
+      </mesh>
     </>
   );
 };

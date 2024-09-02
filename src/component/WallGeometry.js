@@ -68,10 +68,10 @@ const WallGeometry = ({
   const {factor}=useSelector((state)=>state.ApplicationState)
 
 
-  const length = start.distanceTo(end) * (factor[0]/0.48);
+  const length = start.distanceTo(end) * (2.084);
   const height = convert(dimension.height*factor[2]).from("mm").to(measured);
   const width = convert(dimension.width*factor[1]).from("mm").to(measured);
-  const midpoint = new Vector3().addVectors(start, end).multiplyScalar(factor[0]);
+  const midpoint = new Vector3().addVectors(start, end).multiplyScalar(1);
 
   const adjustTextureScale = (texture, length, height) => {
     texture.wrapS = THREE.RepeatWrapping;
