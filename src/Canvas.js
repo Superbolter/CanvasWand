@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
-import { Canvas, useThree } from "@react-three/fiber";
-import { Grid, Line, Text, OrbitControls, OrthographicCamera } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Grid, Line, Text, OrbitControls, OrthographicCamera, Html } from "@react-three/drei";
 import BoxGeometry from "./component/BoxGeometry.js";
 import WallGeometry from "./component/WallGeometry.js";
 import DownloadJSONButton from "./component/ConvertToJson.js";
@@ -226,7 +226,7 @@ export const CanvasComponent = () => {
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        onWheel={handleWheel}
+        // onWheel={handleWheel}
         style={ scale? {cursor:'grab'}: lineBreak ?{cursor:`url(${blade}) 8 8, crosshair`} :selectionMode? roomSelectorMode? {cursor:"pointer"} :{ cursor: "grab"}:{cursor:'crosshair'}}
       >
         {/* 2D (Orthographic) Canvas */}
@@ -242,7 +242,7 @@ export const CanvasComponent = () => {
           onClick={handleClick}
         >
 
-          <CameraController zoom={zoom} />
+          <CameraController setZoom={setZoom}/>
           {isSelecting && startPoint && endPoint && (
             <mesh >
               <shapeGeometry  attach="geometry" args={[createQuadrilateral(startPoint,new Vector3(endPoint.x, startPoint.y,0) ,endPoint,new Vector3(startPoint.x, endPoint.y,0) )]} />
@@ -343,12 +343,8 @@ export const CanvasComponent = () => {
             fadeStrength={1}
             fadeFrom={1}
           />
-          {/* <OrbitControls enablePan={false} // Disable panning if needed
-              maxPolarAngle={Math.PI / 2} // Limit vertical rotation to 90 degrees (horizontal plane)
-              minPolarAngle={Math.PI / 2} // Limit vertical rotation to 90 degrees (horizontal plane)
-              maxAzimuthAngle={Math.PI / 100} // Optional: Limit horizontal rotation range if needed
-              minAzimuthAngle={-Math.PI / 100} // Optional: Limit horizontal rotation range if needed
-            /> */}
+        <ZoomComponent zoom={zoom} setZoom={setZoom}/>          
+
         </Canvas>
         <DrawtoolHeader
             undo={undo}
@@ -358,7 +354,6 @@ export const CanvasComponent = () => {
             handleReset={handleReset}
             handleResetRooms={handleResetRooms}
           />
-        <ZoomComponent zoom={zoom} setZoom={setZoom}/>          
       </div>
       {!scale ?
       <div className="button-container">
@@ -442,29 +437,82 @@ export const CanvasComponent = () => {
 
 export default CanvasComponent;
 
-const CameraController = ({ zoom }) => {
+const CameraController = ({ setZoom }) => {
   const { camera } = useThree();
-  
-  useEffect(() => {
-    camera.zoom = zoom;
-    camera.updateProjectionMatrix();
-  }, [zoom, camera]);
+  const controlsRef = useRef();
 
-  return null;
+  useEffect(() => {
+    if (controlsRef.current) {
+      const controls = controlsRef.current;
+      controls.addEventListener('change', () => {
+        const { target } = controls;
+        target.clamp(controls.minPan, controls.maxPan);
+      });
+    }
+  }, []);
+
+  const handleControlsChange = () => {
+    setZoom(camera.zoom);
+  };
+
+  return (
+    <OrbitControls 
+      ref={controlsRef}
+      enableRotate={false} 
+      minZoom={1}  
+      maxZoom={4.5} 
+      minPan={new THREE.Vector3(-100 * camera.zoom, -100 * camera.zoom, 0)}
+      maxPan={new THREE.Vector3(100 * camera.zoom, 100 * camera.zoom, 0)}
+      onChange={handleControlsChange}
+      maxAzimuthAngle={Math.PI / 100}
+      minAzimuthAngle={-Math.PI / 100}
+      maxPolarAngle={Math.PI / 2}
+      minPolarAngle={Math.PI / 2}
+    />
+  );
 };
 
 const ZoomComponent = ({ zoom, setZoom }) => {
+  const { camera } = useThree();
+
+  const zoomIn = () => {
+    if (camera.zoom < 4.5) {  // Adjust max zoom level here
+      camera.zoom += 0.5; // Increment zoom level
+      camera.updateProjectionMatrix(); // Update camera matrix after zoom change
+      setZoom(camera.zoom); // Update zoom state
+    }
+  };
+
+  const zoomOut = () => {
+    if (camera.zoom > 1) {  // Adjust min zoom level here
+      camera.zoom -= 0.5; // Decrement zoom level
+      camera.updateProjectionMatrix(); // Update camera matrix after zoom change
+      setZoom(camera.zoom); // Update zoom state
+    }
+  };
+
+  const handleChange = (e) => {
+    const newZoom = parseFloat(e.target.value);
+    if (newZoom >= 0.5 && newZoom <= 4.5) {
+      camera.zoom = newZoom;
+      camera.updateProjectionMatrix();
+      setZoom(newZoom);
+    }
+  };
+
   return (
-    <div className="zoom-container">
-      <button onClick={() => setZoom(Math.max((zoom - 0.5), 1))}>
-        <ZoomOutIcon />
-      </button>
-      <input className="zoom-slider" type="range" min="1" max="4.5" step="0.1" value={zoom} onChange={(e) => setZoom(parseFloat(e.target.value))} style={{
-        background: `linear-gradient(to right, #007AFF 0%, #007AFF ${(zoom - 1) / 3.5 * 100}%, #0000000D ${(zoom - 1) / 3.5 * 100}%, #0000000D 100%)`
-      }}/>
-      <button onClick={() => setZoom(Math.min((zoom + 0.5), 4.5))}>
-        <ZoomInIcon />
-      </button>
-    </div>
+    <Html className="zoom-container-parent" >
+      <div className="zoom-container">
+        <button onClick={zoomOut}>
+          <ZoomOutIcon />
+        </button>
+        <input className="zoom-slider" type="range" min="1" max="4.5" step="0.1" value={zoom} onChange={handleChange} style={{
+          background: `linear-gradient(to right, #007AFF 0%, #007AFF ${(zoom - 1) / 3.5 * 100}%, #0000000D ${(zoom - 1) / 3.5 * 100}%, #0000000D 100%)`
+        }}/>
+        <button onClick={zoomIn}>
+          <ZoomInIcon />
+        </button>
+      </div>
+    </Html>
   );
 }
