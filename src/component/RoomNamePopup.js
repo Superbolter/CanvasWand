@@ -75,6 +75,17 @@ const RoomNamePopup = (props) => {
   }, [selectedRoomName]);
 
   const addRoomClick = () => {
+    if (activeRoomButton === "add") {
+      dispatch(setActiveRoomButton(""));
+      setName("")
+      dispatch(setExpandRoomNamePopup(false));
+      dispatch(setRoomDetails(""))
+      dispatch(setRoomName(""))
+      dispatch(setRoomEditingMode(false))
+      dispatch(setActiveRoomIndex(-1))
+      dispatch(setSelectedLinesState([]));
+      return;
+    }
     dispatch(setActiveRoomButton("add"));
     dispatch(setTypeId(1));
     if (!selectionMode) {

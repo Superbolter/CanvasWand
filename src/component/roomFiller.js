@@ -51,8 +51,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
   const {selectedRoomName, activeRoomButton} = useSelector((state) => state.ApplicationState);
   const { storeLines, points } = useDrawing();
   const dispatch = useDispatch();
-  const [ ishover, setHover ] = useState(false);
-
+  
   const roomPoints = useMemo(() => {
     let pts = [];
     wallIds.forEach((id) => {
@@ -73,6 +72,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
   }
 
   const handleRoomClick = (e) => {
+    if(activeRoomButton === "add") return;
     e.stopPropagation();
     if(selectedRoomName === roomName) {
       dispatch(setSelectedLinesState([]));
@@ -103,11 +103,10 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
 
   // Adjust font size based on bounding box dimensions
   const fontSize = Math.min(boxSize.x, boxSize.y) * 0.1;
-  console.log(ishover)
+
   return (
     <>
-      <mesh onPointerOver={() => setHover(true)}  // Set hovered to true on mouse over
-        onPointerOut={() => setHover(false)}>
+      <mesh>
         <shapeGeometry attach="geometry" args={[shape]} />
         <meshBasicMaterial attach="material" args={[material]} />
         {activeRoomButton === "divide" ? null:  
@@ -130,11 +129,11 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
           color: selectedRoomName === roomName? "white":roomType!==null? "#4B73EC":"black", 
           border: selectedRoomName === roomName || roomType!==null? "2px solid #4B73EC":"0.7px solid #B6BABD",
           pointerEvents: activeRoomButton === "add" ? "none":"auto",
-          opacity: ishover && activeRoomButton === "add"? 0.5: 1,
+          opacity: activeRoomButton === "add"? 0.5: 1,
         }}
           onClick={handleRoomClick}
         >
-          {roomType!==null && selectedRoomName !== roomName ? <Check sx={{color: "#4B73EC", fontSize: fontSize + 4, marginRight: "4px"}} /> : null}
+          {roomType!==null && selectedRoomName !== roomName ? <Check sx={{color: "#4B73EC", fontSize: fontSize < 18? (fontSize > 9? fontSize + 4: "9px"): "18px", marginRight: "4px"}} /> : null}
           {roomName}
         </div>
       </Html>

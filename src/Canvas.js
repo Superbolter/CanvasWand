@@ -381,7 +381,7 @@ export const CanvasComponent = () => {
             orthographic
             camera={{ position: [0, 0, 800], fov: 75, }}
           >
-            <OrthographicCamera makeDefault zoom={0.3} position={[0, 0, 800]} />
+            <OrthographicCamera makeDefault zoom={0.15} position={[0, 0, 800]} />
 
             {/* Render lines in 3D view */}
             {storeLines.map((line) => (
@@ -403,7 +403,7 @@ export const CanvasComponent = () => {
             {/* 3D grid */}
             <Grid
               rotation={[Math.PI / 2, 0, 0]}
-              cellSize={100}
+              cellSize={10}
               cellThickness={0}
               cellColor="black"
               sectionSize={80}
