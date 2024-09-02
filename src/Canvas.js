@@ -242,7 +242,7 @@ export const CanvasComponent = () => {
           onClick={handleClick}
         >
 
-          <CameraController setZoom={setZoom}/>
+          <CameraController zoom={zoom} setZoom={setZoom}/>
           {isSelecting && startPoint && endPoint && (
             <mesh >
               <shapeGeometry  attach="geometry" args={[createQuadrilateral(startPoint,new Vector3(endPoint.x, startPoint.y,0) ,endPoint,new Vector3(startPoint.x, endPoint.y,0) )]} />
@@ -343,8 +343,6 @@ export const CanvasComponent = () => {
             fadeStrength={1}
             fadeFrom={1}
           />
-        <ZoomComponent zoom={zoom} setZoom={setZoom}/>          
-
         </Canvas>
         <DrawtoolHeader
             undo={undo}
@@ -354,6 +352,8 @@ export const CanvasComponent = () => {
             handleReset={handleReset}
             handleResetRooms={handleResetRooms}
           />
+        <ZoomComponent zoom={zoom} setZoom={setZoom}/>          
+
       </div>
       {!scale ?
       <div className="button-container">
@@ -437,7 +437,7 @@ export const CanvasComponent = () => {
 
 export default CanvasComponent;
 
-const CameraController = ({ setZoom }) => {
+const CameraController = ({zoom, setZoom }) => {
   const { camera } = useThree();
   const controlsRef = useRef();
 
@@ -450,6 +450,11 @@ const CameraController = ({ setZoom }) => {
       });
     }
   }, []);
+
+  useEffect(() => {
+      camera.zoom = zoom;
+      camera.updateProjectionMatrix();
+  }, [zoom]);
 
   const handleControlsChange = () => {
     setZoom(camera.zoom);
@@ -473,46 +478,18 @@ const CameraController = ({ setZoom }) => {
 };
 
 const ZoomComponent = ({ zoom, setZoom }) => {
-  const { camera } = useThree();
-
-  const zoomIn = () => {
-    if (camera.zoom < 4.5) {  // Adjust max zoom level here
-      camera.zoom += 0.5; // Increment zoom level
-      camera.updateProjectionMatrix(); // Update camera matrix after zoom change
-      setZoom(camera.zoom); // Update zoom state
-    }
-  };
-
-  const zoomOut = () => {
-    if (camera.zoom > 1) {  // Adjust min zoom level here
-      camera.zoom -= 0.5; // Decrement zoom level
-      camera.updateProjectionMatrix(); // Update camera matrix after zoom change
-      setZoom(camera.zoom); // Update zoom state
-    }
-  };
-
-  const handleChange = (e) => {
-    const newZoom = parseFloat(e.target.value);
-    if (newZoom >= 0.5 && newZoom <= 4.5) {
-      camera.zoom = newZoom;
-      camera.updateProjectionMatrix();
-      setZoom(newZoom);
-    }
-  };
 
   return (
-    <Html className="zoom-container-parent" >
-      <div className="zoom-container">
-        <button onClick={zoomOut}>
-          <ZoomOutIcon />
-        </button>
-        <input className="zoom-slider" type="range" min="1" max="4.5" step="0.1" value={zoom} onChange={handleChange} style={{
-          background: `linear-gradient(to right, #007AFF 0%, #007AFF ${(zoom - 1) / 3.5 * 100}%, #0000000D ${(zoom - 1) / 3.5 * 100}%, #0000000D 100%)`
-        }}/>
-        <button onClick={zoomIn}>
-          <ZoomInIcon />
-        </button>
-      </div>
-    </Html>
+    <div className="zoom-container">
+      <button onClick={() => setZoom(Math.max((zoom - 0.5), 1))}>
+        <ZoomOutIcon />
+      </button>
+      <input className="zoom-slider" type="range" min="1" max="4.5" step="0.1" value={zoom} onChange={(e) => setZoom(parseFloat(e.target.value))} style={{
+        background: `linear-gradient(to right, #007AFF 0%, #007AFF ${(zoom - 1) / 3.5 * 100}%, #0000000D ${(zoom - 1) / 3.5 * 100}%, #0000000D 100%)`
+      }}/>
+      <button onClick={() => setZoom(Math.min((zoom + 0.5), 4.5))}>
+        <ZoomInIcon />
+      </button>
+    </div>
   );
 }
