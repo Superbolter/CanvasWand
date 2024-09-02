@@ -124,7 +124,13 @@ const RoomNamePopup = (props) => {
 
   const handleChange = (event) => {
     dispatch(setRoomDetails(event.target.value));
-    setName(event.target.value)
+    const length = roomSelectors.filter((room)=> room.roomName === event.target.value).length
+    if( length > 0){
+      const name = event.target.value + " " + (length + 1);
+      setName(name)
+    }else{
+      setName(event.target.value)
+    }
   };
 
   const handleSaveClick = () => {

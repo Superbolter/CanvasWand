@@ -900,7 +900,7 @@ export const useDrawing = () => {
     const currentDistance = lastPoint.distanceTo(point);
     setDistance(currentDistance * factor[0]);
 
-    if (draggingPointIndex !== null && !roomSelectorMode) {
+    if (draggingPointIndex !== null ) {
       let beforeUpdation = points[draggingPointIndex];
 
       let prevPoint = points[draggingPointIndex - 1];
@@ -1582,6 +1582,7 @@ export const useDrawing = () => {
       dispatch(showRoomNamePopup(true));
       dispatch(setShowPopup(false))
       dispatch(setContextualMenuStatus(false))  
+      dispatch(setPerpendicularLine(false));
       // MySwal.fire({
       //   title: "Room Selector Instructions",
       //   html: `

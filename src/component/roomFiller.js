@@ -51,7 +51,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
   const {selectedRoomName, activeRoomButton} = useSelector((state) => state.ApplicationState);
   const { storeLines, points } = useDrawing();
   const dispatch = useDispatch();
-  
+
   const roomPoints = useMemo(() => {
     let pts = [];
     wallIds.forEach((id) => {
@@ -59,11 +59,15 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
       if (line) {
         const startPoint = line.points[0];
         const endPoint = line.points[1];
-        if (startPoint) pts.push(startPoint);
-        if (endPoint) pts.push(endPoint);
+        if (startPoint && pts.find((pt) =>pt.x === startPoint.x && pt.y === startPoint.y && pt.z === startPoint.z) === undefined){
+          pts.push(startPoint);
+        }
+        if (endPoint && pts.find((pt) =>pt.x === endPoint.x && pt.y === endPoint.y && pt.z === endPoint.z) === undefined) {
+          pts.push(endPoint);
+        }
       }
     });
-    return [...new Set(pts)];
+    return pts;
   }, [wallIds, storeLines, points]);
 
   if (roomPoints.length < 3) {
