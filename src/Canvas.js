@@ -43,6 +43,7 @@ import * as THREE from 'three';
 import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import CappedLine from "./component/CappedLine.js";
 
 
 export const CanvasComponent = () => {
@@ -218,6 +219,7 @@ export const CanvasComponent = () => {
     shape.lineTo(p1.x, p1.y); // Close the shape by going back to the first point
     return shape;
   };
+
   
 
   return (
@@ -282,6 +284,13 @@ export const CanvasComponent = () => {
               onClick={(e) => handleLineClick(e,line.id)}
             />
           ))}
+          {/* {!scale && <BoxSegments lines={storeLines}/>} */}
+          {!scale && 
+          // <LineSegments lines={storeLines} />
+          // <BoxSegments lines={storeLines} />
+            <CappedLine lines={storeLines} />
+          }
+          
 
           
             {!scale && showSnapLine && snappingPoint && (
@@ -505,5 +514,46 @@ const ZoomComponent = ({ zoom, setZoom }) => {
         <ZoomInIcon />
       </button>
     </div>
+  );
+}
+
+function LineSegments({ lines }) {
+  const geometries = lines.map((line) => {
+    return new THREE.BufferGeometry().setFromPoints(line.points);
+  });
+
+  return (
+    <>
+      {geometries.map((geometry, index) => (
+        <lineSegments
+          key={index}
+          geometry={geometry}
+          material={new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 20 })}
+        />
+      ))}
+    </>
+  );
+}
+
+function BoxSegments({ lines }) {
+  return (
+    <>
+      {lines.map((line, index) => {
+        const length = line.points[0].distanceTo(line.points[1]);
+        const midpoint = new THREE.Vector3().addVectors(line.points[0], line.points[1]).multiplyScalar(0.5);
+        const angle = Math.atan2(line.points[1].y - line.points[0].y, line.points[1].x - line.points[0].x);
+
+        return (
+          <mesh
+            key={index}
+            position={midpoint}
+            rotation={[0, 0, angle]}
+          >
+            <boxGeometry args={[length, 20, 0.1]} />
+            <meshBasicMaterial color={0x000000} />
+          </mesh>
+        );
+      })}
+    </>
   );
 }
