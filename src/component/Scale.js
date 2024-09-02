@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import {
+  Plane,
   Vector3,
   Matrix4,
   BufferGeometry,
@@ -14,7 +15,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useDrawing } from "../hooks/useDrawing.js";
 
-export const Scale = () => {
+export const Scale = ({ raycaster, mouse}) => {
   const dispatch = useDispatch();
   const mesh = useRef();
   const leftJaw = useRef();
@@ -28,6 +29,7 @@ export const Scale = () => {
   const [firstLoad, setFirstLoad] = useState(true);
   const { handleDoubleClick, setLeftPos, setRightPos } = useDrawing();
   const { leftPos, rightPos } = useSelector((state) => state.drawing);
+  const { cameraContext  } = useSelector((state) => state.Drawing);
   const [leftJawActivated, setLeftJawActivated] = useState(false);
   const [rightJawActivated, setRightJawActivated] = useState(false);
   const tolerance = 1e-3;
@@ -84,7 +86,19 @@ export const Scale = () => {
       const posX = x * (cameraWidth / 2);
       const posY = y * (cameraHeight / 2);
 
-      const newPoint = new Vector3(posX, posY, 0);
+      let newPoint = new Vector3(posX, posY, 0);
+
+      mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  
+      // Update the raycaster with the camera and mouse position
+      raycaster.current.setFromCamera(mouse.current, cameraContext);
+  
+      // Define a plane at z = 0 and find the intersection point
+      const plane = new Plane(new Vector3(0, 0, 1), 0);
+      const intersectionPoint = new Vector3();
+      raycaster.current.ray.intersectPlane(plane, intersectionPoint);
+      newPoint = intersectionPoint;
 
       if (dragging) {
         if (dragging === mesh.current) {
@@ -210,7 +224,20 @@ export const Scale = () => {
     const posX = x * (cameraWidth / 2);
     const posY = y * (cameraHeight / 2);
 
-    const clickPosition = new Vector3(posX, posY, 0);
+    let clickPosition = new Vector3(posX, posY, 0);
+  
+    mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Update the raycaster with the camera and mouse position
+    raycaster.current.setFromCamera(mouse.current, cameraContext);
+
+    // Define a plane at z = 0 and find the intersection point
+    const plane = new Plane(new Vector3(0, 0, 1), 0);
+    const intersectionPoint = new Vector3();
+    raycaster.current.ray.intersectPlane(plane, intersectionPoint);
+
+    clickPosition = intersectionPoint;
 
     if (
       jawRef.current === leftJaw.current &&

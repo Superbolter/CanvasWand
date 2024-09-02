@@ -118,7 +118,7 @@ export const CanvasComponent = () => {
     mouse
   } = useDrawing();
 
-  const { leftPos, rightPos, merge, lineBreak, perpendicularLine, linePlacementMode } = useSelector((state) => state.drawing)
+  const { leftPos, rightPos, merge, lineBreak, perpendicularLine, linePlacementMode, userLength, userWidth } = useSelector((state) => state.drawing)
   const { storeBoxes, roomSelectorMode, selectionMode,selectedLines, expandRoomPopup} = useSelector((state) => state.ApplicationState);
 
 
@@ -244,7 +244,7 @@ export const CanvasComponent = () => {
 
         >
 
-          <CameraController zoom={zoom} setZoom={setZoom}/>
+          <CameraController zoom={zoom} setZoom={setZoom} scale={scale} userLength={userLength} userWidth={userWidth}/>
           {isSelecting && startPoint && endPoint && (
             <mesh >
               <shapeGeometry  attach="geometry" args={[createQuadrilateral(startPoint,new Vector3(endPoint.x, startPoint.y,0) ,endPoint,new Vector3(startPoint.x, endPoint.y,0) )]} />
@@ -354,8 +354,10 @@ export const CanvasComponent = () => {
             handleReset={handleReset}
             handleResetRooms={handleResetRooms}
           />
-        <ZoomComponent zoom={zoom} setZoom={setZoom}/>          
 
+          {scale && !(userLength===0 || userWidth===0 || userLength===undefined || userWidth===undefined || userLength==="" || userWidth==="") ? null:
+            <ZoomComponent zoom={zoom} setZoom={setZoom}/>          
+          }
       </div>
       {!scale ?
       <div className="button-container">
@@ -439,7 +441,7 @@ export const CanvasComponent = () => {
 
 export default CanvasComponent;
 
-const CameraController = ({zoom, setZoom }) => {
+const CameraController = ({zoom, setZoom, scale, userLength, userWidth }) => {
   const { camera } = useThree();
   const dispatch = useDispatch();
   const {cameraContext} = useSelector((state) => state.Drawing);
@@ -475,6 +477,7 @@ const CameraController = ({zoom, setZoom }) => {
     <OrbitControls 
       ref={controlsRef}
       enableRotate={false} 
+      enableZoom={scale && !(userLength===0 || userWidth===0 || userLength===undefined || userWidth===undefined || userLength==="" || userWidth==="")? false:true}
       minZoom={1}  
       maxZoom={4.5} 
       minPan={new THREE.Vector3(-100 * camera.zoom, -100 * camera.zoom, 0)}
