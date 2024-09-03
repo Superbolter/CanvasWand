@@ -468,14 +468,16 @@ const CameraController = ({zoom, setZoom, scale, userLength, userWidth }) => {
         const { target } = controls;
         target.clamp(controls.minPan, controls.maxPan);
       });
+      // const newContext = camera.clone();
+      // dispatch(setCameraContext(newContext));
     }
   }, []);
 
   useEffect(() => {
       camera.zoom = zoom;
       camera.updateProjectionMatrix();
-      const newContext = camera.clone();
-      dispatch(setCameraContext(newContext));
+      // const newContext = camera.clone();
+      // dispatch(setCameraContext(newContext));
   }, [zoom]);
 
   const handleControlsChange = () => {
