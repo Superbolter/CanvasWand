@@ -90,15 +90,10 @@ const BoxGeometry = ({
   start,
   end,
   dimension,
-  widthchange,
-  widthchangetype,
   isSelected,
-  type,
   typeId,
-  isChoose,
   onClick,
-  currentPoint,
-  newPointMode,
+  showDimension=false,
   opacity = 0.5,
 }) => {
   const dispatch = useDispatch();
@@ -342,7 +337,7 @@ const BoxGeometry = ({
         />
       </mesh>
 
-      {seeDimensions && typeId !== 5 && (
+      {(seeDimensions || showDimension) && typeId !== 5 && (
         <Text
           position={textPosition}
           rotation={[0, 0, textRotation]}

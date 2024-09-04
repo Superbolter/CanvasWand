@@ -1,6 +1,7 @@
 // drawingSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import { Vector3 } from "three";
+import { toast } from 'react-hot-toast';
 
 const initialState = {
   points: [],
@@ -42,6 +43,14 @@ export const drawingSlice = createSlice({
     },
     setSnapActive: (state, action) => {
       state.snapActive = action.payload;
+      toast(`Snapping is ${action.payload} `, {
+        icon: '⚠️',
+        style: {
+          fontFamily: "'DM Sans', sans-serif",
+          color: '#000',
+          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)'
+        },
+      });
     },
     setScale: (state, action) => {
       state.scale = action.payload;

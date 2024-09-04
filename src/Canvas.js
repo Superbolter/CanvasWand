@@ -45,6 +45,9 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import CappedLine from "./component/CappedLine.js";
 import { setSnapActive } from "./features/drawing/drwingSlice.js";
+import CameraController from "./component/CameraController.js";
+import { INITIAL_BREADTH, INITIAL_HEIGHT } from "./constant/constant.js";
+import convert from "convert-units";
 
 
 export const CanvasComponent = () => {
@@ -122,7 +125,7 @@ export const CanvasComponent = () => {
   } = useDrawing();
 
   const { leftPos, rightPos, merge, lineBreak, perpendicularLine, linePlacementMode, userLength, userWidth } = useSelector((state) => state.drawing)
-  const { storeBoxes, roomSelectorMode, selectionMode,selectedLines, expandRoomPopup} = useSelector((state) => state.ApplicationState);
+  const { storeBoxes, roomSelectorMode, selectionMode,selectedLines, expandRoomPopup, factor} = useSelector((state) => state.ApplicationState);
 
 
   const getUrlParameter = (name) => {
@@ -130,21 +133,20 @@ export const CanvasComponent = () => {
     return urlParams.get(name);
   };
 
-  const { contextualMenuStatus, type_id, lineId } = useSelector(
+  const { contextualMenuStatus, typeId, lineId } = useSelector(
     (state) => state.Drawing
   );
   const { floorplanId, drawData, storeLines, points } = useSelector(
     (state) => state.ApplicationState
   );
 
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoomState] = useState(1);
+  const [isNeeded, setIsNeeded] = useState(false)
 
-  const handleWheel = (event) => {
-    event.preventDefault();
-    const zoomSensitivity = 0.001; // Adjust this value to change zoom sensitivity
-    const newZoom = zoom * (1 - event.deltaY * zoomSensitivity);
-    setZoom(Math.max(1, Math.min(4.5, newZoom))); // Limit zoom between 0.1 and 10
-  };
+  const setZoom = (zoom, val = true) =>{
+    setZoomState(zoom)
+    setIsNeeded(val)
+  }
 
   const handleKeyDown = (event) => {
     if (event.key === "s" || event.key === "S") {
@@ -195,7 +197,7 @@ export const CanvasComponent = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [storeLines, selectionMode, selectedLines, points, stop ,leftPos, rightPos,storeBoxes,roomSelectorMode, perpendicularLine]);
+  }, [storeLines, selectionMode, selectedLines, points, stop ,leftPos, rightPos,storeBoxes,roomSelectorMode, perpendicularLine, snapActive]);
 
   useEffect(() => {
     // console.log(type_id);
@@ -242,16 +244,15 @@ export const CanvasComponent = () => {
           style={{
             height: window.innerHeight,
             width: "100%",
-            background: "#f0f0f0",
+            background: "#EFEFEF",
           }}
           orthographic
           raycaster={{ params: { Line: { threshold: 5 } } }}
-          camera={{ position: [0, 0, 500], zoom: 1 }}
+          camera={{ position: [0, 0, 500], zoom: 1}}
           onClick={handleClick}
-
         >
-
-          <CameraController zoom={zoom} setZoom={setZoom} scale={scale} userLength={userLength} userWidth={userWidth}/>
+          <CameraController zoom={zoom} setZoom={setZoom} scale={scale} userLength={userLength} userWidth={userWidth} isNeeded={isNeeded}/>
+          
           {isSelecting && startPoint && endPoint && (
             <mesh >
               <shapeGeometry  attach="geometry" args={[createQuadrilateral(startPoint,new Vector3(endPoint.x, startPoint.y,0) ,endPoint,new Vector3(startPoint.x, endPoint.y,0) )]} />
@@ -281,9 +282,6 @@ export const CanvasComponent = () => {
               start={line.points[0]}
               end={line.points[1]}
               dimension={{ width: line.width, height: line.height }}
-              widthchange={line.widthchange}
-              widthchangetype={line.widthchangetype}
-              type={line.type}
               typeId={line.typeId}
               isSelected={selectedLines.includes(line.id)}
               onClick={(e) => handleLineClick(e,line.id)}
@@ -311,13 +309,28 @@ export const CanvasComponent = () => {
             <>
               <Line
                 points={[points[points.length - 1], currentMousePosition]}
-                color="blue"
-                lineWidth={5}
+                color="black"
+                lineWidth={2}
               />
-              <Text
+              <BoxGeometry
+  
+                start={points[points.length - 1]}
+                end={currentMousePosition}
+                dimension={{ width: convert(INITIAL_BREADTH / factor[1])
+                  .from(measured)
+                  .to("mm"), height: convert(INITIAL_HEIGHT / factor[2])
+                  .from(measured)
+                  .to("mm") }}
+                typeId={typeId}
+                isSelected={false}
+                showDimension={true}
+                onClick={() => {}}
+            />
+              {/* <Text
                 position={[
                   (points[points.length - 1].x + currentMousePosition.x) / 2,
                   (points[points.length - 1].y + currentMousePosition.y) / 2 +
+
                     10,
                   0,
                 ]}
@@ -328,7 +341,7 @@ export const CanvasComponent = () => {
                 fontWeight="bold"
               >
                 {`${distance.toFixed(2)} ${measured}`}
-              </Text>
+              </Text> */}
             </>
           )}
           {!scale && storeBoxes.map((box, index) => (
@@ -350,14 +363,16 @@ export const CanvasComponent = () => {
             rotation={[Math.PI / 2, 0, 0]}
             cellSize={10}
             cellThickness={0}
-            //cellColor="gray"
-            sectionSize={10}
+            cellColor="#FFFFFF"
+            sectionSize={50}
             //sectionThickness={1.5}
-            sectionColor="white"
+            sectionColor="#FFFFFF"
             fadeDistance={10000}
             infiniteGrid
-            fadeStrength={1}
-            fadeFrom={1}
+            fadeStrength={0.5}
+            fadeFrom={0.5}
+            opacity={0.3}
+            materialProps={{ toneMapped: false , transparent: true, opacity: 0.3}}
           />
         </Canvas>
         <DrawtoolHeader
@@ -390,7 +405,7 @@ export const CanvasComponent = () => {
           }}
         >
           <Canvas
-            style={{ height: "100%", width: "100%" }}
+            style={{ height: "100%", width: "100%", backgroundColor: "#EFEFEF", borderRadius: "16px" }}
             orthographic
             camera={{ position: [0, 0, 800], fov: 75, }}
           >
@@ -416,10 +431,10 @@ export const CanvasComponent = () => {
             {/* 3D grid */}
             <Grid
               rotation={[Math.PI / 2, 0, 0]}
-              cellSize={10}
+              cellSize={0}
               cellThickness={0}
               cellColor="black"
-              sectionSize={80}
+              sectionSize={0}
               sectionThickness={1.5}
               sectionColor="lightgray"
               fadeDistance={10000}
@@ -428,11 +443,13 @@ export const CanvasComponent = () => {
 
             {/* Orbit controls for 3D view */}
             <OrbitControls
-              enablePan={false} // Disable panning if needed
-              // maxPolarAngle={Math.PI / 2} // Limit vertical rotation to 90 degrees (horizontal plane)
-              // minPolarAngle={Math.PI / 2} // Limit vertical rotation to 90 degrees (horizontal plane)
-              maxAzimuthAngle={Math.PI / 3} // Optional: Limit horizontal rotation range if needed
-              minAzimuthAngle={-Math.PI / 3} // Optional: Limit horizontal rotation range if needed
+              enablePan={true} // Disable panning if needed
+              zoomToCursor={true}
+              maxAzimuthAngle={Math.PI / 3} // Limit horizontal rotation to 60 degrees (PI/3 radians)
+              minAzimuthAngle={-Math.PI / 3} // Limit horizontal rotation to -60 degrees (-PI/3 radians)
+              // maxPolarAngle={Math.PI / 3} // Limit vertical rotation to 60 degrees
+              // minPolarAngle={Math.PI / 2 - Math.PI / 3} // Limit vertical rotation to 30 degrees above the horizontal plane
+              defaultPolarAngle={Math.PI / 2 - Math.PI / 6} // Set default vertical angle to 30 degrees
             />
           </Canvas>
         </div>
@@ -454,68 +471,6 @@ export const CanvasComponent = () => {
 };
 
 export default CanvasComponent;
-
-
-const CameraController = ({ zoom, setZoom, scale, userLength, userWidth }) => {
-  const { camera } = useThree();
-  const dispatch = useDispatch();
-  const { cameraContext } = useSelector((state) => state.Drawing);
-  const controlsRef = useRef();
-
-  useEffect(() => {
-    if (Object.keys(cameraContext).length === 0) {
-      dispatch(setCameraContext(camera));
-    }
-  }, [camera, cameraContext, dispatch]);
-
-  useEffect(() => {
-    if (controlsRef.current) {
-      const controls = controlsRef.current;
-      controls.addEventListener('change', () => {
-        const newContext = camera.clone(); 
-        dispatch(setCameraContext(newContext));
-        setZoom(camera.zoom);
-      });
-
-      return () => {
-        controls.removeEventListener('change', () => {});
-      };
-    }
-  }, [camera, dispatch, setZoom]);
-
-  useEffect(() => {
-    camera.zoom = zoom;
-    camera.updateProjectionMatrix();
-    const newContext = camera.clone();
-    dispatch(setCameraContext(newContext));
-  }, [zoom, camera, dispatch]);
-
-  const handleControlsChange = () => {
-    setZoom(camera.zoom);
-  };
-
-  return (
-    <OrbitControls
-      ref={controlsRef}
-      enableRotate={false}
-      enableZoom={
-        scale &&
-        !(userLength === 0 || userWidth === 0 || userLength === undefined || userWidth === undefined || userLength === "" || userWidth === "")
-          ? false
-          : true
-      }
-      minZoom={1}
-      maxZoom={4.5}
-      minPan={new THREE.Vector3(-100 * camera.zoom, -100 * camera.zoom, 0)}
-      maxPan={new THREE.Vector3(100 * camera.zoom, 100 * camera.zoom, 0)}
-      onChange={() => handleControlsChange()}
-      maxAzimuthAngle={Math.PI / 100}
-      minAzimuthAngle={-Math.PI / 100}
-      maxPolarAngle={Math.PI / 2}
-      minPolarAngle={Math.PI / 2}
-    />
-  );
-};
 
 const ZoomComponent = ({ zoom, setZoom }) => {
 
@@ -574,3 +529,4 @@ function BoxSegments({ lines }) {
     </>
   );
 }
+
