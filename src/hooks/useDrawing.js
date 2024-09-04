@@ -78,6 +78,8 @@ export const useDrawing = () => {
     userHeight,
     lineBreak,
     merge,
+    snapActive,
+    setSnapActive,
   } = useSelector((state) => state.drawing);
   const { typeId, contextualMenuStatus, actionHistory, redoStack, cameraContext} = useSelector(
     (state) => state.Drawing
@@ -118,6 +120,7 @@ export const useDrawing = () => {
   const [mergeLine, setMergeLine] = useState([]);
   const [lineClick, setLineClick] = useState(false);
   const [doorPoint, setdoorPoint] = useState([]);
+  //const [snapActive,setSnapActive] = useState(true);
 
   const [snappingPoint, setSnappingPoint] = useState([]);
   const [showSnapLine, setShowSnapLine] = useState(false);
@@ -319,7 +322,7 @@ export const useDrawing = () => {
         line.points[0],
         line.points[1],
         startPoint,
-        newPoint
+        newPoint,snapActive
       );
       if (intersection) {
         intersections.push({ line, intersection });
@@ -866,8 +869,8 @@ export const useDrawing = () => {
     point = intersectionPoint;
 
     if(lineBreak){
-      if (findLineForPoint(point, storeLines)) {
-        let { closestPointOnLine,line } = findLineForPoint(point, storeLines);
+      if (findLineForPoint(point, storeLines,snapActive)) {
+        let { closestPointOnLine,line } = findLineForPoint(point, storeLines,snapActive);
         if(closestPointOnLine){
           setNearPoint(true);
           setNearVal({line: line, point: closestPointOnLine})
@@ -887,29 +890,30 @@ export const useDrawing = () => {
     let cuuPoint = point;
     // Check for snapping
     let snapFound = false;
-    for (let i = 0; i < points.length; i++) {
-      if (
-        Math.abs(points[i].x - point.x) < 2 &&
-        points[points.length - 1].y !== points[i].y &&
-        points[points.length - 1].x !== points[i].x && !selectionMode
-      ) {
-        cuuPoint.x = points[i].x;
-        let newarr = [cuuPoint, points[i]];
-        setSnappingPoint([...newarr]);
-        snapFound = true;
-        break;
-      } else if (
-        Math.abs(points[i].y - point.y) < 2 &&
-        points[points.length - 1].y !== points[i].y &&
-        points[points.length - 1].x !== points[i].x && !selectionMode
-      ) {
-        cuuPoint.y = points[i].y;
-        let newarr = [cuuPoint, points[i]];
-        setSnappingPoint([...newarr]);
-        snapFound = true;
-        break;
+      for (let i = 0; i < points.length; i++) {
+        if (
+          Math.abs(points[i].x - point.x) < 2 &&
+          points[points.length - 1].y !== points[i].y &&
+          points[points.length - 1].x !== points[i].x && !selectionMode
+        ) {
+          cuuPoint.x = points[i].x;
+          let newarr = [cuuPoint, points[i]];
+          setSnappingPoint([...newarr]);
+          snapFound = true;
+          break;
+        } else if (
+          Math.abs(points[i].y - point.y) < 2 &&
+          points[points.length - 1].y !== points[i].y &&
+          points[points.length - 1].x !== points[i].x && !selectionMode
+        ) {
+          cuuPoint.y = points[i].y;
+          let newarr = [cuuPoint, points[i]];
+          setSnappingPoint([...newarr]);
+          snapFound = true;
+          break;
+        }
       }
-    }
+    
 
     if (!snapFound) {
       setSnappingPoint([]);
@@ -1201,8 +1205,8 @@ export const useDrawing = () => {
 
 
     if (lineBreak) {
-      if (findLineForPoint(point, storeLines)) {
-        let { closestPointOnLine } = findLineForPoint(point, storeLines);
+      if (findLineForPoint(point, storeLines,snapActive)) {
+        let { closestPointOnLine } = findLineForPoint(point, storeLines,snapActive);
         breakingLine(closestPointOnLine);
       } else {
         setLineBreak(false);
@@ -1220,7 +1224,9 @@ export const useDrawing = () => {
         dispatch(setContextualMenuStatus(true,pointToSend,"neutral"));
       }
       setNewLine(false);
-      point = snapToPoint(point, points, storeLines);
+      
+      point = snapToPoint(point, points, storeLines,snapActive);
+      
 
       const newPoint = [...points, point];
       const breaking = [...breakPoint, point];
@@ -1232,7 +1238,8 @@ export const useDrawing = () => {
     if (perpendicularLine && points.length > 0) {
       point = calculateAlignedPoint(points[points.length - 1], point);
     }
-    point = snapToPoint(point, points, storeLines); //snapping
+   
+    point = snapToPoint(point, points, storeLines,snapActive);//snapping
     const newPoints = [...points, point];
     dispatch(setPoints(newPoints));
 
@@ -1700,6 +1707,8 @@ export const useDrawing = () => {
     merge,
     nearPoint, 
     nearVal, 
+    snapActive,
+    setSnapActive,
     setNearVal,
     setNearPoint,
     setMerge,

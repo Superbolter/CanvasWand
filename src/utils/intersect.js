@@ -7,14 +7,14 @@ import { SNAPPING_THRESHOLD } from "../constant/constant";
 
 
 // Helper function to check intersection and find intersection point
-export const getLineIntersection = (p1, p2, p3, p4) => {
+export const getLineIntersection = (p1, p2, p3, p4,snapActive) => {
 
   const closestPointOnLine = closestPointOnSegment(
     p1,
     p2,
     p4
   );
-  if (closestPointOnLine.distanceTo(p4) < SNAPPING_THRESHOLD) {
+  if (closestPointOnLine.distanceTo(p4) < (snapActive ?SNAPPING_THRESHOLD:0)) {
     return closestPointOnLine;
   }
 

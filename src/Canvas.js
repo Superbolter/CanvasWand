@@ -44,11 +44,12 @@ import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import CappedLine from "./component/CappedLine.js";
+import { setSnapActive } from "./features/drawing/drwingSlice.js";
 
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
-  const {scale} = useSelector((state) => state.drawing);
+  const {scale,snapActive} = useSelector((state) => state.drawing);
   const {
     handleClick,
     handleMouseMove,
@@ -93,6 +94,7 @@ export const CanvasComponent = () => {
     handleSaveClick,
     snappingPoint,
     showSnapLine,
+    
     setShowSnapLine,
     setSnappingPoint,
     escape,
@@ -160,6 +162,9 @@ export const CanvasComponent = () => {
     }
     if((event.ctrlKey || event.metaKey)&&(event.key === "y" || event.key === "Y")){
       redo();
+    }
+    if((event.ctrlKey || event.metaKey)&&(event.key === "c" || event.key === "C")){
+      dispatch(setSnapActive(!snapActive));
     }
     if((event.ctrlKey || event.metaKey) && (event.key === "b" || event.key === "B")){
       if(linePlacementMode === "midpoint"){

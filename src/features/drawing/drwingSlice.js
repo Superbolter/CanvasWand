@@ -23,6 +23,7 @@ const initialState = {
   userWidth: 0,
   userHeight: 0,
   lineBreak: false,
+  snapActive: true,
   merge: false
 };
 
@@ -38,6 +39,9 @@ export const drawingSlice = createSlice({
     },
     setLinePlacementMode: (state, action) => {
       state.linePlacementMode = action.payload;
+    },
+    setSnapActive: (state, action) => {
+      state.snapActive = action.payload;
     },
     setScale: (state, action) => {
       state.scale = action.payload;
@@ -123,7 +127,9 @@ export const {
   setUserWidth,
   setUserHeight,
   setLineBreakState,
-  setMergeState
+  setMergeState,
+  snapActive,
+  setSnapActive,
 } = drawingSlice.actions;
 
 export default drawingSlice.reducer;

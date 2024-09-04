@@ -1,17 +1,20 @@
 import { SNAPPING_THRESHOLD } from "../constant/constant";
+import { useDispatch, useSelector } from "react-redux";
 
- export const snapToPoint = (point,points,storeLines) => {
+ export const snapToPoint = (point,points,storeLines,snapActive) => {
+   
+
     // Check against all points and endpoints of existing lines
     for (let p of points) {
-      if (p.distanceTo(point) < 5) {
+      if (p.distanceTo(point) < (snapActive ?5:0)) {
         return p;
       }
     }
     for (let line of storeLines) {
-      if (line.points[0].distanceTo(point) < 5) {
+      if (line.points[0].distanceTo(point) < (snapActive ?5:0)) {
         return line.points[0];
       }
-      if (line.points[1].distanceTo(point) < 5) {
+      if (line.points[1].distanceTo(point) < (snapActive ?5:0)) {
         return line.points[1];
       }
 
