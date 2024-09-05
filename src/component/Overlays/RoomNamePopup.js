@@ -55,19 +55,24 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 const RoomNamePopup = () => {
   const [error, setError] = useState("");
   const [roomName, setName] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
-  const { roomPopup, expandRoomPopup, selectionMode, roomEditingMode,selectedRoomName,selectedRoomType, activeRoomButton, activeRoomIndex } = useSelector(
-    (state) => state.ApplicationState
-  );
+  const {
+    roomPopup,
+    expandRoomPopup,
+    selectionMode,
+    roomEditingMode,
+    selectedRoomName,
+    selectedRoomType,
+    activeRoomButton,
+    activeRoomIndex,
+  } = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch();
   const { roomSelectors } = useSelector((state) => state.drawing);
   const { toggleSelectionMode } = useModes();
-  const {addRoom} = useDrawing();
+  const { addRoom } = useDrawing();
 
   useEffect(() => {
     if (selectedRoomName) {
       setName(selectedRoomName);
-      setIsEditing(false);
       setError(false);
     }
   }, [selectedRoomName]);
@@ -119,11 +124,27 @@ const RoomNamePopup = () => {
     const length = roomSelectors.filter((room) =>
       room.roomName.includes(event.target.value)
     ).length;
+    let name = event.target.value;
     if (length > 0) {
-      const name = event.target.value + " " + (length + 1);
+      name = event.target.value + " " + (length + 1);
       setName(name);
     } else {
-      setName(event.target.value);
+      setName(name);
+    }
+    if (roomEditingMode) {
+      if (name.length === 0) {
+        setError("Please enter room name");
+      } else if (event.target.value.length === 0) {
+        setError("Please select room type");
+      } else {
+        const newRooms = [...roomSelectors];
+        newRooms[activeRoomIndex] = {
+          ...newRooms[activeRoomIndex],
+          roomName: name,
+          roomType: event.target.value,
+        };
+        dispatch(setRoomSelectors(newRooms));
+      }
     }
   };
 
@@ -160,40 +181,6 @@ const RoomNamePopup = () => {
       setError("");
     }
   }, [selectedRoomName, selectedRoomType]);
-
-  const handleEditSaveClick = () => {
-    if (
-      roomName.length > 0 &&
-      selectedRoomType &&
-      selectedRoomType?.length > 0
-    ) {
-      const newRooms = [...roomSelectors];
-      newRooms[activeRoomIndex] = {
-        ...newRooms[activeRoomIndex],
-        roomName: roomName,
-        roomType: selectedRoomType,
-      };
-      setName("");
-      setIsEditing(false);
-      dispatch(setActiveRoomButton(""));
-      dispatch(setRoomSelectors(newRooms));
-      handleReset(false);
-    } else {
-      if (roomName.length === 0) {
-        setError("Please enter room name");
-      } else if (
-        selectedRoomType?.length === 0 ||
-        selectedRoomType === null ||
-        selectedRoomType === ""
-      ) {
-        setError("Please select room type");
-      }
-    }
-  };
-
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
 
   return (
     <div>
@@ -255,7 +242,6 @@ const RoomNamePopup = () => {
                 value={selectedRoomType}
                 onChange={handleChange}
                 displayEmpty
-                disabled={roomEditingMode && !isEditing}
                 input={<BootstrapInput />}
                 MenuProps={{
                   PaperProps: {
@@ -351,8 +337,24 @@ const RoomNamePopup = () => {
                 placeholder="Enter room name"
                 required={true}
                 value={roomName}
-                disabled={roomEditingMode && !isEditing}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (roomEditingMode) {
+                    if (e.target.value.length === 0) {
+                      setError("Please enter room name");
+                    } else if (selectedRoomType?.length === 0) {
+                      setError("Please select room type");
+                    } else {
+                      const newRooms = [...roomSelectors];
+                      newRooms[activeRoomIndex] = {
+                        ...newRooms[activeRoomIndex],
+                        roomName: e.target.value,
+                        roomType: selectedRoomType,
+                      };
+                      dispatch(setRoomSelectors(newRooms));
+                    }
+                  }
+                }}
                 InputProps={{
                   style: {
                     fontSize: "16px",
@@ -363,30 +365,6 @@ const RoomNamePopup = () => {
                   },
                 }}
               />
-              {roomEditingMode && (
-                <div
-                  onClick={isEditing ? handleEditSaveClick : handleEditClick}
-                  className="room-name-edit"
-                >
-                  {isEditing ? (
-                    <Check style={{ color: "#4B73EC", fontSize: "16px" }} />
-                  ) : (
-                    <img src={edit} alt="edit" />
-                  )}
-                  {isEditing ? (
-                    <Typography
-                      modifiers={["helpText"]}
-                      style={{ color: "#4B73EC" }}
-                    >
-                      Save
-                    </Typography>
-                  ) : (
-                    <Typography modifiers={["black600", "helpText"]}>
-                      Edit
-                    </Typography>
-                  )}
-                </div>
-              )}
             </div>
             {error.length > 0 && (
               <Typography modifiers={["medium", "warning300", "helpText"]}>

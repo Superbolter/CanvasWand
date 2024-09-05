@@ -16,22 +16,49 @@ import {
   showRoomNamePopup,
   updateDrawData,
 } from "../Actions/ApplicationStateAction";
-import { setContextualMenuStatus, setRedoStack, setShowPopup, setUndoStack } from "../Actions/DrawingActions";
+import {
+  setContextualMenuStatus,
+  setRedoStack,
+  setShowPopup,
+  setUndoStack,
+} from "../Actions/DrawingActions";
 import useModes from "./useModes";
-import { setLineBreakState, setMergeState, setRoomSelectors, setScale, setUserHeight, setUserLength } from "../features/drawing/drwingSlice";
+import {
+  setLineBreakState,
+  setMergeState,
+  setRoomSelectors,
+  setScale,
+  setUserHeight,
+  setUserLength,
+} from "../features/drawing/drwingSlice";
 import { handleDownload } from "../component/Helpers/ConvertToJson.js";
 import { fetchWrapper } from "../app/RomeDataManager.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
-import { toast } from 'react-hot-toast';
+import { toast } from "react-hot-toast";
 
 export const useActions = () => {
   const { actionHistory, redoStack } = useSelector((state) => state.Drawing);
-  const { storeLines, points, storeBoxes, selectionMode, roomSelectorMode, floorplanId } = useSelector(
-    (state) => state.ApplicationState
-  );
-  const {lineBreak, merge, userLength, userWidth, userHeight, roomSelectors, leftPos, rightPos, measured} = useSelector((state) => state.drawing)
+  const {
+    storeLines,
+    points,
+    storeBoxes,
+    selectionMode,
+    roomSelectorMode,
+    floorplanId,
+  } = useSelector((state) => state.ApplicationState);
+  const {
+    lineBreak,
+    merge,
+    userLength,
+    userWidth,
+    userHeight,
+    roomSelectors,
+    leftPos,
+    rightPos,
+    measured,
+  } = useSelector((state) => state.drawing);
   const dispatch = useDispatch();
-  const {toggleSelectionMode} = useModes();
+  const { toggleSelectionMode } = useModes();
 
   const undo = () => {
     const newStack = [...actionHistory];
@@ -85,6 +112,17 @@ export const useActions = () => {
 
       case "replace":
         dispatch(setStoreLines([...lastAction.previousLines]));
+        break;
+
+      case "deleteRoom":
+        dispatch(setRoomSelectors([...lastAction.oldRooms]));
+        dispatch(setSelectedLinesState([]));
+        dispatch(setExpandRoomNamePopup(false));
+        dispatch(setRoomDetails(""));
+        dispatch(setRoomName(""));
+        dispatch(setRoomEditingMode(false));
+        dispatch(setActiveRoomButton(""));
+        dispatch(setActiveRoomIndex(-1));
         break;
 
       default:
@@ -154,6 +192,17 @@ export const useActions = () => {
         dispatch(setStoreLines([...lastRedoAction.currentLines]));
         break;
 
+      case "deleteRoom":
+        dispatch(setRoomSelectors([...lastRedoAction.newRooms]));
+        dispatch(setSelectedLinesState([]));
+        dispatch(setExpandRoomNamePopup(false));
+        dispatch(setRoomDetails(""));
+        dispatch(setRoomName(""));
+        dispatch(setRoomEditingMode(false));
+        dispatch(setActiveRoomButton(""));
+        dispatch(setActiveRoomIndex(-1));
+        break;
+
       default:
         break;
     }
@@ -175,14 +224,14 @@ export const useActions = () => {
   const handleResetRooms = () => {
     const rooms = [];
     dispatch(setRoomSelectors(rooms));
-    handleApiCall(userHeight,rooms);
+    handleApiCall(userHeight, rooms);
     dispatch(setExpandRoomNamePopup(false));
-    dispatch(setRoomDetails(""))
-    dispatch(setRoomName(""))
-    dispatch(setRoomEditingMode(false))
-    dispatch(setActiveRoomButton(""))
-    dispatch(setActiveRoomIndex(-1))
-    dispatch(setSelectedLinesState([]))
+    dispatch(setRoomDetails(""));
+    dispatch(setRoomName(""));
+    dispatch(setRoomEditingMode(false));
+    dispatch(setActiveRoomButton(""));
+    dispatch(setActiveRoomIndex(-1));
+    dispatch(setSelectedLinesState([]));
   };
 
   const handleApiCall = (height = userHeight, rooms = roomSelectors) => {
@@ -216,30 +265,35 @@ export const useActions = () => {
       }
       dispatch(setRoomSelectorMode(true));
       dispatch(showRoomNamePopup(true));
-      dispatch(setShowPopup(false))
-      dispatch(setContextualMenuStatus(false))  
+      dispatch(setShowPopup(false));
+      dispatch(setContextualMenuStatus(false));
       // dispatch(setPerpendicularLine(false));
     } else {
       toast("Saving, Please Wait ...", {
-        icon: '✔️',
+        icon: "✔️",
         style: {
           fontFamily: "'DM Sans', sans-serif",
-          color: '#000',
-          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)'
+          color: "#000",
+          boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.25)",
         },
-      })
+      });
       handleApiCall();
       setTimeout(() => {
-        fetchWrapper.post(`/floorplans/process_draw_data/${floorplanId}`).then((res)=>{
-          window.open(`https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`, '_blank');
-        })
+        fetchWrapper
+          .post(`/floorplans/process_draw_data/${floorplanId}`)
+          .then((res) => {
+            window.open(
+              `https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`,
+              "_blank"
+            );
+          });
       }, 1000);
     }
   };
 
   const handleDoubleClick = async () => {
     let height = userHeight;
-    switch (measured){
+    switch (measured) {
       case "in":
         height = "120";
         break;
@@ -258,16 +312,15 @@ export const useActions = () => {
       default:
         break;
     }
-    dispatch(setUserHeight(height))
+    dispatch(setUserHeight(height));
     dispatch(setUserLength(userLength));
     const lfactor = userLength / leftPos.distanceTo(rightPos);
     const wfactor = INITIAL_BREADTH / userWidth;
     const hfactor = INITIAL_HEIGHT / height;
     dispatch(setFactor([lfactor, wfactor, hfactor]));
     dispatch(setScale(false));
-    handleApiCall(height)
+    handleApiCall(height);
   };
-
 
   return {
     undo,
@@ -275,6 +328,6 @@ export const useActions = () => {
     handleReset,
     handleResetRooms,
     handleDoubleClick,
-    handleSaveClick
+    handleSaveClick,
   };
 };

@@ -36,6 +36,7 @@ import blade from "./assets/blade.png";
 import {
   setContextualMenuStatus,
   setNewLine,
+  setShiftPressed,
   setShowPopup,
   setShowSnapLine,
   setStop,
@@ -49,6 +50,7 @@ import { INITIAL_BREADTH, INITIAL_HEIGHT } from "./constant/constant.js";
 import convert from "convert-units";
 import ZoomComponent from "./component/CanvasOverLays/ZoomComponent.js";
 import useModes from "./hooks/useModes.js";
+import newCursor from "./assets/linedraw.png"
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -68,6 +70,7 @@ export const CanvasComponent = () => {
     handlePointerDown,
     handlePointerUp,
     deleteSelectedLines,
+    deleteSelectedRoom,
     nearPoint,
     nearVal,
     isSelecting,
@@ -98,6 +101,7 @@ export const CanvasComponent = () => {
     storeLines,
     factor,
     points,
+    activeRoomIndex
   } = useSelector((state) => state.ApplicationState);
   const { typeId, stop, showSnapLine, snappingPoint } = useSelector(
     (state) => state.Drawing
@@ -169,15 +173,30 @@ export const CanvasComponent = () => {
       }
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
-      deleteSelectedLines();
+      if(roomSelectorMode && activeRoomIndex!== -1){
+        deleteSelectedRoom()
+      }else{
+        deleteSelectedLines();
+      }
+    }
+    if(event.key === "Shift"){
+      dispatch(setShiftPressed(true))
+    }
+  };
+
+  const handleKeyUp = (event) => {
+    if (event.key === "Shift"){
+      dispatch(setShiftPressed(false))
     }
   };
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
   }, [
     storeLines,
@@ -192,6 +211,7 @@ export const CanvasComponent = () => {
     perpendicularLine,
     snapActive,
     linePlacementMode,
+    roomSelectors
   ]);
 
   useEffect(() => {
@@ -234,7 +254,7 @@ export const CanvasComponent = () => {
             ? roomSelectorMode
               ? { cursor: "pointer" }
               : { cursor: "grab" }
-            : { cursor: "crosshair" }
+            : { cursor: `url(${newCursor}) 16 16, crosshair` }
         }
       >
         {/* 2D (Orthographic) Canvas */}

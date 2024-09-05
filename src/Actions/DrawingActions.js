@@ -71,6 +71,9 @@ export const setContextualMenuStatus=(value, position=[0,0,0], positionType="neu
       position,
       positionType
     });
+    if(!value){
+      dispatch(setShowPopup(false))
+    }
   }
 }
 export const setLineId=(lineId)=>({
@@ -126,4 +129,9 @@ export const setDragMode = (val) => ({
 export const setMergeLine = (val) => ({
   type: "UPDATE_DRAWING_STATE",
   mergeLine: val
+})
+
+export const setShiftPressed = (val) => ({
+  type: "UPDATE_DRAWING_STATE",
+  shiftPressed: val
 })

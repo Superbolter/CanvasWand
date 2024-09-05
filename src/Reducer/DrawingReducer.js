@@ -16,6 +16,7 @@ const initialState = {
     snappingPoint: [],
     dragMode: false,
     mergeLine: [],
+    shiftPressed: false,
   };
   
   const DrawingReducer = (state = initialState, action) => {

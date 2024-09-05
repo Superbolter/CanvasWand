@@ -72,6 +72,7 @@ export const useDrawing = () => {
     snappingPoint,
     dragMode,
     mergeLine,
+    shiftPressed
   } = useSelector((state) => state.Drawing);
   const {
     storeLines,
@@ -418,7 +419,6 @@ export const useDrawing = () => {
     );
   }
 
-
   useEffect(() => {
     const { pointUpper, pointLower } = calculateUpperAndLowerPoints(storeLines, factor, measured);
     console.log("hello this is working");
@@ -428,6 +428,29 @@ export const useDrawing = () => {
     dispatch(setUpperPoint(pointUpper));
     dispatch(setLowerPoint(pointLower));
   }, [storeLines, factor, measured, dispatch]);
+
+  const deleteSelectedRoom = () => {
+    if (activeRoomIndex !== -1) {
+      const rooms = [...roomSelectors];
+      rooms.splice(activeRoomIndex, 1);
+      dispatch(setRoomSelectors(rooms));
+      setSelectedLines([]);
+      const history = [...actionHistory];
+      history.push({
+        type: "deleteRoom",
+        oldRooms: [...roomSelectors],
+        newRooms: rooms,
+      });
+      dispatch(setUndoStack(history));
+      dispatch(setRedoStack([]));
+      dispatch(setExpandRoomNamePopup(false));
+      dispatch(setRoomDetails(""));
+      dispatch(setRoomName(""));
+      dispatch(setRoomEditingMode(false));
+      dispatch(setActiveRoomButton(""));
+      dispatch(setActiveRoomIndex(-1));
+    }
+  };
 
   const deleteSelectedLines = () => {
     let lockedCount = 0;
@@ -618,62 +641,62 @@ export const useDrawing = () => {
       let prevPoint = points[draggingPointIndex - 1];
 
       let nextPoint = points[draggingPointIndex + 1];
-      if (perpendicularLine) {
-        if (prevPoint && nextPoint) {
-          // Check if all coordinates are different
+      // if (perpendicularLine) {
+      //   if (prevPoint && nextPoint) {
+      //     // Check if all coordinates are different
 
-          if (
-            point.x !== prevPoint.x &&
-            point.y !== prevPoint.y &&
-            point.x !== nextPoint.x &&
-            point.y !== nextPoint.y
-          ) {
-            // Calculate the direction vector of the line (prevPoint to nextPoint)
-            const dx = nextPoint.x - prevPoint.x;
-            const dy = nextPoint.y - prevPoint.y;
+      //     if (
+      //       point.x !== prevPoint.x &&
+      //       point.y !== prevPoint.y &&
+      //       point.x !== nextPoint.x &&
+      //       point.y !== nextPoint.y
+      //     ) {
+      //       // Calculate the direction vector of the line (prevPoint to nextPoint)
+      //       const dx = nextPoint.x - prevPoint.x;
+      //       const dy = nextPoint.y - prevPoint.y;
 
-            // Normalize the direction vector
-            const length = Math.sqrt(dx * dx + dy * dy);
-            const dirX = dx / length;
-            const dirY = dy / length;
+      //       // Normalize the direction vector
+      //       const length = Math.sqrt(dx * dx + dy * dy);
+      //       const dirX = dx / length;
+      //       const dirY = dy / length;
 
-            // Calculate the vector from prevPoint to point
-            const px = point.x - prevPoint.x;
-            const py = point.y - prevPoint.y;
+      //       // Calculate the vector from prevPoint to point
+      //       const px = point.x - prevPoint.x;
+      //       const py = point.y - prevPoint.y;
 
-            // Project the point onto the line
-            const dotProduct = px * dirX + py * dirY;
-            point.x = prevPoint.x + dotProduct * dirX;
-            point.y = prevPoint.y + dotProduct * dirY;
-          } else {
-            // Align with the previous point
-            if (
-              Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)
-            ) {
-              point.y = prevPoint.y; // Align horizontally
-            } else {
-              point.x = prevPoint.x; // Align vertically
-            }
-          }
-        } else if (prevPoint) {
-          if (
-            Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)
-          ) {
-            point.y = prevPoint.y; // Align horizontally
-          } else {
-            point.x = prevPoint.x; // Align vertically
-          }
-        } else if (nextPoint) {
-          // Align with the next point if there's no previous point
-          if (
-            Math.abs(point.x - nextPoint.x) > Math.abs(point.y - nextPoint.y)
-          ) {
-            point.y = nextPoint.y; // Align horizontally
-          } else {
-            point.x = nextPoint.x; // Align vertically
-          }
-        }
-      }
+      //       // Project the point onto the line
+      //       const dotProduct = px * dirX + py * dirY;
+      //       point.x = prevPoint.x + dotProduct * dirX;
+      //       point.y = prevPoint.y + dotProduct * dirY;
+      //     } else {
+      //       // Align with the previous point
+      //       if (
+      //         Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)
+      //       ) {
+      //         point.y = prevPoint.y; // Align horizontally
+      //       } else {
+      //         point.x = prevPoint.x; // Align vertically
+      //       }
+      //     }
+      //   } else if (prevPoint) {
+      //     if (
+      //       Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)
+      //     ) {
+      //       point.y = prevPoint.y; // Align horizontally
+      //     } else {
+      //       point.x = prevPoint.x; // Align vertically
+      //     }
+      //   } else if (nextPoint) {
+      //     // Align with the next point if there's no previous point
+      //     if (
+      //       Math.abs(point.x - nextPoint.x) > Math.abs(point.y - nextPoint.y)
+      //     ) {
+      //       point.y = nextPoint.y; // Align horizontally
+      //     } else {
+      //       point.x = nextPoint.x; // Align vertically
+      //     }
+      //   }
+      // }
 
       let updatedPoints = [...points];
       const updated = replaceValue(updatedPoints, beforeUpdation, point);
@@ -897,7 +920,9 @@ export const useDrawing = () => {
         newMergeLines.push(line);
       });
       dispatch(setMergeLine(newMergeLines));
-      handleMerge(newMergeLines);
+      if(selectedLines.length > 1){
+        handleMerge(newMergeLines);
+      }
     }
   };
 
@@ -1069,9 +1094,9 @@ export const useDrawing = () => {
     if (selectionMode && !merged) {
       const selected = selectedLines.includes(id)
         ? selectedLines.filter((lineId) => lineId !== id)
-        : !merge && !expandRoomPopup
-        ? [id]
-        : [...selectedLines, id];
+        : merge || expandRoomPopup || shiftPressed
+        ? [...selectedLines, id]
+        : [id];
       setSelectedLines(selected);
       if (roomSelectorMode && roomEditingMode && activeRoomIndex >= 0) {
         let newRooms = [...roomSelectors];
@@ -1192,6 +1217,7 @@ export const useDrawing = () => {
     handlePointerUp,
     setDimensions,
     deleteSelectedLines,
+    deleteSelectedRoom,
     handleMergeClick,
     addRoom,
     isSelecting,
