@@ -61,27 +61,18 @@ export const CanvasComponent = () => {
     handleMouseDown,
     handleMouseUp,
     currentMousePosition,
-    idSelection,
     doorPosition,
     setDoorPosition,
     isDraggingDoor,
     setIsDraggingDoor,
     handlePointerDown,
     handlePointerUp,
-    handlePointerMove,
-    roomSelectors,
     deleteSelectedLines,
     nearPoint,
     nearVal,
-    setNearVal,
-    setNearPoint,
     isSelecting,
     startPoint,
     endPoint,
-    setDraggingPointIndex,
-    setIsSelecting,
-    setStartPoint,
-    setEndPoint,
   } = useDrawing();
   const { undo, redo } = useActions();
   const { toggleSelectionMode, perpendicularHandler } = useModes();
@@ -95,7 +86,9 @@ export const CanvasComponent = () => {
     linePlacementMode,
     userLength,
     userWidth,
-    measured
+    measured,
+    idSelection,
+    roomSelectors,
   } = useSelector((state) => state.drawing);
   const {
     storeBoxes,

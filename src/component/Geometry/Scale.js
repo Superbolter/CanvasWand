@@ -28,7 +28,6 @@ export const Scale = () => {
   const [lineAngle, setLineAngle] = useState(0);
   const [isPointerMoving, setIsPointerMoving] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
-  const { setLeftPos, setRightPos } = useDrawing();
   const { leftPos, rightPos } = useSelector((state) => state.drawing);
   const { cameraContext  } = useSelector((state) => state.Drawing);
   const [leftJawActivated, setLeftJawActivated] = useState(false);
@@ -102,7 +101,7 @@ export const Scale = () => {
           }
 
           leftJaw.current.position.set(adjustedX, adjustedY, 0);
-          setLeftPos(new Vector3(adjustedX, adjustedY, 0));
+          dispatch(setLeftPosState(new Vector3(adjustedX, adjustedY, 0)));
 
           const length = rightJaw.current.position.distanceTo(
             leftJaw.current.position
@@ -126,8 +125,7 @@ export const Scale = () => {
           }
 
           rightJaw.current.position.set(adjustedX, adjustedY, 0);
-          setRightPos(new Vector3(adjustedX, adjustedY, 0));
-
+          dispatch(setRightPosState(new Vector3(adjustedX, adjustedY, 0)));
           const length = rightJaw.current.position.distanceTo(
             leftJaw.current.position
           );
@@ -161,8 +159,8 @@ export const Scale = () => {
       const rotatedLeft = boxCenter.clone().sub(rotatedOffset);
       const rotatedRight = boxCenter.clone().add(rotatedOffset);
 
-      setLeftPos(rotatedLeft);
-      setRightPos(rotatedRight);
+      dispatch(setLeftPosState(rotatedLeft));
+      dispatch(setRightPosState(rotatedRight));
       leftJaw.current.position.set(rotatedLeft.x, rotatedLeft.y, 0);
       rightJaw.current.position.set(rotatedRight.x, rotatedRight.y, 0);
     };

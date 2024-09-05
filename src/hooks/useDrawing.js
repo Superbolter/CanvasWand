@@ -112,13 +112,6 @@ export const useDrawing = () => {
     dispatch(setSelectedLinesState(data));
   };
 
-  const setLeftPos = (data) => {
-    dispatch(setLeftPosState(data));
-  };
-
-  const setRightPos = (data) => {
-    dispatch(setRightPosState(data));
-  };
 
   const handlePointerDown = useCallback(
     (event, right, left, mesh) => {
@@ -1064,14 +1057,6 @@ export const useDrawing = () => {
   };
 
 
-  const toggleDoorWindowMode = (mode) => {
-    setaddOn("door");
-    setIsDraggingDoor(true);
-    dispatch(setSelectionMode(false));
-    dispatch(setDragMode(false));
-    setDoorWindowMode(!doorWindowMode);
-  };
-
   const breakingLine = (point) => {
     const idx = storeLines.findIndex((line) => line.id === selectId);
     const line = storeLines.filter((line) => line.id === selectId);
@@ -1147,49 +1132,31 @@ export const useDrawing = () => {
   
 
   return {
-    doorWindowMode,
-    doorPoint,
     addOn,
     currentMousePosition,
     distance,
-    information,
-    idSelection,
     doorPosition,
     isDraggingDoor,
     dimensions,
-    roomSelect,
-    roomSelectors,
-    showSnapLine,
-    lineBreak,
-    merge,
     nearPoint, 
     nearVal, 
-    setNearVal,
-    setNearPoint,
     handleClick,
     handleMouseMove,
     handleLineClick,
     setdoorPoint,
     handleMouseDown,
     handleMouseUp,
-    toggleDoorWindowMode,
     setDoorPosition,
     setIsDraggingDoor, // New state setter
     handlePointerDown,
     handlePointerUp,
     setDimensions,
-    setLeftPos,
-    setRightPos,
     deleteSelectedLines,
-    showRoomNamePopup,
     handleMergeClick,
     addRoom,
     isSelecting,
     startPoint,
     endPoint,
     setDraggingPointIndex,
-    setIsSelecting,
-    setStartPoint,
-    setEndPoint,
   };
 };
