@@ -14,8 +14,9 @@ import {
 } from "../../features/drawing/drwingSlice.js";
 import { useDispatch, useSelector } from "react-redux";
 import { useDrawing } from "../../hooks/useDrawing.js";
+import usePoints from "../../hooks/usePoints.js";
 
-export const Scale = ({ raycaster, mouse}) => {
+export const Scale = () => {
   const dispatch = useDispatch();
   const mesh = useRef();
   const leftJaw = useRef();
@@ -27,12 +28,13 @@ export const Scale = ({ raycaster, mouse}) => {
   const [lineAngle, setLineAngle] = useState(0);
   const [isPointerMoving, setIsPointerMoving] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
-  const { handleDoubleClick, setLeftPos, setRightPos } = useDrawing();
+  const { setLeftPos, setRightPos } = useDrawing();
   const { leftPos, rightPos } = useSelector((state) => state.drawing);
   const { cameraContext  } = useSelector((state) => state.Drawing);
   const [leftJawActivated, setLeftJawActivated] = useState(false);
   const [rightJawActivated, setRightJawActivated] = useState(false);
   const tolerance = 1e-3;
+  const { screenToNDC} = usePoints();
 
   useEffect(() => {
     const updateMesh = (pointA, pointB) => {
@@ -65,9 +67,6 @@ export const Scale = ({ raycaster, mouse}) => {
 
   useEffect(() => {
     const canvasContainer = document.querySelector(".canvas-container");
-    const rect = canvasContainer.getBoundingClientRect();
-    const cameraWidth = rect.width;
-    const cameraHeight = rect.height;
     let frameId = null;
 
     const handlePointerMove = (event) => {
@@ -80,25 +79,7 @@ export const Scale = ({ raycaster, mouse}) => {
         });
       }
 
-      let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-      const posX = x * (cameraWidth / 2);
-      const posY = y * (cameraHeight / 2);
-
-      let newPoint = new Vector3(posX, posY, 0);
-
-      mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  
-      // Update the raycaster with the camera and mouse position
-      raycaster.current.setFromCamera(mouse.current, cameraContext);
-  
-      // Define a plane at z = 0 and find the intersection point
-      const plane = new Plane(new Vector3(0, 0, 1), 0);
-      const intersectionPoint = new Vector3();
-      raycaster.current.ray.intersectPlane(plane, intersectionPoint);
-      newPoint = intersectionPoint;
+      let newPoint = screenToNDC(event.clientX, event.clientY);
 
       if (dragging) {
         if (dragging === mesh.current) {
@@ -212,32 +193,9 @@ export const Scale = ({ raycaster, mouse}) => {
   };
 
   const handlePointerDownJaw = (event, jawRef) => {
-    document.getElementsByClassName('canvas-container')[0].style.cursor = "col-resize"
-    const canvasContainer = document.querySelector(".canvas-container");
-    const rect = canvasContainer.getBoundingClientRect();
-    const cameraWidth = rect.width;
-    const cameraHeight = rect.height;
+    document.getElementsByClassName('canvas-container')[0].style.cursor = "col-resize";
 
-    let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-    const posX = x * (cameraWidth / 2);
-    const posY = y * (cameraHeight / 2);
-
-    let clickPosition = new Vector3(posX, posY, 0);
-  
-    mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    // Update the raycaster with the camera and mouse position
-    raycaster.current.setFromCamera(mouse.current, cameraContext);
-
-    // Define a plane at z = 0 and find the intersection point
-    const plane = new Plane(new Vector3(0, 0, 1), 0);
-    const intersectionPoint = new Vector3();
-    raycaster.current.ray.intersectPlane(plane, intersectionPoint);
-
-    clickPosition = intersectionPoint;
+    const clickPosition = screenToNDC(event.clientX, event.clientY);
 
     if (
       jawRef.current === leftJaw.current &&

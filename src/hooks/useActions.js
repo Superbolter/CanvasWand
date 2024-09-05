@@ -1,18 +1,37 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  setActiveRoomButton,
+  setActiveRoomIndex,
+  setExpandRoomNamePopup,
+  setFactor,
   setPoints,
+  setRoomDetails,
+  setRoomEditingMode,
+  setRoomName,
+  setRoomSelectorMode,
+  setSelectedLinesState,
   setStoreBoxes,
   setStoreLines,
+  showRoomNamePopup,
+  updateDrawData,
 } from "../Actions/ApplicationStateAction";
-import { setRedoStack, setUndoStack } from "../Actions/DrawingActions";
+import { setContextualMenuStatus, setRedoStack, setShowPopup, setUndoStack } from "../Actions/DrawingActions";
+import useModes from "./useModes";
+import { setLineBreakState, setMergeState, setRoomSelectors, setScale, setUserHeight, setUserLength } from "../features/drawing/drwingSlice";
+import { handleDownload } from "../component/Helpers/ConvertToJson.js";
+import { fetchWrapper } from "../app/RomeDataManager.js";
+import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
+import { toast } from 'react-hot-toast';
 
 export const useActions = () => {
   const { actionHistory, redoStack } = useSelector((state) => state.Drawing);
-  const { storeLines, points, storeBoxes } = useSelector(
+  const { storeLines, points, storeBoxes, selectionMode, roomSelectorMode, floorplanId } = useSelector(
     (state) => state.ApplicationState
   );
+  const {lineBreak, merge, userLength, userWidth, userHeight, roomSelectors, leftPos, rightPos, measured} = useSelector((state) => state.drawing)
   const dispatch = useDispatch();
+  const {toggleSelectionMode} = useModes();
 
   const undo = () => {
     const newStack = [...actionHistory];
@@ -141,8 +160,121 @@ export const useActions = () => {
     dispatch(setRedoStack(newStack));
   };
 
+  const handleReset = () => {
+    if (selectionMode) {
+      toggleSelectionMode();
+    }
+    if (lineBreak) {
+      dispatch(setLineBreakState(false));
+    }
+    if (merge) {
+      dispatch(setMergeState(false));
+    }
+  };
+
+  const handleResetRooms = () => {
+    const rooms = [];
+    dispatch(setRoomSelectors(rooms));
+    handleApiCall(userHeight,rooms);
+    dispatch(setExpandRoomNamePopup(false));
+    dispatch(setRoomDetails(""))
+    dispatch(setRoomName(""))
+    dispatch(setRoomEditingMode(false))
+    dispatch(setActiveRoomButton(""))
+    dispatch(setActiveRoomIndex(-1))
+    dispatch(setSelectedLinesState([]))
+  };
+
+  const handleApiCall = (height = userHeight, rooms = roomSelectors) => {
+    const lines = storeLines;
+    const distance = Math.sqrt(
+      (rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2
+    );
+    const scaleData = {
+      leftPos,
+      rightPos,
+      distance: distance,
+      unitLength: userLength,
+      userWidth: userWidth,
+      userHeight: height,
+      unitType: measured,
+    };
+    const data = handleDownload(lines, points, rooms, storeBoxes);
+    const finalData = {
+      floorplan_id: floorplanId,
+      draw_data: data,
+      scale: scaleData,
+    };
+    dispatch(updateDrawData(finalData, floorplanId));
+  };
+
+  const handleSaveClick = () => {
+    if (!roomSelectorMode) {
+      handleApiCall();
+      if (!selectionMode) {
+        toggleSelectionMode();
+      }
+      dispatch(setRoomSelectorMode(true));
+      dispatch(showRoomNamePopup(true));
+      dispatch(setShowPopup(false))
+      dispatch(setContextualMenuStatus(false))  
+      // dispatch(setPerpendicularLine(false));
+    } else {
+      toast("Saving, Please Wait ...", {
+        icon: '✔️',
+        style: {
+          fontFamily: "'DM Sans', sans-serif",
+          color: '#000',
+          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)'
+        },
+      })
+      handleApiCall();
+      setTimeout(() => {
+        fetchWrapper.post(`/floorplans/process_draw_data/${floorplanId}`).then((res)=>{
+          window.open(`https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`, '_blank');
+        })
+      }, 1000);
+    }
+  };
+
+  const handleDoubleClick = async () => {
+    let height = userHeight;
+    switch (measured){
+      case "in":
+        height = "120";
+        break;
+      case "cm":
+        height = "304.8";
+        break;
+      case "ft":
+        height = "10";
+        break;
+      case "m":
+        height = "3.05";
+        break;
+      case "mm":
+        height = "3048";
+        break;
+      default:
+        break;
+    }
+    dispatch(setUserHeight(height))
+    dispatch(setUserLength(userLength));
+    const lfactor = userLength / leftPos.distanceTo(rightPos);
+    const wfactor = INITIAL_BREADTH / userWidth;
+    const hfactor = INITIAL_HEIGHT / height;
+    dispatch(setFactor([lfactor, wfactor, hfactor]));
+    dispatch(setScale(false));
+    handleApiCall(height)
+  };
+
+
   return {
     undo,
     redo,
+    handleReset,
+    handleResetRooms,
+    handleDoubleClick,
+    handleSaveClick
   };
 };

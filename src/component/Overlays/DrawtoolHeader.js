@@ -21,12 +21,12 @@ import { useActions } from "../../hooks/useActions.js";
 
 const MySwal = withReactContent(Swal);
 
-const DrawtoolHeader = ({ handleSaveClick, handleReset, handleResetRooms }) => {
+const DrawtoolHeader = ({ }) => {
   const dispatch = useDispatch();
   const { roomSelectorMode } = useSelector((state) => state.ApplicationState);
   const { scale } = useSelector((state) => state.drawing);
   const { seeDimensions } = useSelector((state) => state.Drawing);
-  const { undo, redo} = useActions();
+  const { undo, redo, handleReset, handleResetRooms, handleSaveClick} = useActions();
 
   const handleBackToScale = () => {
     dispatch(setScale(true));

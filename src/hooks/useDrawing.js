@@ -3,19 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import convert from "convert-units";
 import { Vector3 } from "three";
 import {
-  setPerpendicularLine,
-  setInformation,
-  setRoomSelect,
   setRoomSelectors,
-  setType,
-  setScale,
-  setSelectedButton,
   setLeftPosState,
   setRightPosState,
-  setUserLength,
   setLineBreakState,
-  setMergeState,
-  setUserHeight,
 } from "../features/drawing/drwingSlice.js";
 import {
   uniqueId,
@@ -46,6 +37,8 @@ import {
 } from "../Actions/ApplicationStateAction.js";
 import {
   setContextualMenuStatus,
+  setDragMode,
+  setMergeLine,
   setNewLine,
   setRedoStack,
   setShowPopup,
@@ -55,12 +48,11 @@ import {
   setTypeId,
   setUndoStack,
 } from "../Actions/DrawingActions.js";
-import { handleDownload } from "../component/Helpers/ConvertToJson.js";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { toast } from 'react-hot-toast';
-import { fetchWrapper } from "../app/RomeDataManager.js";
-import * as THREE from 'three';
+import useModes from "./useModes.js";
+import usePoints from "./usePoints.js";
 
 const MySwal = withReactContent(Swal);
 
@@ -74,24 +66,17 @@ export const useDrawing = () => {
     information,
     roomSelect,
     roomSelectors,
-    leftPos,
-    rightPos,
-    userLength,
-    userWidth,
-    userHeight,
     lineBreak,
     merge,
     snapActive,
-    setSnapActive,
   } = useSelector((state) => state.drawing);
-  const { typeId, actionHistory, cameraContext, stop, newLine, showSnapLine, snappingPoint} = useSelector(
+  const { typeId, actionHistory, stop, newLine, showSnapLine, snappingPoint, dragMode, mergeLine} = useSelector(
     (state) => state.Drawing
   );
   const {
     storeLines,
     points,
     factor,
-    floorplanId,
     storeBoxes,
     roomSelectorMode,
     selectionMode,
@@ -101,11 +86,13 @@ export const useDrawing = () => {
     activeRoomIndex,
   } = useSelector((state) => state.ApplicationState);
 
+  const {toggleSelectionSplitMode} = useModes()
+  const { screenToNDC } = usePoints()
+
   const [currentMousePosition, setCurrentMousePosition] = useState(null);
   const [distance, setDistance] = useState(0);
   const [breakPoint, setBreakPoint] = useState([]);
   const [draggingPointIndex, setDraggingPointIndex] = useState(null);
-  const [dragMode, setDragMode] = useState(false);
   const [doorWindowMode, setDoorWindowMode] = useState(false);
   const [addOn, setaddOn] = useState(null);
   const [isDraggingDoor, setIsDraggingDoor] = useState(false);
@@ -113,7 +100,6 @@ export const useDrawing = () => {
   const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
   const [breakPointLocation, setBreakPointLocation] = useState(null);
   const [selectId, setId] = useState(null);
-  const [mergeLine, setMergeLine] = useState([]);
   const [lineClick, setLineClick] = useState(false);
   const [doorPoint, setdoorPoint] = useState([]);
   const [nearPoint, setNearPoint] = useState(false);
@@ -122,19 +108,8 @@ export const useDrawing = () => {
   const [startPoint, setStartPoint] = useState(null);
   const [endPoint, setEndPoint] = useState(null);
 
-  const raycaster = useRef(new THREE.Raycaster());
-  const mouse = useRef(new THREE.Vector2());
-
   const setSelectedLines = (data) => {
     dispatch(setSelectedLinesState(data));
-  };
-
-  const setMerge = (data) => {
-    dispatch(setMergeState(data));
-  };
-
-  const setLineBreak = (data) => {
-    dispatch(setLineBreakState(data));
   };
 
   const setLeftPos = (data) => {
@@ -257,7 +232,7 @@ export const useDrawing = () => {
       setIsDraggingDoor(false);
 
       dispatch(setSelectionMode(false));
-      setDragMode(false);
+      dispatch(setDragMode(false));
       setTimeout(() => {
         setDoorWindowMode(false);
       }, 1000);
@@ -548,87 +523,9 @@ export const useDrawing = () => {
       });
     }
   };
+
+
   
-
-  const perpendicularHandler = () => {
-    dispatch(setPerpendicularLine(!perpendicularLine));
-    dispatch(setNewLine(true));
-    dispatch(setShowSnapLine(false));
-    dispatch(setStop(true));
-  };
-
-  const toggleSelectionMode = () => {
-    if (selectionMode) {
-      setSelectedLines([]);
-      dispatch(setNewLine(true));
-      dispatch(setContextualMenuStatus(false));
-      dispatch(setShowSnapLine(false));
-      dispatch(setStop(true));
-      setDragMode(false);
-    } else {
-      dispatch(setNewLine(true));
-      dispatch(setShowSnapLine(false));
-      dispatch(setContextualMenuStatus(false));
-      dispatch(setStop(true));
-      setDragMode(true);
-      dispatch(setSelectedButton([]));
-    }
-    dispatch(setSelectionMode(!selectionMode));
-  };
-
-  const escape = () => {
-    dispatch(setNewLine(!newLine));
-    dispatch(setShowSnapLine(false));
-    dispatch(setContextualMenuStatus(false));
-    dispatch(setStop(!stop));
-  };
-
-  const handleDoubleClick = async () => {
-    let height = userHeight;
-    switch (measured){
-      case "in":
-        height = "120";
-        break;
-      case "cm":
-        height = "304.8";
-        break;
-      case "ft":
-        height = "10";
-        break;
-      case "m":
-        height = "3.05";
-        break;
-      case "mm":
-        height = "3048";
-        break;
-      default:
-        break;
-    }
-    dispatch(setUserHeight(height))
-    dispatch(setUserLength(userLength));
-    const lfactor = userLength / leftPos.distanceTo(rightPos);
-    const wfactor = INITIAL_BREADTH / userWidth;
-    const hfactor = INITIAL_HEIGHT / height;
-    dispatch(setFactor([lfactor, wfactor, hfactor]));
-    dispatch(setScale(false));
-    handleApiCall(height)
-  };
-
-
-  const screenToNDC = (clientX, clientY) => {
-    mouse.current.x = (clientX / window.innerWidth) * 2 - 1;
-    mouse.current.y = -(clientY / window.innerHeight) * 2 + 1;
-
-    // Update the raycaster with the camera and mouse position
-    raycaster.current.setFromCamera(mouse.current, cameraContext);
-
-    // Define a plane at z = 0 and find the intersection point
-    const plane = new THREE.Plane(new Vector3(0, 0, 1), 0);
-    const intersectionPoint = new Vector3();
-    raycaster.current.ray.intersectPlane(plane, intersectionPoint);
-
-    return new Vector3(intersectionPoint.x, intersectionPoint.y, 0);
-  };
 
   const handleMouseMove = (event) => {
     if(roomSelectorMode && expandRoomPopup){
@@ -643,34 +540,7 @@ export const useDrawing = () => {
       return; // No point to start from or not in perpendicular mode
     // if(roomSelectorMode) return;
 
-    const canvasContainer = document.querySelector(".canvas-container");
-    const rect = canvasContainer.getBoundingClientRect();
-
-    let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-    const cameraWidth = rect.width;
-    const cameraHeight = rect.height;
-
-    const posX = x * (cameraWidth / 2);
-    const posY = y * (cameraHeight / 2);
-
-    let point = new Vector3(posX, posY, 0);
-
-    mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    // Update the raycaster with the camera and mouse position
-    raycaster.current.setFromCamera(mouse.current, cameraContext);
-
-    // Define a plane at z = 0 and find the intersection point
-    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    const intersectionPoint = new THREE.Vector3();
-    raycaster.current.ray.intersectPlane(plane, intersectionPoint);
-
-    // Add the intersection point to the array of points
-
-    point = intersectionPoint;
+    let point = screenToNDC(event.clientX, event.clientY);
 
     if(lineBreak){
       if (findLineForPoint(point, storeLines,snapActive)) {
@@ -833,19 +703,7 @@ export const useDrawing = () => {
     }
     if (!dragMode) return;
 
-    const canvasContainer = document.querySelector(".canvas-container");
-    const rect = canvasContainer.getBoundingClientRect();
-
-    let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-    const cameraWidth = rect.width;
-    const cameraHeight = rect.height;
-
-    const posX = x * (cameraWidth / 2);
-    const posY = y * (cameraHeight / 2);
-
-    const point = new Vector3(posX, posY, 0);
+    const point = screenToNDC(event.clientX, event.clientY);
 
     const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10);
     if (pointIndex !== -1) {
@@ -901,23 +759,6 @@ export const useDrawing = () => {
     setSelectedLines([]);
   }
 
-  const toggleSelectionSplitMode = () => {
-    if (selectionMode) {
-      setSelectedLines([]);
-      dispatch(setNewLine(false));
-      dispatch(setContextualMenuStatus(false));
-      dispatch(setShowSnapLine(false));
-      dispatch(setStop(true));
-    } else {
-      dispatch(setNewLine(true));
-      dispatch(setShowSnapLine(false));
-      dispatch(setContextualMenuStatus(false));
-      dispatch(setStop(true));
-      dispatch(setSelectedButton([]));
-    }
-    dispatch(setSelectionMode(!selectionMode));
-  };
-
 
   const handleClick = (event) => {
     if (selectionMode && !lineClick && !expandRoomPopup) {
@@ -937,34 +778,7 @@ export const useDrawing = () => {
     if (selectionMode || doorWindowMode || merge || scale) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
 
-    const canvasContainer = document.querySelector(".canvas-container");
-    const rect = canvasContainer.getBoundingClientRect();
-
-    let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-    const cameraWidth = rect.width;
-    const cameraHeight = rect.height;
-
-    const posX = x * (cameraWidth / 2);
-    const posY = y * (cameraHeight / 2);
-
-    let point = new Vector3(posX, posY, 0);
-
-    mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    // Update the raycaster with the camera and mouse position
-    raycaster.current.setFromCamera(mouse.current, cameraContext);
-
-    // Define a plane at z = 0 and find the intersection point
-    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    const intersectionPoint = new THREE.Vector3();
-    raycaster.current.ray.intersectPlane(plane, intersectionPoint);
-
-    // Add the intersection point to the array of points
-
-    point = intersectionPoint;
+    let point = screenToNDC(event.clientX, event.clientY);
 
 
     if (lineBreak) {
@@ -972,7 +786,7 @@ export const useDrawing = () => {
         let { closestPointOnLine } = findLineForPoint(point, storeLines,snapActive);
         breakingLine(closestPointOnLine);
       } else {
-        setLineBreak(false);
+        dispatch(setLineBreakState(false));
         if (!selectionMode) {
           toggleSelectionSplitMode();
         }
@@ -1067,7 +881,7 @@ export const useDrawing = () => {
       selectedLines.forEach((line)=>{
         newMergeLines.push(line)
       })
-      setMergeLine(newMergeLines)
+      dispatch(setMergeLine(newMergeLines))
       handleMerge(newMergeLines);
     }
   };
@@ -1147,7 +961,7 @@ export const useDrawing = () => {
   
     if (merged) {
       dispatch(setStoreLines(updatedLine));
-      setMergeLine([]);
+      dispatch(setMergeLine([]));
       dispatch(setUndoStack(history));
       dispatch(setRedoStack([]));
     }
@@ -1183,7 +997,7 @@ export const useDrawing = () => {
     if (merge) {
       if(!mergeLine.find(line => line === id)){
         storeid = [...mergeLine, id];
-        setMergeLine([...mergeLine, id]);
+        dispatch(setMergeLine([...mergeLine, id]));
       }
     }
 
@@ -1249,15 +1063,12 @@ export const useDrawing = () => {
     //dispatch(setIdSelection([...selectedLines]));
   };
 
-  const toggleDragMode = () => {
-    setDragMode(!dragMode);
-  };
 
   const toggleDoorWindowMode = (mode) => {
     setaddOn("door");
     setIsDraggingDoor(true);
     dispatch(setSelectionMode(false));
-    setDragMode(false);
+    dispatch(setDragMode(false));
     setDoorWindowMode(!doorWindowMode);
   };
 
@@ -1332,92 +1143,15 @@ export const useDrawing = () => {
     dispatch(setRedoStack([]));
   };
 
-  const handleResetRooms = () => {
-    const rooms = [];
-    dispatch(setRoomSelectors(rooms));
-    handleApiCall(userHeight,rooms);
-    dispatch(setExpandRoomNamePopup(false));
-    dispatch(setRoomDetails(""))
-    dispatch(setRoomName(""))
-    dispatch(setRoomEditingMode(false))
-    dispatch(setActiveRoomButton(""))
-    dispatch(setActiveRoomIndex(-1))
-    dispatch(setSelectedLinesState([]))
-  };
 
-  const handleApiCall = (height = userHeight, rooms = roomSelectors) => {
-    const lines = storeLines;
-    const distance = Math.sqrt(
-      (rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2
-    );
-    const scaleData = {
-      leftPos,
-      rightPos,
-      distance: distance,
-      unitLength: userLength,
-      userWidth: userWidth,
-      userHeight: height,
-      unitType: measured,
-    };
-    const data = handleDownload(lines, points, rooms, storeBoxes);
-    const finalData = {
-      floorplan_id: floorplanId,
-      draw_data: data,
-      scale: scaleData,
-    };
-    dispatch(updateDrawData(finalData, floorplanId));
-  };
-
-  const handleSaveClick = () => {
-    if (!roomSelectorMode) {
-      handleApiCall();
-      if (!selectionMode) {
-        toggleSelectionMode();
-      }
-      dispatch(setRoomSelectorMode(true));
-      dispatch(showRoomNamePopup(true));
-      dispatch(setShowPopup(false))
-      dispatch(setContextualMenuStatus(false))  
-      // dispatch(setPerpendicularLine(false));
-    } else {
-      toast("Saving, Please Wait ...", {
-        icon: '✔️',
-        style: {
-          fontFamily: "'DM Sans', sans-serif",
-          color: '#000',
-          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)'
-        },
-      })
-      handleApiCall();
-      setTimeout(() => {
-        fetchWrapper.post(`/floorplans/process_draw_data/${floorplanId}`).then((res)=>{
-          window.open(`https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`, '_blank');
-        })
-      }, 1000);
-    }
-  };
-
-  const handleReset = () => {
-    if (selectionMode) {
-      toggleSelectionMode();
-    }
-    if (lineBreak) {
-      setLineBreak(false);
-    }
-    if (merge) {
-      setMerge(false);
-    }
-  };
+  
 
   return {
     doorWindowMode,
     doorPoint,
     addOn,
-    dragMode,
     currentMousePosition,
     distance,
-    perpendicularLine,
-    measured,
     information,
     idSelection,
     doorPosition,
@@ -1430,38 +1164,24 @@ export const useDrawing = () => {
     merge,
     nearPoint, 
     nearVal, 
-    snapActive,
-    setSnapActive,
     setNearVal,
     setNearPoint,
-    setMerge,
-    setLineBreak,
     handleClick,
     handleMouseMove,
     handleLineClick,
     setdoorPoint,
-    setSelectedLines,
-    toggleDragMode,
     handleMouseDown,
     handleMouseUp,
-    toggleSelectionMode,
-    perpendicularHandler,
     toggleDoorWindowMode,
     setDoorPosition,
     setIsDraggingDoor, // New state setter
     handlePointerDown,
     handlePointerUp,
     setDimensions,
-    toggleSelectionSplitMode,
-    escape,
-    handleDoubleClick,
     setLeftPos,
     setRightPos,
     deleteSelectedLines,
     showRoomNamePopup,
-    handleSaveClick,
-    handleApiCall,
-    handleReset,
     handleMergeClick,
     addRoom,
     isSelecting,
@@ -1471,8 +1191,5 @@ export const useDrawing = () => {
     setIsSelecting,
     setStartPoint,
     setEndPoint,
-    handleResetRooms,
-    raycaster,
-    mouse
   };
 };

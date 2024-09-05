@@ -28,6 +28,8 @@ import CheckIcon from "@mui/icons-material/Check";
 import { setRoomSelectors } from "../../features/drawing/drwingSlice.js";
 import edit from "../../assets/edit.svg";
 import { Check } from "@mui/icons-material";
+import useModes from "../../hooks/useModes.js";
+import { useDrawing } from "../../hooks/useDrawing.js";
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   "label + &": {
@@ -50,7 +52,7 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const RoomNamePopup = (props) => {
+const RoomNamePopup = () => {
   const [error, setError] = useState("");
   const [roomName, setName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -59,6 +61,8 @@ const RoomNamePopup = (props) => {
   );
   const dispatch = useDispatch();
   const { roomSelectors } = useSelector((state) => state.drawing);
+  const { toggleSelectionMode } = useModes();
+  const {addRoom} = useDrawing();
 
   useEffect(() => {
     if (selectedRoomName) {
@@ -87,7 +91,7 @@ const RoomNamePopup = (props) => {
     dispatch(setActiveRoomButton("add"));
     dispatch(setTypeId(1));
     if (!selectionMode) {
-      props.toggleSelectionMode();
+      toggleSelectionMode();
     }
     setName("");
     handleReset(true);
@@ -98,14 +102,14 @@ const RoomNamePopup = (props) => {
       dispatch(setActiveRoomButton(""));
       dispatch(setTypeId(1));
       if (!selectionMode) {
-        props.toggleSelectionMode();
+        toggleSelectionMode();
       }
       return;
     }
     dispatch(setActiveRoomButton("divide"));
     dispatch(setTypeId(5));
     if (selectionMode) {
-      props.toggleSelectionMode();
+      toggleSelectionMode();
     }
     handleReset(false);
   };
@@ -125,7 +129,7 @@ const RoomNamePopup = (props) => {
 
   const handleSaveClick = () => {
     if (roomName.length > 0 && selectedRoomType?.length > 0) {
-      props.addRoom(roomName, selectedRoomType);
+      addRoom(roomName, selectedRoomType);
       setName("");
       dispatch(setRoomDetails(""));
       dispatch(setRoomName(""));

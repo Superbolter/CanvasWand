@@ -47,8 +47,7 @@ const calculateBoundingBox = (points) => {
 };
 
 const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
-  const {selectedRoomName, activeRoomButton} = useSelector((state) => state.ApplicationState);
-  const { storeLines, points } = useDrawing();
+  const {selectedRoomName, activeRoomButton,storeLines, points} = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch();
 
   const roomPoints = useMemo(() => {

@@ -117,3 +117,13 @@ export const setSnappingPoint = (val) => ({
   type: "UPDATE_DRAWING_STATE",
   snappingPoint: val
 })
+
+export const setDragMode = (val) => ({
+  type: "UPDATE_DRAWING_STATE",
+  dragMode: val
+})
+
+export const setMergeLine = (val) => ({
+  type: "UPDATE_DRAWING_STATE",
+  mergeLine: val
+})

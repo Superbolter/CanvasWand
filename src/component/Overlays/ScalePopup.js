@@ -6,18 +6,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUserLength, setUserWidth } from "../../features/drawing/drwingSlice.js";
 import { Button } from "../../design_system/StyledComponents/components/Button.js";
 import LengthConverter from "./LengthConverter.js";
+import { useActions } from "../../hooks/useActions.js";
 
-const ScalePopup = (props) => {
+const ScalePopup = () => {
   const dispatch = useDispatch();
   const { scale, userLength, userWidth, measured } = useSelector((state) => state.drawing);
   const [error, setError] = useState(false);
+  const {handleDoubleClick} = useActions();
 
   const handleContinueClick = () =>{
     if(userLength===0 || userWidth===0 || userLength===undefined || userWidth===undefined || userLength==="" || userWidth===""){
         setError(true);
         return;
     }
-    props.handleDoubleClick();
+    handleDoubleClick();
   }
 
   useEffect(()=>{

@@ -13,13 +13,19 @@ import split from "../../assets/split.png";
 import mergeIcon from "../../assets/merge.png";
 import Unlocked from "../../assets/Unlocked.png";
 import Delete from "../../assets/Delete.png";
+import { setLineBreakState, setMergeState } from "../../features/drawing/drwingSlice.js";
+import useModes from "../../hooks/useModes.js";
+import { useDrawing } from "../../hooks/useDrawing.js";
 
-const ContextualMenu = (props) => {
+const ContextualMenu = () => {
   const dispatch = useDispatch();
   const { contextualMenuStatus, position, positionType, locked, typeId } = useSelector(
     (state) => state.Drawing
   );
+  const {selectionMode} = useSelector((state) => state.ApplicationState)
   const { lineBreak, merge } = useSelector((state) => state.drawing);
+  const {toggleSelectionSplitMode} = useModes();
+  const {deleteSelectedLines, handleMergeClick} = useDrawing();
   
   const handleWallClick = (e) => {
     e.stopPropagation();
@@ -46,34 +52,33 @@ const ContextualMenu = (props) => {
     dispatch(setSelectedLinesState([]));
   };
 
-  const handleMergeClick = (e) => {
+  const handleMerge = (e) => {
     e.stopPropagation()
-    // setSelectedLines([]);
-    props.handleMerge();
-    props.setLineBreak(false);
-    if (!props.selectionMode) {
-      props.toggleSelectionMode();
+    handleMergeClick();
+    dispatch(setLineBreakState(false));
+    if (!selectionMode) {
+      toggleSelectionSplitMode();
     }
-    props.setMerge(!merge);
+    dispatch(setMergeState(!merge));
   };
 
   const handleSplitClick = (e) => {
     e.stopPropagation()
-    props.setMerge(false);
-    if (!lineBreak && props.selectionMode) {
-      props.toggleSelectionMode();
-    } else if (lineBreak && !props.selectionMode) {
-      props.toggleSelectionMode();
+    dispatch(setMergeState(false));
+    if (!lineBreak && selectionMode) {
+      toggleSelectionSplitMode();
+    } else if (lineBreak && !selectionMode) {
+      toggleSelectionSplitMode();
     }
-    props.setLineBreak(!lineBreak);
+    dispatch(setLineBreakState(!lineBreak));
   };
 
   const handlDeleteClick = (e) => {
     e.stopPropagation()
-    if (!props.selectionMode) {
-      props.toggleSelectionMode();
+    if (!selectionMode) {
+      toggleSelectionSplitMode();
     } else {
-      props.deleteSelectedLines();
+      deleteSelectedLines();
     }
   };
 
@@ -117,7 +122,7 @@ const ContextualMenu = (props) => {
             </div>:null}
             {typeId === 1?
             <div
-              onClick={handleMergeClick}
+              onClick={handleMerge}
               className="btn"
               style={{ border: merge ? "2px solid cornflowerblue" : "" }}
             >

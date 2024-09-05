@@ -13,51 +13,49 @@ import {
   setShowPopup,
   setTypeId,
 } from "../../Actions/DrawingActions.js";
-import { useDrawing } from "../../hooks/useDrawing.js";
 import Properties from "./Properties.js";
+import { setLineBreakState, setMergeState } from "../../features/drawing/drwingSlice.js";
+import useModes from "../../hooks/useModes.js";
+import { useDrawing } from "../../hooks/useDrawing.js";
 
-const PropertiesPopup = ({
-  selectionMode,
-  deleteSelectedLines,
-  toggleSelectionMode,
-  handleMerge,
-}) => {
-  const { typeId, showPropertiesPopup } = useSelector((state) => state.Drawing);
-  const dispatch = useDispatch();
+const PropertiesPopup = ({}) => {
+  const dispatch = useDispatch()
+  const { lineBreak, merge } = useSelector((state) => state.drawing);
+  const { roomSelectorMode, selectionMode } = useSelector((state) => state.ApplicationState);
+  const { locked,typeId, showPropertiesPopup  } = useSelector((state) => state.Drawing);
+  const { toggleSelectionSplitMode } = useModes();
+  const {deleteSelectedLines, handleMergeClick} = useDrawing();
+
   const handleCloseClick = () => {
     dispatch(setTypeId(1));
     dispatch(setShowPopup(false));
     dispatch(setContextualMenuStatus(false));
-    setLineBreak(false);
-    setMerge(false);
+    dispatch(setLineBreakState(false));
+    dispatch(setMergeState(false));
   };
-  const { lineBreak, merge } = useSelector((state) => state.drawing);
-  const { setLineBreak, setMerge } = useDrawing();
-  const { roomSelectorMode } = useSelector((state) => state.ApplicationState);
-  const { locked } = useSelector((state) => state.Drawing);
 
-  const handleMergeClick = () => {
-    handleMerge();
-    setLineBreak(false);
+  const handleMerge = () => {
+    handleMergeClick();
+    dispatch(setLineBreakState(false));
     if (!selectionMode) {
-      toggleSelectionMode();
+      toggleSelectionSplitMode();
     }
-    setMerge(!merge);
+    dispatch(setMergeState(!merge));
   };
 
   const handleSplitClick = () => {
-    setMerge(false);
+    dispatch(setMergeState(false));
     if (!lineBreak && selectionMode) {
-      toggleSelectionMode();
+      toggleSelectionSplitMode();
     } else if (lineBreak && !selectionMode) {
-      toggleSelectionMode();
+      toggleSelectionSplitMode();
     }
-    setLineBreak(!lineBreak);
+    dispatch(setLineBreakState(!lineBreak));
   };
 
   const handlDeleteClick = () => {
     if (!selectionMode) {
-      toggleSelectionMode();
+      toggleSelectionSplitMode();
     } else {
       deleteSelectedLines();
     }
@@ -118,7 +116,7 @@ const PropertiesPopup = ({
               )}
               {typeId === 1 && (
                 <div
-                  onClick={handleMergeClick}
+                  onClick={handleMerge}
                   className="btn"
                   style={{ border: merge ? "2px solid cornflowerblue" : "" }}
                 >

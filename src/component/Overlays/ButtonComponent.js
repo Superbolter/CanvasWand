@@ -8,20 +8,21 @@ import "./ButtonComponent.css";
 import { useDispatch, useSelector } from 'react-redux';
 import { setShowPopup, setTypeId } from '../../Actions/DrawingActions.js';
 import { setSelectedButton } from '../../features/drawing/drwingSlice.js';
+import useModes from '../../hooks/useModes.js';
 
-const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
+const ButtonComponent = () => {
   const {lineBreak,merge} = useSelector((state) => state.drawing);
   const {typeId, showPropertiesPopup} = useSelector((state) => state.Drawing);
   const { selectedButton} = useSelector((state)=> state.drawing)
-  const {roomSelectorMode} = useSelector((state) => state.ApplicationState);
-  const roomPopup = useSelector((state) => state.ApplicationState.roomPopup);
+  const {roomSelectorMode, selectionMode} = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch()
+  const {toggleSelectionMode , escape} = useModes();
 
   const handleButtonClick = (buttonName) => {
     if(selectionMode){
       toggleSelectionMode();
     }else{
-      setNewLine();
+      escape();
     }
     if(buttonName=== selectedButton){
       dispatch(setSelectedButton(null))

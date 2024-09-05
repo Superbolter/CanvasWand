@@ -7,7 +7,6 @@ const initialState = {
   roomSelect: false,
   roomSelectors: [],
   perpendicularLine: true,
-  factor: [1, 1, 1],
   measured: "in",
   linePlacementMode: "midpoint",
   information: false,
@@ -47,7 +46,6 @@ export const drawingSlice = createSlice({
     setScale: (state, action) => {
       state.scale = action.payload;
     },
-
     setRoomSelectors: (state, action) => {
       state.roomSelectors = action.payload;
     },
@@ -59,9 +57,6 @@ export const drawingSlice = createSlice({
     },
     setRoomSelect: (state, action) => {
       state.roomSelect = action.payload;
-    },
-    setFactor: (state, action) => {
-      state.factor = action.payload;
     },
     setMeasured: (state, action) => {
       state.measured = action.payload;
