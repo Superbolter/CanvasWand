@@ -5,6 +5,8 @@ import { toast } from 'react-hot-toast';
 
 const initialState = {
   roomSelect: false,
+  upperpoints: [],
+  lowerpoints: [],
   roomSelectors: [],
   perpendicularLine: true,
   measured: "in",
@@ -31,6 +33,12 @@ export const drawingSlice = createSlice({
   reducers: {
     setLinePlacementMode: (state, action) => {
       state.linePlacementMode = action.payload;
+    },
+    setUpperPoint: (state, action) => {
+      state.upperpoints = action.payload;
+    },
+    setLowerPoint: (state, action) => {
+      state.lowerpoints = action.payload;
     },
     setSnapActive: (state, action) => {
       state.snapActive = action.payload;
@@ -110,6 +118,10 @@ export const {
   setRoomSelectors,
   type,
   setType,
+  upperpoints,
+  setUpperPoint,
+  lowerpoints,
+  setLowerPoint,
   linePlacementMode, 
   setLinePlacementMode,
   scale,

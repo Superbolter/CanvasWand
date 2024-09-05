@@ -5,6 +5,8 @@ import { Vector3 } from "three";
 import {
   setRoomSelectors,
   setLineBreakState,
+  setUpperPoint,
+  setLowerPoint,
 } from "../features/drawing/drwingSlice.js";
 import {
   uniqueId,
@@ -15,6 +17,7 @@ import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import { findLineForPoint } from "../utils/coolinear.js";
+import {calculateUpperAndLowerPoints}from "../utils/upperlowerpoint.js"
 import {
   setPoints,
   setStoreLines,
@@ -414,6 +417,17 @@ export const useDrawing = () => {
       )
     );
   }
+
+
+  useEffect(() => {
+    const { pointUpper, pointLower } = calculateUpperAndLowerPoints(storeLines, factor, measured);
+    console.log("hello this is working");
+    console.log(pointUpper);
+
+    // Dispatch the calculated points to the store
+    dispatch(setUpperPoint(pointUpper));
+    dispatch(setLowerPoint(pointLower));
+  }, [storeLines, factor, measured, dispatch]);
 
   const deleteSelectedLines = () => {
     let lockedCount = 0;

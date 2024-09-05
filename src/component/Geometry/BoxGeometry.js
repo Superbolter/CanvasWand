@@ -144,6 +144,18 @@ const BoxGeometry = ({
 
   const midpoint = new Vector3().addVectors(start, end).multiplyScalar(0.5);
   const angle = Math.atan2(end.y - start.y, end.x - start.x);
+  const direction = new Vector3().subVectors(end, start).normalize();
+
+  // Calculate the perpendicular vector
+  const perpVector = new Vector3(-direction.y, direction.x, 0).multiplyScalar(width / 2);
+
+  // Calculate the four corners
+  const upperLeft = new Vector3().addVectors(start, perpVector);
+  const lowerLeft = new Vector3().subVectors(start, perpVector);
+  const upperRight = new Vector3().addVectors(end, perpVector);
+  const lowerRight = new Vector3().subVectors(end, perpVector);
+
+
   let p1, p2, p3, p4, mid1, mid2, prevAngle;
   if (linePlacementMode === "below") {
     // Calculate the offset to shift the midpoint by half the width
@@ -348,6 +360,78 @@ const BoxGeometry = ({
       )}
 
       <mesh position={end}>
+        <sphereGeometry args={[3, 16, 16]} />
+        <meshBasicMaterial
+          color={
+            typeId === 2
+              ? "brown"
+              : typeId === 3
+              ? "skyblue"
+              : typeId === 4
+              ? "violet"
+              : typeId === 4 
+              ? "#E6AB4A"
+              : "black"
+          }
+          transparent={true}
+          opacity={opacity}
+        />
+      </mesh>
+      <mesh position={upperLeft}>
+        <sphereGeometry args={[3, 16, 16]} />
+        <meshBasicMaterial
+          color={
+            typeId === 2
+              ? "brown"
+              : typeId === 3
+              ? "skyblue"
+              : typeId === 4
+              ? "violet"
+              : typeId === 4 
+              ? "#E6AB4A"
+              : "black"
+          }
+          transparent={true}
+          opacity={opacity}
+        />
+      </mesh>
+      <mesh position={lowerLeft}>
+        <sphereGeometry args={[3, 16, 16]} />
+        <meshBasicMaterial
+          color={
+            typeId === 2
+              ? "brown"
+              : typeId === 3
+              ? "skyblue"
+              : typeId === 4
+              ? "violet"
+              : typeId === 4 
+              ? "#E6AB4A"
+              : "black"
+          }
+          transparent={true}
+          opacity={opacity}
+        />
+      </mesh>
+      <mesh position={upperRight}>
+        <sphereGeometry args={[3, 16, 16]} />
+        <meshBasicMaterial
+          color={
+            typeId === 2
+              ? "brown"
+              : typeId === 3
+              ? "skyblue"
+              : typeId === 4
+              ? "violet"
+              : typeId === 4 
+              ? "#E6AB4A"
+              : "black"
+          }
+          transparent={true}
+          opacity={opacity}
+        />
+      </mesh>
+      <mesh position={lowerRight}>
         <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial
           color={
