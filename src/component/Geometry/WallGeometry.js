@@ -4,11 +4,11 @@ import React, { useMemo } from "react";
 import { useLoader } from "@react-three/fiber";
 import { TextureLoader } from "three";
 import { extend } from "@react-three/fiber";
-import Brick1 from "../assets/Bricks1.jpg"; // Adjust the path to your texture
-import Wall from "../assets/Wall.jpg";
-import Door from "../assets/Door.jpg";
-import window from "../assets/Window.jpg"
-import Railing from "../assets/Railing.jpg"
+import Brick1 from "../../assets/Bricks1.jpg"; // Adjust the path to your texture
+import Wall from "../../assets/Wall.jpg";
+import Door from "../../assets/Door.jpg";
+import window from "../../assets/Window.jpg"
+import Railing from "../../assets/Railing.jpg"
 import * as THREE from "three";
 import { useSelector } from "react-redux";
 import convert from "convert-units";

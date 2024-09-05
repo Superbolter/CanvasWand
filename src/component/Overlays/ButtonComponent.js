@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Typography } from "../design_system/StyledComponents/components/Typography.js";
-import WallIcon from "../assets/wallBig.png";
-import DoorIcon from "../assets/doorBig.png";
-import WindowIcon from "../assets/windowBig.png";
-import RailingIcon from "../assets/railingBig.png";
+import { Typography } from "../../design_system/StyledComponents/components/Typography.js";
+import WallIcon from "../../assets/wallBig.png";
+import DoorIcon from "../../assets/doorBig.png";
+import WindowIcon from "../../assets/windowBig.png";
+import RailingIcon from "../../assets/railingBig.png";
 import "./ButtonComponent.css";
 import { useDispatch, useSelector } from 'react-redux';
-import { setShowPopup, setTypeId } from '../Actions/DrawingActions.js';
-import { setSelectedButton } from '../features/drawing/drwingSlice.js';
+import { setShowPopup, setTypeId } from '../../Actions/DrawingActions.js';
+import { setSelectedButton } from '../../features/drawing/drwingSlice.js';
 
 const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
   const {lineBreak,merge} = useSelector((state) => state.drawing);
@@ -16,13 +16,7 @@ const ButtonComponent = ({ setNewLine, selectionMode,toggleSelectionMode }) => {
   const {roomSelectorMode} = useSelector((state) => state.ApplicationState);
   const roomPopup = useSelector((state) => state.ApplicationState.roomPopup);
   const dispatch = useDispatch()
-  // useEffect(() => {
-    
-  // console.log(typeId);
-  // console.log(roomPopup);
-    
-  // }, [typeId, roomPopup])
-  
+
   const handleButtonClick = (buttonName) => {
     if(selectionMode){
       toggleSelectionMode();

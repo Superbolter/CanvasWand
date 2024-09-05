@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Vector3 } from "three";
-import { useDrawing } from "../hooks/useDrawing.js";
-import { findLineForPoint } from "../utils/coolinear";
+import { useDrawing } from "../../hooks/useDrawing.js";
+import { findLineForPoint } from "../../utils/coolinear";
 import { useDispatch, useSelector } from "react-redux";
 
 export const DraggableDoor = ({

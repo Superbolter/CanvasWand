@@ -46,17 +46,20 @@ import {
 } from "../Actions/ApplicationStateAction.js";
 import {
   setContextualMenuStatus,
-  setRedoState,
+  setNewLine,
+  setRedoStack,
   setShowPopup,
+  setShowSnapLine,
+  setSnappingPoint,
+  setStop,
   setTypeId,
   setUndoStack,
 } from "../Actions/DrawingActions.js";
-import { handleDownload } from "../component/ConvertToJson.js";
+import { handleDownload } from "../component/Helpers/ConvertToJson.js";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { toast } from 'react-hot-toast';
 import { fetchWrapper } from "../app/RomeDataManager.js";
-import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const MySwal = withReactContent(Swal);
@@ -81,7 +84,7 @@ export const useDrawing = () => {
     snapActive,
     setSnapActive,
   } = useSelector((state) => state.drawing);
-  const { typeId, contextualMenuStatus, actionHistory, redoStack, cameraContext} = useSelector(
+  const { typeId, actionHistory, cameraContext, stop, newLine, showSnapLine, snappingPoint} = useSelector(
     (state) => state.Drawing
   );
   const {
@@ -98,36 +101,21 @@ export const useDrawing = () => {
     activeRoomIndex,
   } = useSelector((state) => state.ApplicationState);
 
-  const [firstTime, setFirstTime] = useState(true);
-  const [newLine, setNewLine] = useState(false);
   const [currentMousePosition, setCurrentMousePosition] = useState(null);
   const [distance, setDistance] = useState(0);
-  const [stop, setStop] = useState(false);
   const [breakPoint, setBreakPoint] = useState([]);
   const [draggingPointIndex, setDraggingPointIndex] = useState(null);
   const [dragMode, setDragMode] = useState(false);
   const [doorWindowMode, setDoorWindowMode] = useState(false);
-  const [hoveredLine, setHoveredLine] = useState([]);
   const [addOn, setaddOn] = useState(null);
-  const [redoLines, setRedoLines] = useState([]); // Holds the lines that have been undone and can be redone
-  const [redoPoints, setRedoPoints] = useState([]); // Holds the points that have been undone and can be redone
   const [isDraggingDoor, setIsDraggingDoor] = useState(false);
   const [doorPosition, setDoorPosition] = useState([]);
   const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
-  const [check, setCheck] = useState(true);
   const [breakPointLocation, setBreakPointLocation] = useState(null);
   const [selectId, setId] = useState(null);
   const [mergeLine, setMergeLine] = useState([]);
   const [lineClick, setLineClick] = useState(false);
   const [doorPoint, setdoorPoint] = useState([]);
-  //const [snapActive,setSnapActive] = useState(true);
-
-  const [snappingPoint, setSnappingPoint] = useState([]);
-  const [showSnapLine, setShowSnapLine] = useState(false);
-  // const [actionHistory, setActionHistory] = useState([]);
-  // const [redoStack, setRedoStack] = useState([]);
-  // const [leftPos, setLeftPosState] = useState(new Vector3(-5, 0, 0));
-  // const [rightPos, setRightPosState] = useState(new Vector3(5, 0, 0));
   const [nearPoint, setNearPoint] = useState(false);
   const [nearVal, setNearVal]= useState();
   const [isSelecting, setIsSelecting] = useState(false);
@@ -136,14 +124,6 @@ export const useDrawing = () => {
 
   const raycaster = useRef(new THREE.Raycaster());
   const mouse = useRef(new THREE.Vector2());
-
-  const setActionHistory = (data) =>{
-    dispatch(setUndoStack(data))
-  }
-
-  const setRedoStack = (data) =>{
-    dispatch(setRedoState(data))
-  }
 
   const setSelectedLines = (data) => {
     dispatch(setSelectedLinesState(data));
@@ -439,8 +419,8 @@ export const useDrawing = () => {
       newPoints,
       newBoxes: [...storeBoxes],
     });
-    setActionHistory(history);
-    setRedoStack([]);
+    dispatch(setUndoStack(history));
+    dispatch(setRedoStack([]));
   };
 
   // Function to compare two Vector3 objects
@@ -461,182 +441,6 @@ export const useDrawing = () => {
     );
   }
 
-  const deleteLastPoint = () => {
-    const deleteLine = storeLines[storeLines.length - 1];
-    const updatedLines = storeLines.slice(0, -1);
-    let updatedPoints = points.slice(0, -1);
-    const lastPoint = updatedPoints[updatedPoints.length - 1];
-    const deleteLinePoints = deleteLine.points;
-
-    // Iterate over storeBoxes and remove the ones that match
-    const result = storeBoxes.filter(
-      (box) =>
-        !shouldRemoveBox([box.p1, box.p2, box.p3, box.p4], deleteLinePoints)
-    );
-    dispatch(setStoreBoxes(result));
-
-    const roomupdate = roomSelectors
-      .map((room) => {
-        // Filter out the walls that are in the selectedLines array
-        const updatedWallIds = room.wallIds.filter((lineId) =>  !selectedLines.includes(lineId) ); // Remove if in selectedLines
-        // Return null if the room has no walls left
-        if (updatedWallIds.length < 2) {
-          return null;
-        }
-        // Otherwise, return the room with the updated walls
-        return {
-          ...room,
-          wallIds: updatedWallIds,
-        };
-      })
-      .filter((room) => room !== null);
-  
-    dispatch(setRoomSelectors(roomupdate));
-
-    const hasBreakPoint = breakPoint.includes(lastPoint);
-    if (hasBreakPoint) {
-      updatedPoints = updatedPoints.slice(0, -1);
-    }
-    if (updatedPoints.length === 1) {
-      updatedPoints = updatedPoints.slice(0, -1);
-    }
-    // Store the undone line and point in the redo stacks
-    const redoLine = deleteLine;
-    const redoPoint = points[points.length - 1];
-
-    setRedoLines((prevRedoLines) => [...prevRedoLines, redoLine]);
-    setRedoPoints((prevRedoPoints) => [...prevRedoPoints, redoPoint]);
-
-    // Update the state with the new lines and points
-    dispatch(setStoreLines(updatedLines));
-    dispatch(setPoints(updatedPoints));
-  };
-
-  const undo = () => {
-    const newStack = [...actionHistory];
-    const lastAction = newStack.pop();
-    if (!lastAction) return; // No action to undo
-
-    const redoStackCopy = [...redoStack, lastAction];
-    setRedoStack(redoStackCopy);
-  
-    switch (lastAction.type) {
-      case 'delete':
-        // Undo deletion by adding back the deleted lines
-        dispatch(setStoreLines([...storeLines, ...lastAction.deletedLines]));
-        dispatch(setPoints([...points, ...lastAction.deletedPoints]));
-        dispatch(setStoreBoxes([...storeBoxes, ...lastAction.deletedBoxes]));
-        break;
-  
-      case 'merge':
-        // Undo merge by removing the merged line and adding back the original lines
-        const filteredLines = storeLines.filter(
-          (line) => line.id !== lastAction.mergedLine.id
-        );
-        dispatch(setStoreLines([...filteredLines, ...lastAction.originalLines]));
-        break;
-  
-      case 'split':
-        // Undo split by removing the split lines and adding back the original line
-        const linesAfterSplitUndo = storeLines.filter(
-          (line) =>
-            !lastAction.splitLines.some((splitLine) => splitLine.id === line.id)
-        );
-        dispatch(setStoreLines([...linesAfterSplitUndo, lastAction.originalLine]));
-        
-        // Optionally remove the break point if necessary
-        const pointsAfterSplitUndo = points.filter(
-          (p) => !p.equals(lastAction.newPoint)
-        );
-        dispatch(setPoints(pointsAfterSplitUndo));
-        break;
-      
-      case 'addPoint':
-         // Undo addPoint by restoring the previous state
-        dispatch(setStoreLines([...lastAction.previousLines]));
-        dispatch(setPoints([...lastAction.previousPoints]));
-        dispatch(setStoreBoxes([...lastAction.previousBoxes]));
-        break;
-      
-      case 'replace':
-        dispatch(setStoreLines([...lastAction.previousLines]));
-        break;
-
-      default:
-        break;
-      }
-      setActionHistory(newStack);
-      // setActionHistory([...actionHistory]);
-  };
-  
-
-  const redo = () => {
-    const newStack = [...redoStack];
-    const lastRedoAction = newStack.pop();
-    if (!lastRedoAction) return; // No action to redo
-
-    // Push the redone action back to the undo stack
-    const updatedHistory = [...actionHistory, lastRedoAction];
-    setActionHistory(updatedHistory);
-
-    switch (lastRedoAction.type) {
-      case "delete":
-        // Redo deletion by removing the deleted lines again
-        const updatedLines = storeLines.filter(
-          (line) => !lastRedoAction.deletedLines.some((dl) => dl.id === line.id)
-        );
-        dispatch(setStoreLines(updatedLines));
-        const updatedPoints = points.filter(
-          (p) => !lastRedoAction.deletedPoints.some((dp) => dp.equals(p))
-        );
-        dispatch(setPoints(updatedPoints));
-        dispatch(
-          setStoreBoxes(
-            storeBoxes.filter(
-              (box) =>
-                !lastRedoAction.deletedBoxes.some((db) => db.id === box.id)
-            )
-          )
-        );
-        break;
-
-      case "merge":
-        // Redo merge by removing the original lines and adding the merged line
-        const mergedLines = storeLines.filter(
-          (line) =>
-            !lastRedoAction.originalLines.some((ol) => ol.id === line.id)
-        );
-        dispatch(setStoreLines([...mergedLines, lastRedoAction.mergedLine]));
-        break;
-
-      case "split":
-        // Redo split by removing the original line and adding the split lines
-        const splitLines = storeLines.filter(
-          (line) => line.id !== lastRedoAction.originalLine.id
-        );
-        dispatch(setStoreLines([...splitLines, ...lastRedoAction.splitLines]));
-
-        // Optionally add the break point if necessary
-        dispatch(setPoints([...points, lastRedoAction.newPoint]));
-        break;
-
-      case "addPoint":
-        // Redo addPoint by restoring the state after the point was added
-        dispatch(setStoreLines([...lastRedoAction.newLines]));
-        dispatch(setPoints([...lastRedoAction.newPoints]));
-        dispatch(setStoreBoxes([...lastRedoAction.newBoxes]));
-        break;
-      
-      case 'replace':
-        dispatch(setStoreLines([...lastRedoAction.currentLines]));
-        break;
-
-      default:
-        break;
-    }
-    setRedoStack(newStack);
-    // setRedoStack([...redoStack]); // Update the redo stack
-  };
 
   const deleteSelectedLines = () => {
     let lockedCount = 0;
@@ -700,8 +504,8 @@ export const useDrawing = () => {
       deletedPoints,
       deletedBoxes: Array.from(boxes),
     });
-    setActionHistory(history);
-    setRedoStack([]);
+    dispatch(setUndoStack(history));
+    dispatch(setRedoStack([]));
   
     const pointsToKeep = [];
   
@@ -748,24 +552,24 @@ export const useDrawing = () => {
 
   const perpendicularHandler = () => {
     dispatch(setPerpendicularLine(!perpendicularLine));
-    setNewLine(true);
-    setShowSnapLine(false);
-    setStop(true);
+    dispatch(setNewLine(true));
+    dispatch(setShowSnapLine(false));
+    dispatch(setStop(true));
   };
 
   const toggleSelectionMode = () => {
     if (selectionMode) {
       setSelectedLines([]);
-      setNewLine(true);
+      dispatch(setNewLine(true));
       dispatch(setContextualMenuStatus(false));
-      setShowSnapLine(false);
-      setStop(true);
+      dispatch(setShowSnapLine(false));
+      dispatch(setStop(true));
       setDragMode(false);
     } else {
-      setNewLine(true);
-      setShowSnapLine(false);
+      dispatch(setNewLine(true));
+      dispatch(setShowSnapLine(false));
       dispatch(setContextualMenuStatus(false));
-      setStop(true);
+      dispatch(setStop(true));
       setDragMode(true);
       dispatch(setSelectedButton([]));
     }
@@ -773,10 +577,10 @@ export const useDrawing = () => {
   };
 
   const escape = () => {
-    setNewLine(!newLine);
-    setShowSnapLine(false);
+    dispatch(setNewLine(!newLine));
+    dispatch(setShowSnapLine(false));
     dispatch(setContextualMenuStatus(false));
-    setStop(!stop);
+    dispatch(setStop(!stop));
   };
 
   const handleDoubleClick = async () => {
@@ -898,7 +702,7 @@ export const useDrawing = () => {
         ) {
           cuuPoint.x = points[i].x;
           let newarr = [cuuPoint, points[i]];
-          setSnappingPoint([...newarr]);
+          dispatch(setSnappingPoint([...newarr]));
           snapFound = true;
           break;
         } else if (
@@ -908,7 +712,7 @@ export const useDrawing = () => {
         ) {
           cuuPoint.y = points[i].y;
           let newarr = [cuuPoint, points[i]];
-          setSnappingPoint([...newarr]);
+          dispatch(setSnappingPoint([...newarr]));
           snapFound = true;
           break;
         }
@@ -916,10 +720,10 @@ export const useDrawing = () => {
     
 
     if (!snapFound) {
-      setSnappingPoint([]);
+      dispatch(setSnappingPoint([]));
     }
 
-    setShowSnapLine(snapFound);
+    dispatch(setShowSnapLine(snapFound));
     //setCurrentMousePosition(point);
 
     const lastPoint = points[points.length - 1];
@@ -1085,47 +889,6 @@ export const useDrawing = () => {
   };
   
 
-  const room = () => {
-    MySwal.fire({
-      title: "Enter the room name",
-      input: "text",
-      inputPlaceholder: "Enter the name here...",
-      showCancelButton: true,
-      preConfirm: (value) => {
-        if (!value) {
-          Swal.showValidationMessage("You need to enter a name!");
-        }
-      },
-      customClass: {
-        title: "swal2-title-custom",
-        htmlContainer: "swal2-text-custom",
-        input: "swal2-input-custom",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const roomName = result.value;
-        const room = {
-          roomId: uniqueId(),
-          roomName: roomName,
-          wallIds: [...selectedLines],
-        };
-        dispatch(setRoomSelectors([...roomSelectors, room]));
-        setSelectedLines([]);
-        dispatch(setRoomSelect(false));
-      }
-    });
-    // const roomName = prompt("Enter the room Name:");
-
-    // const room = {
-    //   roomId: uniqueId(),
-    //   roomName: roomName,
-    //   wallIds: [...selectedLines],
-    // }
-
-    // dispatch(setRoomSelectors([...roomSelectors,room]));
-    // setSelectedLines([]);
-    // dispatch(setRoomSelect(false));
-  };
 
   const addRoom = (roomName, roomType) => {
     const room = {
@@ -1141,15 +904,15 @@ export const useDrawing = () => {
   const toggleSelectionSplitMode = () => {
     if (selectionMode) {
       setSelectedLines([]);
-      setNewLine(false);
+      dispatch(setNewLine(false));
       dispatch(setContextualMenuStatus(false));
-      setShowSnapLine(false);
-      setStop(true);
+      dispatch(setShowSnapLine(false));
+      dispatch(setStop(true));
     } else {
-      setNewLine(true);
-      setShowSnapLine(false);
+      dispatch(setNewLine(true));
+      dispatch(setShowSnapLine(false));
       dispatch(setContextualMenuStatus(false));
-      setStop(true);
+      dispatch(setStop(true));
       dispatch(setSelectedButton([]));
     }
     dispatch(setSelectionMode(!selectionMode));
@@ -1218,12 +981,12 @@ export const useDrawing = () => {
     }
 
     if (newLine) {
-      setStop(!stop);
+      dispatch(setStop(!stop));
       if(!roomSelectorMode){
         const pointToSend = [point?.x + 40, point?.y + 100 , point?.z];
         dispatch(setContextualMenuStatus(true,pointToSend,"neutral"));
       }
-      setNewLine(false);
+      dispatch(setNewLine(false));
       
       point = snapToPoint(point, points, storeLines,snapActive);
       
@@ -1385,8 +1148,8 @@ export const useDrawing = () => {
     if (merged) {
       dispatch(setStoreLines(updatedLine));
       setMergeLine([]);
-      setActionHistory(history);
-      setRedoStack([]);
+      dispatch(setUndoStack(history));
+      dispatch(setRedoStack([]));
     }
     setSelectedLines([]);
     dispatch(setContextualMenuStatus(false));
@@ -1486,11 +1249,6 @@ export const useDrawing = () => {
     //dispatch(setIdSelection([...selectedLines]));
   };
 
-  const handleInformtion = () => {
-    dispatch(setSelectionMode(!selectionMode));
-    dispatch(setInformation(!information));
-  };
-
   const toggleDragMode = () => {
     setDragMode(!dragMode);
   };
@@ -1501,15 +1259,6 @@ export const useDrawing = () => {
     dispatch(setSelectionMode(false));
     setDragMode(false);
     setDoorWindowMode(!doorWindowMode);
-  };
-
-  const handlemode = () => {
-    setCheck(!check);
-    if (check) {
-      dispatch(setType("imaginary"));
-    } else {
-      dispatch(setType("wall"));
-    }
   };
 
   const breakingLine = (point) => {
@@ -1579,8 +1328,8 @@ export const useDrawing = () => {
       splitLines: [splitNewLine, splitNewLine1],
       newPoint: point, // store the breakpoint location
     });
-    setActionHistory(history);
-    setRedoStack([]);
+    dispatch(setUndoStack(history));
+    dispatch(setRedoStack([]));
   };
 
   const handleResetRooms = () => {
@@ -1630,26 +1379,6 @@ export const useDrawing = () => {
       dispatch(setShowPopup(false))
       dispatch(setContextualMenuStatus(false))  
       // dispatch(setPerpendicularLine(false));
-      // MySwal.fire({
-      //   title: "Room Selector Instructions",
-      //   html: `
-      //     <p style="text-align: left;">
-      //       1. <strong>Select all the walls</strong> of a single room.<br><br>
-      //       2. Once all walls are selected, <strong>press the "R" key</strong> on your keyboard to assign the room.<br><br>
-      //       3. <strong>Repeat this process</strong> for each additional room you wish to assign.
-      //     </p>
-      //   `,
-      //   icon: "info",
-      //   confirmButtonText: "Got it!",
-      //   customClass: {
-      //     title: "swal2-title-custom",
-      //     htmlContainer: "swal2-html-custom",
-      //     confirmButton: "swal2-confirm-button-custom",
-      //   },
-      //   width: "600px",
-      //   padding: "20px",
-      //   backdrop: true,
-      // });
     } else {
       toast("Saving, Please Wait ...", {
         icon: '✔️',
@@ -1682,15 +1411,11 @@ export const useDrawing = () => {
 
   return {
     doorWindowMode,
-    newLine,
     doorPoint,
     addOn,
     dragMode,
     currentMousePosition,
     distance,
-    stop,
-    points,
-    storeLines,
     perpendicularLine,
     measured,
     information,
@@ -1700,8 +1425,6 @@ export const useDrawing = () => {
     dimensions,
     roomSelect,
     roomSelectors,
-
-    snappingPoint,
     showSnapLine,
     lineBreak,
     merge,
@@ -1713,19 +1436,10 @@ export const useDrawing = () => {
     setNearPoint,
     setMerge,
     setLineBreak,
-    setShowSnapLine,
-    setSnappingPoint,
-    setStop,
-
     handleClick,
     handleMouseMove,
     handleLineClick,
-    setNewLine,
     setdoorPoint,
-    handleInformtion,
-    deleteLastPoint,
-    undo,
-    redo,
     setSelectedLines,
     toggleDragMode,
     handleMouseDown,
@@ -1739,8 +1453,6 @@ export const useDrawing = () => {
     handlePointerUp,
     setDimensions,
     toggleSelectionSplitMode,
-    handlemode,
-    room,
     escape,
     handleDoubleClick,
     setLeftPos,

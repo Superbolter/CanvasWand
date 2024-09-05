@@ -11,9 +11,9 @@ import {
 import {
   setLeftPosState,
   setRightPosState,
-} from "../features/drawing/drwingSlice.js";
+} from "../../features/drawing/drwingSlice.js";
 import { useDispatch, useSelector } from "react-redux";
-import { useDrawing } from "../hooks/useDrawing.js";
+import { useDrawing } from "../../hooks/useDrawing.js";
 
 export const Scale = ({ raycaster, mouse}) => {
   const dispatch = useDispatch();

@@ -10,15 +10,14 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { Text } from "@react-three/drei";
 import convert from "convert-units";
-import CreateFiller from "./filler";
-import Window from "../assets/Window.png";
-import Door from "../assets/Door.png";
-import Railing from "../assets/Railing.png";
-import New from "../assets/New.png";
-import Wall from "../assets/Walll.png";
-import HiddenWall from "../assets/hiddenwall.png"
-import Opening from "../assets/Opening.png"
-import { setStoreBoxes } from "../Actions/ApplicationStateAction";
+import Window from "../../assets/Window.png";
+import Door from "../../assets/Door.png";
+import Railing from "../../assets/Railing.png";
+import New from "../../assets/New.png";
+import Wall from "../../assets/Walll.png";
+import HiddenWall from "../../assets/hiddenwall.png"
+import Opening from "../../assets/Opening.png"
+import { setStoreBoxes } from "../../Actions/ApplicationStateAction";
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -315,8 +314,6 @@ const BoxGeometry = ({
           opacity={0.9}
         />
       </mesh>
-
-      {/* {mid1 && mid2 && mid1!==mid2 && (<CreateFiller p1={p1} p2={p2} p3={p3} p4={p4} />)} */}
 
       <mesh position={start}>
         <sphereGeometry args={[4, 16, 16]} />

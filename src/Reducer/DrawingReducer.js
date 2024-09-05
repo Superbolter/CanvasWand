@@ -10,6 +10,10 @@ const initialState = {
     redoStack: [],
     seeDimensions: false,
     cameraContext: {},
+    stop: false,
+    newLine: false,
+    showSnapLine: false,
+    snappingPoint: []
   };
   
   const DrawingReducer = (state = initialState, action) => {
@@ -61,6 +65,11 @@ const initialState = {
           ...state,
           cameraContext: action.payload
         }
+      case 'UPDATE_DRAWING_STATE':
+        return Object.assign({}, state, {
+          ...state,
+          ...action
+       })
       default:
         return state;
     }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setMeasured } from '../features/drawing/drwingSlice';
-import { Typography } from '../design_system/StyledComponents/components/Typography';
+import { setMeasured } from '../../features/drawing/drwingSlice';
+import { Typography } from '../../design_system/StyledComponents/components/Typography';
 import { MenuItem, Select,InputBase, } from '@mui/material';
 import { styled } from "@mui/material/styles";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";

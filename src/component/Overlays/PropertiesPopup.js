@@ -1,26 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { Typography } from "../design_system/StyledComponents/components/Typography.js";
-import split from "../assets/split.png";
-import mergeIcon from "../assets/merge.png";
-import Unlocked from "../assets/Unlocked.png";
-import Delete from "../assets/Delete.png";
-import "./WallPropertiesPopup.css";
-import Close from "../assets/Close.png";
+import React from "react";
+import { Typography } from "../../design_system/StyledComponents/components/Typography.js";
+import split from "../../assets/split.png";
+import mergeIcon from "../../assets/merge.png";
+import Unlocked from "../../assets/Unlocked.png";
+import Delete from "../../assets/Delete.png";
+import "./PropertiesPopup.css";
+import Close from "../../assets/Close.png";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setContextualMenuStatus,
   setLockForLines,
   setShowPopup,
   setTypeId,
-} from "../Actions/DrawingActions.js";
-import { useDrawing } from "../hooks/useDrawing.js";
+} from "../../Actions/DrawingActions.js";
+import { useDrawing } from "../../hooks/useDrawing.js";
 import Properties from "./Properties.js";
 
-const WallPropertiesPopup = ({
+const PropertiesPopup = ({
   selectionMode,
   deleteSelectedLines,
   toggleSelectionMode,
-  setSelectedLines,
   handleMerge,
 }) => {
   const { typeId, showPropertiesPopup } = useSelector((state) => state.Drawing);
@@ -32,15 +31,12 @@ const WallPropertiesPopup = ({
     setLineBreak(false);
     setMerge(false);
   };
-  const { lineBreak, merge, measured } = useSelector((state) => state.drawing);
-  const { setLineBreak, setMerge, stop, setStop } = useDrawing();
-  const { length, width, roomSelectorMode } = useSelector(
-    (state) => state.ApplicationState
-  );
+  const { lineBreak, merge } = useSelector((state) => state.drawing);
+  const { setLineBreak, setMerge } = useDrawing();
+  const { roomSelectorMode } = useSelector((state) => state.ApplicationState);
   const { locked } = useSelector((state) => state.Drawing);
 
   const handleMergeClick = () => {
-    // setSelectedLines([]);
     handleMerge();
     setLineBreak(false);
     if (!selectionMode) {
@@ -75,7 +71,7 @@ const WallPropertiesPopup = ({
     <div>
       <div
         className={
-          (typeId === 1 && showPropertiesPopup && !roomSelectorMode) ||
+          (showPropertiesPopup && !roomSelectorMode) ||
           (lineBreak && !roomSelectorMode) ||
           (merge && !roomSelectorMode)
             ? "popup-container"
@@ -87,7 +83,15 @@ const WallPropertiesPopup = ({
             modifiers={["header6", "medium"]}
             style={{ fontSize: "16px", lineHeight: "18px", textAlign: "left" }}
           >
-            Wall Properties
+            {typeId === 1
+              ? "Wall Properties"
+              : typeId === 2
+              ? "Door Properties"
+              : typeId === 3
+              ? "Window Properties"
+              : typeId === 4
+              ? "Railing Properties"
+              : "Properties"}
           </Typography>
           <img
             onClick={handleCloseClick}
@@ -98,25 +102,31 @@ const WallPropertiesPopup = ({
         </div>
         <div className="input-container">
           <Properties />
-          {/* <div className="divider"></div> */}
           {selectionMode || lineBreak || merge ? (
             <div className="btn-container">
-              <div
-                onClick={handleSplitClick}
-                className="btn"
-                style={{ border: lineBreak ? "2px solid cornflowerblue" : "" }}
-              >
-                <img src={split} alt="" />
-                <Typography className="contextual-btn-text">Split</Typography>
-              </div>
-              <div
-                onClick={handleMergeClick}
-                className="btn"
-                style={{ border: merge ? "2px solid cornflowerblue" : "" }}
-              >
-                <img src={mergeIcon} alt="" />
-                <Typography className="contextual-btn-text">Merge</Typography>
-              </div>
+              {typeId === 1 && (
+                <div
+                  onClick={handleSplitClick}
+                  className="btn"
+                  style={{
+                    border: lineBreak ? "2px solid cornflowerblue" : "",
+                  }}
+                >
+                  <img src={split} alt="" />
+                  <Typography className="contextual-btn-text">Split</Typography>
+                </div>
+              )}
+              {typeId === 1 && (
+                <div
+                  onClick={handleMergeClick}
+                  className="btn"
+                  style={{ border: merge ? "2px solid cornflowerblue" : "" }}
+                >
+                  <img src={mergeIcon} alt="" />
+                  <Typography className="contextual-btn-text">Merge</Typography>
+                </div>
+              )}
+
               {lineBreak || merge ? null : (
                 <div
                   className="btn"
@@ -149,4 +159,4 @@ const WallPropertiesPopup = ({
   );
 };
 
-export default WallPropertiesPopup;
+export default PropertiesPopup;

@@ -2,10 +2,9 @@ import React, { useMemo, useState } from "react";
 import { extend } from "@react-three/fiber";
 import { Shape, ShapeGeometry, MeshBasicMaterial, Vector3, Box3 } from "three";
 import { Html } from "@react-three/drei";
-import { useDrawing } from "../hooks/useDrawing";
-import { Typography } from "../design_system/StyledComponents/components/Typography";
+import { useDrawing } from "../../hooks/useDrawing";
 import { useDispatch, useSelector } from "react-redux";
-import { setActiveRoomIndex, setExpandRoomNamePopup, setRoomDetails, setRoomEditingMode, setRoomName, setSelectedLinesState } from "../Actions/ApplicationStateAction";
+import { setActiveRoomIndex, setExpandRoomNamePopup, setRoomDetails, setRoomEditingMode, setRoomName, setSelectedLinesState } from "../../Actions/ApplicationStateAction";
 import { Check } from "@mui/icons-material";
 
 // Extend the R3F renderer with ShapeGeometry

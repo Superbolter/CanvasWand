@@ -1,7 +1,7 @@
 import React, { Suspense, useMemo } from "react";
 import { Canvas, useThree, useLoader } from "@react-three/fiber";
 import { TextureLoader } from "three";
-import Image from "../assets/img.jpg";
+import Image from "../../assets/img.jpg";
 import { useSelector } from "react-redux";
 
 const BackgroundImage = () => {
@@ -20,9 +20,6 @@ const BackgroundImage = () => {
       return [texture.image.width, texture.image.height]
     }
   },[screenHeight,screenWidth,aspectRatio])
-
-
-
 
   return (
     <mesh position={[0, 0, -3]}>

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Typography } from "../design_system/StyledComponents/components/Typography.js";
+import { Typography } from "../../design_system/StyledComponents/components/Typography.js";
 import TextField from "@mui/material/TextField";
-import "./WallPropertiesPopup.css";
+import "./PropertiesPopup.css";
 import { useDispatch, useSelector } from "react-redux";
-import { setUserLength, setUserWidth } from "../features/drawing/drwingSlice.js";
-import { Button } from "../design_system/StyledComponents/components/Button.js";
+import { setUserLength, setUserWidth } from "../../features/drawing/drwingSlice.js";
+import { Button } from "../../design_system/StyledComponents/components/Button.js";
 import LengthConverter from "./LengthConverter.js";
 
 const ScalePopup = (props) => {

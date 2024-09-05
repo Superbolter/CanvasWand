@@ -42,7 +42,7 @@ import React, { useMemo } from "react";
 import { extend } from "@react-three/fiber";
 import { useSelector } from "react-redux";
 import { Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
-import Wall from "../assets/Walll.png"
+import Wall from "../../assets/Walll.png"
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });

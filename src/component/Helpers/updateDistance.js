@@ -4,7 +4,7 @@ import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "
 import { useDispatch, useSelector } from "react-redux";
 import { Text } from "@react-three/drei"; 
 import convert from "convert-units";
-import { setStoreBoxes } from "../Actions/ApplicationStateAction";
+import { setStoreBoxes } from "../../Actions/ApplicationStateAction";
 
 const UpdateDistance = ({nearVal})=>{
     const { measured, roomSelect,newline } = useSelector((state) => state.drawing);

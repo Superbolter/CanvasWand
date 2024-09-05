@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
-import Window from "../assets/Window.png";
-import Door from "../assets/Door.png";
-import Railing from "../assets/Railing.png";
-import Wall from "../assets/Walll.png";
+import Window from "../../assets/Window.png";
+import Door from "../../assets/Door.png";
+import Railing from "../../assets/Railing.png";
+import Wall from "../../assets/Walll.png";
 
 function CappedLine({ lines }) {
     const textureLoader = useMemo(() => new THREE.TextureLoader(), []);

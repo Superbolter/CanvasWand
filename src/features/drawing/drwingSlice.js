@@ -4,8 +4,6 @@ import { Vector3 } from "three";
 import { toast } from 'react-hot-toast';
 
 const initialState = {
-  points: [],
-  storeLines: [],
   roomSelect: false,
   roomSelectors: [],
   perpendicularLine: true,
@@ -32,12 +30,6 @@ export const drawingSlice = createSlice({
   name: "drawing",
   initialState,
   reducers: {
-    setPoints: (state, action) => {
-      state.points = action.payload;
-    },
-    setStoreLines: (state, action) => {
-      state.storeLines = action.payload;
-    },
     setLinePlacementMode: (state, action) => {
       state.linePlacementMode = action.payload;
     },
@@ -111,8 +103,6 @@ export const drawingSlice = createSlice({
 });
 
 export const {
-  setPoints,
-  setStoreLines,
   setIdSelection,
   setPerpendicularLine,
   setFactor,

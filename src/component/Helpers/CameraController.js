@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import { setCameraContext } from "../Actions/DrawingActions";
+import { setCameraContext } from "../../Actions/DrawingActions";
 
 const CameraController = ({
   zoom,

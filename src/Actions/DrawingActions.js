@@ -83,7 +83,7 @@ export const setUndoStack = (undoStack) => ({
   payload: undoStack,
 });
 
-export const setRedoState = (undoStack) => ({
+export const setRedoStack = (undoStack) => ({
   type: "UPDATE_REDO_DATA",
   payload: undoStack,
 });
@@ -97,3 +97,23 @@ export const setCameraContext = (val) => ({
   type: "SET_CAMERA_CONTEXT",
   payload: val,
 });
+
+export const setStop = (val) => ({
+  type: "UPDATE_DRAWING_STATE",
+  stop: val
+})
+
+export const setNewLine = (val) => ({
+  type: "UPDATE_DRAWING_STATE",
+  newLine: val
+})
+
+export const setShowSnapLine = (val) => ({
+  type: "UPDATE_DRAWING_STATE",
+  showSnapLine: val
+})
+
+export const setSnappingPoint = (val) => ({
+  type: "UPDATE_DRAWING_STATE",
+  snappingPoint: val
+})

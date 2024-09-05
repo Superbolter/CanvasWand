@@ -1,26 +1,25 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Typography } from "../design_system/StyledComponents/components/Typography.js";
-import WallIcon from "../assets/WallIcon.svg";
-import DoorIcon from "../assets/DoorIcon.svg";
-import WindowIcon from "../assets/WindowIcon.svg";
-import RailingIcon from "../assets/RailingIcon.svg";
+import React from "react";
+import { Typography } from "../../design_system/StyledComponents/components/Typography.js";
+import WallIcon from "../../assets/WallIcon.svg";
+import DoorIcon from "../../assets/DoorIcon.svg";
+import WindowIcon from "../../assets/WindowIcon.svg";
+import RailingIcon from "../../assets/RailingIcon.svg";
 import "./ContextualMenu.css";
 import { Html } from "@react-three/drei";
 import { useDispatch, useSelector } from "react-redux";
-import { setLockForLines, setTypeId } from "../Actions/DrawingActions.js";
-import { setSelectedLinesState, updateLineTypeId } from "../Actions/ApplicationStateAction.js";
-import split from "../assets/split.png";
-import mergeIcon from "../assets/merge.png";
-import Unlocked from "../assets/Unlocked.png";
-import Delete from "../assets/Delete.png";
-import { useDrawing } from "../hooks/useDrawing.js";
+import { setLockForLines, setTypeId } from "../../Actions/DrawingActions.js";
+import { setSelectedLinesState, updateLineTypeId } from "../../Actions/ApplicationStateAction.js";
+import split from "../../assets/split.png";
+import mergeIcon from "../../assets/merge.png";
+import Unlocked from "../../assets/Unlocked.png";
+import Delete from "../../assets/Delete.png";
 
 const ContextualMenu = (props) => {
   const dispatch = useDispatch();
   const { contextualMenuStatus, position, positionType, locked, typeId } = useSelector(
     (state) => state.Drawing
   );
-  const { lineBreak, merge, measured } = useSelector((state) => state.drawing);
+  const { lineBreak, merge } = useSelector((state) => state.drawing);
   
   const handleWallClick = (e) => {
     e.stopPropagation();

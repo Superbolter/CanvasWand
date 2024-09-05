@@ -6,7 +6,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CheckIcon from "@mui/icons-material/Check";
 import convert from "convert-units";
 import TextField from "@mui/material/TextField";
-import { Typography } from "../design_system/StyledComponents/components/Typography";
+import { Typography } from "../../design_system/StyledComponents/components/Typography";
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   "label + &": {

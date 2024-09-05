@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Typography } from "../design_system/StyledComponents/components/Typography.js";
-import { Button } from "../design_system/StyledComponents/components/Button";
+import { Typography } from "../../design_system/StyledComponents/components/Typography.js";
+import { Button } from "../../design_system/StyledComponents/components/Button";
 import TextField from "@mui/material/TextField";
-import "./WallPropertiesPopup.css";
+import "./PropertiesPopup.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setContextualMenuStatus,
   setTypeId,
-} from "../Actions/DrawingActions.js";
+} from "../../Actions/DrawingActions.js";
 import {
   setActiveRoomButton,
   setActiveRoomIndex,
@@ -17,17 +17,16 @@ import {
   setRoomName,
   setSelectedLinesState,
   showRoomNamePopup,
-} from "../Actions/ApplicationStateAction.js";
-import { useDrawing } from "../hooks/useDrawing.js";
-import plus from "../assets/plus.svg";
-import divide from "../assets/divide.svg";
-import deleteIcon from "../assets/Delete.png";
+} from "../../Actions/ApplicationStateAction.js";
+import plus from "../../assets/plus.svg";
+import divide from "../../assets/divide.svg";
+import deleteIcon from "../../assets/Delete.png";
 import { FormControl, MenuItem, Select, InputBase } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CheckIcon from "@mui/icons-material/Check";
-import { setRoomSelectors } from "../features/drawing/drwingSlice.js";
-import edit from "../assets/edit.svg";
+import { setRoomSelectors } from "../../features/drawing/drwingSlice.js";
+import edit from "../../assets/edit.svg";
 import { Check } from "@mui/icons-material";
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({

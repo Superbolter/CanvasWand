@@ -2,52 +2,38 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Grid, Line, Text, OrbitControls, OrthographicCamera, Html } from "@react-three/drei";
-import BoxGeometry from "./component/BoxGeometry.js";
-import WallGeometry from "./component/WallGeometry.js";
-import DownloadJSONButton from "./component/ConvertToJson.js";
-import LengthConverter from "./component/LengthConverter.js";
-import LineEditForm from "./component/LineEditForm.js";
-import BackgroundImage from "./component/background.js";
+import BoxGeometry from "./component/Geometry/BoxGeometry.js";
+import WallGeometry from "./component/Geometry/WallGeometry.js";
+import BackgroundImage from "./component/CanvasOverLays/background.js";
 import { useDrawing } from "./hooks/useDrawing.js";
-import CreateFiller from "./component/filler.js";
+import { useActions } from "./hooks/useActions.js";
+import CreateFiller from "./component/Geometry/filler.js";
 import RomeDataManager from "./app/RomeDataManager.js";
 import {cookies} from "./App"
 import {
-  setPoints,
-  setStoreLines,
-  setScale,
-  setPerpendicularLine,
-  setFactor,
-  setInformation,
-  setIdSelection,
   setLinePlacementMode,
 } from "./features/drawing/drwingSlice.js";
-import { DraggableDoor } from "./component/DragDrop.js";
-import { Scale } from "./component/Scale.js";
-import DrawtoolHeader from "./component/DrawtoolHeader.js";
+import { DraggableDoor } from "./component/Geometry/DragDrop.js";
+import { Scale } from "./component/Geometry/Scale.js";
+import DrawtoolHeader from "./component/Overlays/DrawtoolHeader.js";
 import { useDispatch, useSelector } from "react-redux";
-import { drawToolData, setSelectedLinesState } from "./Actions/ApplicationStateAction.js";
-import ContextualMenu from "./component/ContextualMenu.js";
-import ButtonComponent from "./component/ButtonComponent.js";
-import WallPropertiesPopup from "./component/WallPropertiesPopup.js";
-import WindowPropertiesPopup from "./component/WindowPropertiesPopup.js";
-import DoorPropertiesPopup from "./component/DoorPropertiesPopup.js";
-import RailingPropertiesPopup from "./component/RailingPropertiesPopup.js";
-import RoomNamePopup from "./component/RoomNamePopup.js";
-import RoomFiller from "./component/roomFiller.js";
-import ScalePopup from "./component/ScalePopup.js";
+import { drawToolData, setStoreLines } from "./Actions/ApplicationStateAction.js";
+import ContextualMenu from "./component/CanvasOverLays/ContextualMenu.js";
+import ButtonComponent from "./component/Overlays/ButtonComponent.js";
+import PropertiesPopup from "./component/Overlays/PropertiesPopup.js";
+import RoomNamePopup from "./component/Overlays/RoomNamePopup.js";
+import RoomFiller from "./component/Geometry/roomFiller.js";
+import ScalePopup from "./component/Overlays/ScalePopup.js";
 import blade from "./assets/blade.png"
-import { setCameraContext, setContextualMenuStatus, setShowPopup } from "./Actions/DrawingActions.js";
-import UpdateDistance from "./component/updateDistance.js";
-import * as THREE from 'three';
-import { Vector3, Shape, ShapeGeometry, MeshBasicMaterial,TextureLoader } from "three";
-import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import ZoomInIcon from '@mui/icons-material/ZoomIn';
-import CappedLine from "./component/CappedLine.js";
+import { setContextualMenuStatus, setNewLine, setShowPopup, setShowSnapLine, setStop } from "./Actions/DrawingActions.js";
+import UpdateDistance from "./component/Helpers/updateDistance.js";
+import { Vector3, Shape, } from "three";
+import CappedLine from "./component/Geometry/CappedLine.js";
 import { setSnapActive } from "./features/drawing/drwingSlice.js";
-import CameraController from "./component/CameraController.js";
+import CameraController from "./component/Helpers/CameraController.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "./constant/constant.js";
 import convert from "convert-units";
+import ZoomComponent from "./component/CanvasOverLays/ZoomComponent.js";
 
 
 export const CanvasComponent = () => {
@@ -58,27 +44,13 @@ export const CanvasComponent = () => {
     handleMouseMove,
     addOn,
     handleLineClick,
-    handleInformtion,
-    deleteLastPoint,
     handleMouseDown,
     handleMouseUp,
     toggleSelectionMode,
     perpendicularHandler,
-    newLine,
-    setNewLine,
-    undo,
-    redo,
     setSelectedLines,
-    toggleDragMode,
-    toggleDoorWindowMode,
-    doorWindowMode,
-    dragMode,
     currentMousePosition,
-    distance,
-    stop,
-    roomSelect,
     measured,
-    information,
     idSelection,
     doorPosition,
     setMerge,
@@ -90,20 +62,10 @@ export const CanvasComponent = () => {
     handlePointerMove,
     toggleSelectionSplitMode,
     roomSelectors,
-    handlemode,
-    type,
-    setStop,
     setLineBreak,
     handleSaveClick,
-    snappingPoint,
-    showSnapLine,
-    
-    setShowSnapLine,
-    setSnappingPoint,
     escape,
     deleteSelectedLines,
-    room,
-    showRoomNamePopup,
     handleDoubleClick,
     handleReset,
     handleMergeClick,
@@ -123,22 +85,18 @@ export const CanvasComponent = () => {
     raycaster,
     mouse
   } = useDrawing();
+  const {undo,redo} = useActions();
 
   const { leftPos, rightPos, merge, lineBreak, perpendicularLine, linePlacementMode, userLength, userWidth } = useSelector((state) => state.drawing)
-  const { storeBoxes, roomSelectorMode, selectionMode,selectedLines, expandRoomPopup, factor} = useSelector((state) => state.ApplicationState);
-
+  const { storeBoxes, roomSelectorMode, selectionMode,selectedLines, storeLines, factor, points} = useSelector((state) => state.ApplicationState);
+  const {  typeId, stop, showSnapLine, snappingPoint } = useSelector(
+    (state) => state.Drawing
+  );
 
   const getUrlParameter = (name) => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(name);
   };
-
-  const { contextualMenuStatus, typeId, lineId } = useSelector(
-    (state) => state.Drawing
-  );
-  const { floorplanId, drawData, storeLines, points } = useSelector(
-    (state) => state.ApplicationState
-  );
 
   const [zoom, setZoomState] = useState(1);
   const [isNeeded, setIsNeeded] = useState(false)
@@ -150,16 +108,12 @@ export const CanvasComponent = () => {
 
   const handleKeyDown = (event) => {
     if (event.key === "s" || event.key === "S") {
-      setStop(!stop);
+      dispatch(setStop(!stop))
     }
-    // if((event.key === "r" || event.key === "R") && !event.ctrlKey && roomSelectorMode){
-    //   room();
-    // }
     if((event.ctrlKey || event.metaKey)&&(event.key === "x" || event.key === "X")){
       perpendicularHandler();
     }
     if((event.ctrlKey || event.metaKey)&&(event.key === "z" || event.key === "Z")){
-      // deleteLastPoint();
       undo();
     }
     if((event.ctrlKey || event.metaKey)&&(event.key === "y" || event.key === "Y")){
@@ -180,9 +134,9 @@ export const CanvasComponent = () => {
         dispatch(setShowPopup(false))
         toggleSelectionMode()
       }else if(!selectionMode){
-        setNewLine(true);
-        setStop(true);
-        setShowSnapLine(false);
+        dispatch(setNewLine(true));
+        dispatch(setStop(true));
+        dispatch(setShowSnapLine(false));
         dispatch(setContextualMenuStatus(false))
       }
     }
@@ -200,8 +154,6 @@ export const CanvasComponent = () => {
   }, [storeLines, selectionMode, selectedLines, points, stop ,leftPos, rightPos,storeBoxes,roomSelectorMode, perpendicularLine, snapActive]);
 
   useEffect(() => {
-    // console.log(type_id);
-    // console.log(cookies);
     const floorplanId = getUrlParameter('floorplanId');
     RomeDataManager.instantiate();
     if (cookies.get("USER-SESSION", { path: "/" }) !== undefined) {
@@ -213,8 +165,6 @@ export const CanvasComponent = () => {
     
     dispatch(drawToolData(floorplanId));
   }, []);
-
-  // const { camera, scene } = useThree();
   
 
   const createQuadrilateral = (p1, p2, p3, p4) => {
@@ -223,7 +173,7 @@ export const CanvasComponent = () => {
     shape.lineTo(p2.x, p2.y);
     shape.lineTo(p3.x, p3.y);
     shape.lineTo(p4.x, p4.y);
-    shape.lineTo(p1.x, p1.y); // Close the shape by going back to the first point
+    shape.lineTo(p1.x, p1.y); 
     return shape;
   };
 
@@ -295,8 +245,7 @@ export const CanvasComponent = () => {
           }
           
 
-          
-            {!scale && showSnapLine && snappingPoint && (
+            {!scale && showSnapLine && snappingPoint.length > 0 && (
               <Line
               points={[snappingPoint[1], snappingPoint[0]]}
               color="green"
@@ -376,8 +325,6 @@ export const CanvasComponent = () => {
           />
         </Canvas>
         <DrawtoolHeader
-            undo={undo}
-            redo={redo}
             handleSaveClick={handleSaveClick}
             handleDoubleClick={handleDoubleClick}
             handleReset={handleReset}
@@ -453,10 +400,7 @@ export const CanvasComponent = () => {
             />
           </Canvas>
         </div>
-          <WindowPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
-          <WallPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines} toggleSelectionMode={toggleSelectionSplitMode} setSelectedLines={setSelectedLines} handleMerge={handleMergeClick} />
-          <DoorPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
-          <RailingPropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines}/>
+          <PropertiesPopup selectionMode={selectionMode} deleteSelectedLines={deleteSelectedLines} toggleSelectionMode={toggleSelectionSplitMode} setSelectedLines={setSelectedLines} handleMerge={handleMergeClick} />
           <RoomNamePopup toggleSelectionMode={toggleSelectionMode} addRoom={addRoom} />
           <ButtonComponent setNewLine={escape} selectionMode={selectionMode} toggleSelectionMode={toggleSelectionMode} />
         </div>
@@ -471,62 +415,3 @@ export const CanvasComponent = () => {
 };
 
 export default CanvasComponent;
-
-const ZoomComponent = ({ zoom, setZoom }) => {
-
-  return (
-    <div className="zoom-container">
-      <button onClick={() => setZoom(Math.max((zoom - 0.5), 1))}>
-        <ZoomOutIcon />
-      </button>
-      <input className="zoom-slider" type="range" min="1" max="4.5" step="0.1" value={zoom} onChange={(e) => setZoom(parseFloat(e.target.value))} style={{
-        background: `linear-gradient(to right, #007AFF 0%, #007AFF ${(zoom - 1) / 3.5 * 100}%, #0000000D ${(zoom - 1) / 3.5 * 100}%, #0000000D 100%)`
-      }}/>
-      <button onClick={() => setZoom(Math.min((zoom + 0.5), 4.5))}>
-        <ZoomInIcon />
-      </button>
-    </div>
-  );
-}
-
-function LineSegments({ lines }) {
-  const geometries = lines.map((line) => {
-    return new THREE.BufferGeometry().setFromPoints(line.points);
-  });
-
-  return (
-    <>
-      {geometries.map((geometry, index) => (
-        <lineSegments
-          key={index}
-          geometry={geometry}
-          material={new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 20 })}
-        />
-      ))}
-    </>
-  );
-}
-
-function BoxSegments({ lines }) {
-  return (
-    <>
-      {lines.map((line, index) => {
-        const length = line.points[0].distanceTo(line.points[1]);
-        const midpoint = new THREE.Vector3().addVectors(line.points[0], line.points[1]).multiplyScalar(0.5);
-        const angle = Math.atan2(line.points[1].y - line.points[0].y, line.points[1].x - line.points[0].x);
-
-        return (
-          <mesh
-            key={index}
-            position={midpoint}
-            rotation={[0, 0, angle]}
-          >
-            <boxGeometry args={[length, 20, 0.1]} />
-            <meshBasicMaterial color={0x000000} />
-          </mesh>
-        );
-      })}
-    </>
-  );
-}
-
