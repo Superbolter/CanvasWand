@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import convert from "convert-units";
-import { Vector3 } from "three";
+import { Vector2, Vector3 } from "three";
 import {
   setRoomSelectors,
   setLineBreakState,
@@ -91,12 +91,13 @@ export const useDrawing = () => {
   const { screenToNDC } = usePoints();
 
   const [currentMousePosition, setCurrentMousePosition] = useState(null);
-  const [currentStrightMousePosition, setCurrentStrightMousePosition] =
-    useState(null);
+  const [currentLinePostion, setCurrentLinePostion] = useState(null);
+  const [currentStrightMousePosition, setCurrentStrightMousePosition] = useState(null);
   const [distance, setDistance] = useState(0);
   const [breakPoint, setBreakPoint] = useState([]);
   const [draggingPointIndex, setDraggingPointIndex] = useState(null);
   const [draggingLineIndex, setDraggingLineIndex] = useState([]);
+  const [draggingLine, setDraggingLine] = useState(null);
   const [doorWindowMode, setDoorWindowMode] = useState(false);
   const [addOn, setaddOn] = useState(null);
   const [isDraggingDoor, setIsDraggingDoor] = useState(false);
@@ -595,6 +596,21 @@ export const useDrawing = () => {
         }
       }
     }
+    if(draggingLine){
+      dispatch(setContextualMenuStatus(false));
+      const line = storeLines[draggingLine];
+      const linePoints = line.points;
+      const lineLength = linePoints[1].distanceTo(linePoints[0]);
+      if(Math.abs(linePoints[0].x - linePoints[1].x) > Math.abs(linePoints[0].y - linePoints[1].y)){
+        const newStart = new Vector3(point.x - lineLength/2, point.y, 0);
+        const newEnd = new Vector3(point.x + lineLength/2, point.y, 0);
+        setCurrentLinePostion([newStart, newEnd]);
+      } else {
+        const newStart = new Vector3(point.x , point.y - lineLength/2, 0);
+        const newEnd = new Vector3(point.x, point.y + lineLength/2, 0);
+        setCurrentLinePostion([newStart, newEnd]);
+      }
+    }
 
     if (perpendicularLine && draggingPointIndex === null) {
       point = calculateAlignedPoint(points[points.length - 1], point);
@@ -606,6 +622,7 @@ export const useDrawing = () => {
       const currentDistance = lastPoint.distanceTo(position);
       setDistance(currentDistance * factor[0]);
     }
+
 
     setCurrentMousePosition(point);
 
@@ -740,6 +757,11 @@ export const useDrawing = () => {
     // }
   };
 
+  const selectedLineRef = useRef(null);
+  useEffect(()=>{
+    selectedLineRef.current = selectedLines[0];
+  },[selectedLines])
+
   const handleMouseDown = (event) => {
     if (roomSelectorMode && expandRoomPopup) {
       setIsSelecting(true);
@@ -773,6 +795,11 @@ export const useDrawing = () => {
           }
         });
         setDraggingLineIndex(updatedDraggingLineIndex);
+      }else if(selectedLines.length > 0){
+          const lineIndex = storeLines.findIndex((line) => line.id === selectedLines[0]);
+          if(lineIndex !== -1){
+            setDraggingLine(lineIndex);
+          }
       }
     }
   };
@@ -781,9 +808,13 @@ export const useDrawing = () => {
     if (draggingPointIndex !== null && !roomSelectorMode) {
       const point = screenToNDC(event.clientX, event.clientY);
       let beforeUpdation = points[draggingPointIndex];
-      let updatedPoints = [...points];
-      const updated = replaceValue(updatedPoints, beforeUpdation, point);
-      dispatch(setPoints(updated));
+      let updatedPoints = points.map((p) => {
+        if (p.equals(beforeUpdation)) {
+          return point;
+        }
+        return p;
+      });
+      dispatch(setPoints(updatedPoints));
 
       const updatedLines = storeLines.map((line) => {
         let updatedLine = { ...line }; // Shallow copy of the line object
@@ -811,8 +842,39 @@ export const useDrawing = () => {
 
       dispatch(setStoreLines(updatedLines));
     }
+    if(draggingLine !== null && !roomSelectorMode){
+      const updatedLines = storeLines.map((line, index) => {
+        let updatedLine = { ...line }; // Shallow copy of the line object
+        if (index === draggingLine) {
+          const beforeUpdation1 = line.points[0];
+          const beforeUpdation2 = line.points[1];
+          let updatedPoints = points.map((p) => {
+            if (p.equals(beforeUpdation1)) {
+              return currentLinePostion[0];
+            }else if(p.equals(beforeUpdation2)){
+              return currentLinePostion[1];
+            }
+            return p;
+          });
+          dispatch(setPoints(updatedPoints));
+          updatedLine = {
+            ...updatedLine,
+            points: currentLinePostion,
+            length: convert(currentLinePostion[0].distanceTo(currentLinePostion[1]) * factor[0])
+              .from(measured)
+              .to("mm"),
+          };
+        }
+        return updatedLine;
+        });
+        dispatch(setStoreLines(updatedLines));
+        
+    }
     setDraggingPointIndex(null);
     setDraggingLineIndex([]);
+    setCurrentLinePostion(null);
+    setDraggingLine(null);
+
     if (roomSelectorMode && expandRoomPopup) {
       if (!isSelecting) return;
       const selectedIds = [];
@@ -1266,6 +1328,8 @@ export const useDrawing = () => {
   return {
     addOn,
     currentMousePosition,
+    currentLinePostion,
+    draggingLine,
     currentStrightMousePosition,
     distance,
     doorPosition,

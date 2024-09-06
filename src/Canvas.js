@@ -63,6 +63,8 @@ export const CanvasComponent = () => {
     handleMouseDown,
     handleMouseUp,
     currentMousePosition,
+    currentLinePostion,
+    draggingLine,
     currentStrightMousePosition,
     distance,
     doorPosition,
@@ -240,6 +242,21 @@ export const CanvasComponent = () => {
     return shape;
   };
 
+  const handleLineMove = (point) => {
+    const line = storeLines[draggingLine];
+      const linePoints = line.points;
+      const lineLength = linePoints[1].distanceTo(linePoints[0]);
+      if(Math.abs(linePoints[0].x - linePoints[1].x) > Math.abs(linePoints[0].y - linePoints[1].y)){
+        const newStart = new Vector3(point.x - lineLength/2, point.y, 0);
+        const newEnd = new Vector3(point.x + lineLength/2, point.y, 0);
+        return [newStart, newEnd];
+      } else {
+        const newStart = new Vector3(point.x , point.y - lineLength/2, 0);
+        const newEnd = new Vector3(point.x, point.y + lineLength/2, 0);
+        return [newStart, newEnd];
+      }
+  }
+
   return (
     <div className="container">
       <div
@@ -329,12 +346,12 @@ export const CanvasComponent = () => {
                   start={
                     lineIndex !== undefined && lineIndex.type === "start"
                       ? currentMousePosition
-                      : line.points[0]
+                      : currentLinePostion && draggingLine === index ? currentLinePostion[0] :line.points[0]
                   }
                   end={
                     lineIndex !== undefined && lineIndex.type === "end"
                       ? currentMousePosition
-                      : line.points[1]
+                      : currentLinePostion && draggingLine === index ? currentLinePostion[1]:line.points[1]
                   }
                   dimension={{ width: line.width, height: line.height }}
                   typeId={line.typeId}
@@ -344,7 +361,7 @@ export const CanvasComponent = () => {
               );
             })}
           {/* {!scale && <BoxSegments lines={storeLines}/>} */}
-          {!scale && draggingLineIndex.length === 0 && (
+          {!scale && draggingLineIndex.length === 0 && !currentLinePostion &&(
             // <LineSegments lines={storeLines} />
             // <BoxSegments lines={storeLines} />
             <CappedLine lines={storeLines} />
