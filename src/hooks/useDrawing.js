@@ -17,7 +17,7 @@ import { snapToPoint } from "../utils/snapping.js";
 import { getLineIntersection } from "../utils/intersect.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import { findLineForPoint } from "../utils/coolinear.js";
-import {calculateUpperAndLowerPoints}from "../utils/upperlowerpoint.js"
+import { calculateUpperAndLowerPoints } from "../utils/upperlowerpoint.js";
 import {
   setPoints,
   setStoreLines,
@@ -72,7 +72,7 @@ export const useDrawing = () => {
     snappingPoint,
     dragMode,
     mergeLine,
-    shiftPressed
+    shiftPressed,
   } = useSelector((state) => state.Drawing);
   const {
     storeLines,
@@ -421,7 +421,11 @@ export const useDrawing = () => {
   }
 
   useEffect(() => {
-    const { pointUpper, pointLower } = calculateUpperAndLowerPoints(storeLines, factor, measured);
+    const { pointUpper, pointLower } = calculateUpperAndLowerPoints(
+      storeLines,
+      factor,
+      measured
+    );
     console.log("hello this is working");
     console.log(pointUpper);
 
@@ -746,32 +750,32 @@ export const useDrawing = () => {
       setDraggingPointIndex(pointIndex);
     }
     const beforeUpdation = points[pointIndex];
-    let updatedDraggingLineIndex= [];
+    let updatedDraggingLineIndex = [];
     storeLines.map((line, index) => {
-      let updatedLine = { ...line }; 
+      let updatedLine = { ...line };
       if (updatedLine.points[0].equals(beforeUpdation)) {
         const data = {
           index: index,
-          type: "start"
-        }
-        updatedDraggingLineIndex.push(data)
+          type: "start",
+        };
+        updatedDraggingLineIndex.push(data);
       }
       if (updatedLine.points[1].equals(beforeUpdation)) {
         const data = {
           index: index,
-          type: "end"
-        }
-        updatedDraggingLineIndex.push(data)
+          type: "end",
+        };
+        updatedDraggingLineIndex.push(data);
       }
     });
     setDraggingLineIndex(updatedDraggingLineIndex);
-
   };
 
   const handleMouseUp = (event) => {
-    const point = screenToNDC(event.clientX, event.clientY);
-    let beforeUpdation = points[draggingPointIndex];
-    let updatedPoints = [...points];
+    if (draggingPointIndex !== null) {
+      const point = screenToNDC(event.clientX, event.clientY);
+      let beforeUpdation = points[draggingPointIndex];
+      let updatedPoints = [...points];
       const updated = replaceValue(updatedPoints, beforeUpdation, point);
       dispatch(setPoints(updated));
 
@@ -800,6 +804,7 @@ export const useDrawing = () => {
       });
 
       dispatch(setStoreLines(updatedLines));
+    }
     setDraggingPointIndex(null);
     setDraggingLineIndex([]);
     if (roomSelectorMode && expandRoomPopup) {
@@ -974,7 +979,7 @@ export const useDrawing = () => {
         newMergeLines.push(line);
       });
       dispatch(setMergeLine(newMergeLines));
-      if(selectedLines.length > 1){
+      if (selectedLines.length > 1) {
         handleMerge(newMergeLines);
       }
     }
@@ -1278,6 +1283,6 @@ export const useDrawing = () => {
     startPoint,
     endPoint,
     setDraggingPointIndex,
-    draggingLineIndex
+    draggingLineIndex,
   };
 };
