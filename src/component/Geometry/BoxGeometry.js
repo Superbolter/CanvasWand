@@ -377,7 +377,7 @@ const BoxGeometry = ({
           opacity={opacity}
         />
       </mesh>
-      <mesh position={upperLeft}>
+      {/* <mesh position={upperLeft}>
         <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial
           color={
@@ -448,7 +448,7 @@ const BoxGeometry = ({
           transparent={true}
           opacity={opacity}
         />
-      </mesh>
+      </mesh> */}
     </>
   );
 };

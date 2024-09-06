@@ -50,7 +50,7 @@ import { INITIAL_BREADTH, INITIAL_HEIGHT } from "./constant/constant.js";
 import convert from "convert-units";
 import ZoomComponent from "./component/CanvasOverLays/ZoomComponent.js";
 import useModes from "./hooks/useModes.js";
-import newCursor from "./assets/linedraw.png"
+import newCursor from "./assets/linedraw.png";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -63,6 +63,8 @@ export const CanvasComponent = () => {
     handleMouseDown,
     handleMouseUp,
     currentMousePosition,
+    currentStrightMousePosition,
+    distance,
     doorPosition,
     setDoorPosition,
     isDraggingDoor,
@@ -76,7 +78,7 @@ export const CanvasComponent = () => {
     isSelecting,
     startPoint,
     endPoint,
-    draggingLineIndex
+    draggingLineIndex,
   } = useDrawing();
   const { undo, redo } = useActions();
   const { toggleSelectionMode, perpendicularHandler } = useModes();
@@ -102,7 +104,7 @@ export const CanvasComponent = () => {
     storeLines,
     factor,
     points,
-    activeRoomIndex
+    activeRoomIndex,
   } = useSelector((state) => state.ApplicationState);
   const { typeId, stop, showSnapLine, snappingPoint } = useSelector(
     (state) => state.Drawing
@@ -174,30 +176,30 @@ export const CanvasComponent = () => {
       }
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
-      if(roomSelectorMode && activeRoomIndex!== -1){
-        deleteSelectedRoom()
-      }else{
+      if (roomSelectorMode && activeRoomIndex !== -1) {
+        deleteSelectedRoom();
+      } else {
         deleteSelectedLines();
       }
     }
-    if(event.key === "Shift"){
-      dispatch(setShiftPressed(true))
+    if (event.key === "Shift") {
+      dispatch(setShiftPressed(true));
     }
   };
 
   const handleKeyUp = (event) => {
-    if (event.key === "Shift"){
-      dispatch(setShiftPressed(false))
+    if (event.key === "Shift") {
+      dispatch(setShiftPressed(false));
     }
   };
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener("keyup", handleKeyUp);
     };
   }, [
     storeLines,
@@ -212,7 +214,7 @@ export const CanvasComponent = () => {
     perpendicularLine,
     snapActive,
     linePlacementMode,
-    roomSelectors
+    roomSelectors,
   ]);
 
   useEffect(() => {
@@ -301,7 +303,7 @@ export const CanvasComponent = () => {
           )}
           {nearPoint && lineBreak && <UpdateDistance nearVal={nearVal} />}
 
-          {scale && <Scale/>}
+          {scale && <Scale />}
           {addOn && !scale && (
             <DraggableDoor
               doorPosition={doorPosition}
@@ -318,17 +320,27 @@ export const CanvasComponent = () => {
           {/* Render lines in 2D view */}
           {!scale &&
             storeLines.map((line, index) => {
-              const lineIndex = draggingLineIndex.find((line) => line.index === index);
+              const lineIndex = draggingLineIndex.find(
+                (line) => line.index === index
+              );
               return (
-              <BoxGeometry
-                key={line.id}
-                start={lineIndex!==undefined && lineIndex.type === "start" ? currentMousePosition:line.points[0]}
-                end={lineIndex!==undefined && lineIndex.type === "end" ? currentMousePosition:line.points[1]}
-                dimension={{ width: line.width, height: line.height }}
-                typeId={line.typeId}
-                isSelected={selectedLines.includes(line.id)}
-                onClick={(e) => handleLineClick(e, line.id)}
-              />
+                <BoxGeometry
+                  key={line.id}
+                  start={
+                    lineIndex !== undefined && lineIndex.type === "start"
+                      ? currentMousePosition
+                      : line.points[0]
+                  }
+                  end={
+                    lineIndex !== undefined && lineIndex.type === "end"
+                      ? currentMousePosition
+                      : line.points[1]
+                  }
+                  dimension={{ width: line.width, height: line.height }}
+                  typeId={line.typeId}
+                  isSelected={selectedLines.includes(line.id)}
+                  onClick={(e) => handleLineClick(e, line.id)}
+                />
               );
             })}
           {/* {!scale && <BoxSegments lines={storeLines}/>} */}
@@ -369,22 +381,37 @@ export const CanvasComponent = () => {
                 showDimension={true}
                 onClick={() => {}}
               />
-              {/* <Text
-                position={[
-                  (points[points.length - 1].x + currentMousePosition.x) / 2,
-                  (points[points.length - 1].y + currentMousePosition.y) / 2 +
-
-                    10,
-                  0,
-                ]}
-                color="black"
-                anchorX="center"
-                anchorY="middle"
-                fontSize={10}
-                fontWeight="bold"
-              >
-                {`${distance.toFixed(2)} ${measured}`}
-              </Text> */}
+              {currentStrightMousePosition && (
+                <>
+                  <Line
+                    points={[points[points.length - 1], currentStrightMousePosition]}
+                    color="blue"
+                    lineWidth={5}
+                  />
+                  <Line
+                    points={[currentMousePosition, currentStrightMousePosition]}
+                    color="black"
+                    lineWidth={1}
+                  />
+                  <Text
+                    position={[
+                      (points[points.length - 1].x + currentStrightMousePosition.x) /
+                        2,
+                      (points[points.length - 1].y + currentStrightMousePosition.y) /
+                        2 +
+                        10,
+                      0,
+                    ]}
+                    color="black"
+                    anchorX="center"
+                    anchorY="middle"
+                    fontSize={8}
+                    fontWeight="bold"
+                  >
+                    {`${distance.toFixed(2)} ${measured}`}
+                  </Text>
+                </>
+              )}
             </>
           )}
           {!scale &&

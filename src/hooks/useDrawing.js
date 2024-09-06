@@ -91,6 +91,7 @@ export const useDrawing = () => {
   const { screenToNDC } = usePoints();
 
   const [currentMousePosition, setCurrentMousePosition] = useState(null);
+  const [currentStrightMousePosition, setCurrentStrightMousePosition] = useState(null);
   const [distance, setDistance] = useState(0);
   const [breakPoint, setBreakPoint] = useState([]);
   const [draggingPointIndex, setDraggingPointIndex] = useState(null);
@@ -597,6 +598,13 @@ export const useDrawing = () => {
     if (perpendicularLine && draggingPointIndex === null) {
       point = calculateAlignedPoint(points[points.length - 1], point);
     }
+    if(!perpendicularLine && draggingPointIndex === null){
+      const position = calculateAlignedPoint(points[points.length - 1], point);
+      setCurrentStrightMousePosition(position);
+      const lastPoint = points[points.length - 1];
+      const currentDistance = lastPoint.distanceTo(position);
+      setDistance(currentDistance * factor[0]);
+    }
 
     setCurrentMousePosition(point);
 
@@ -635,10 +643,6 @@ export const useDrawing = () => {
 
     dispatch(setShowSnapLine(snapFound));
     //setCurrentMousePosition(point);
-
-    const lastPoint = points[points.length - 1];
-    const currentDistance = lastPoint.distanceTo(point);
-    setDistance(currentDistance * factor[0]);
 
     // if (draggingPointIndex !== null && !roomSelectorMode) {
     //   let beforeUpdation = points[draggingPointIndex];
@@ -743,36 +747,37 @@ export const useDrawing = () => {
     }
     if (!dragMode) return;
 
-    const point = screenToNDC(event.clientX, event.clientY);
-
-    const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10);
-    if (pointIndex !== -1) {
-      setDraggingPointIndex(pointIndex);
+    if (!roomSelectorMode) {
+      const point = screenToNDC(event.clientX, event.clientY);
+      const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10);
+      if (pointIndex !== -1) {
+        setDraggingPointIndex(pointIndex);
+      }
+      const beforeUpdation = points[pointIndex];
+      let updatedDraggingLineIndex = [];
+      storeLines.map((line, index) => {
+        let updatedLine = { ...line };
+        if (updatedLine.points[0].equals(beforeUpdation)) {
+          const data = {
+            index: index,
+            type: "start",
+          };
+          updatedDraggingLineIndex.push(data);
+        }
+        if (updatedLine.points[1].equals(beforeUpdation)) {
+          const data = {
+            index: index,
+            type: "end",
+          };
+          updatedDraggingLineIndex.push(data);
+        }
+      });
+      setDraggingLineIndex(updatedDraggingLineIndex);
     }
-    const beforeUpdation = points[pointIndex];
-    let updatedDraggingLineIndex = [];
-    storeLines.map((line, index) => {
-      let updatedLine = { ...line };
-      if (updatedLine.points[0].equals(beforeUpdation)) {
-        const data = {
-          index: index,
-          type: "start",
-        };
-        updatedDraggingLineIndex.push(data);
-      }
-      if (updatedLine.points[1].equals(beforeUpdation)) {
-        const data = {
-          index: index,
-          type: "end",
-        };
-        updatedDraggingLineIndex.push(data);
-      }
-    });
-    setDraggingLineIndex(updatedDraggingLineIndex);
   };
 
   const handleMouseUp = (event) => {
-    if (draggingPointIndex !== null) {
+    if (draggingPointIndex !== null && !roomSelectorMode) {
       const point = screenToNDC(event.clientX, event.clientY);
       let beforeUpdation = points[draggingPointIndex];
       let updatedPoints = [...points];
@@ -967,6 +972,7 @@ export const useDrawing = () => {
     //   dispatch(setStoreLines([newLine]));
     // }
     setCurrentMousePosition(null); // Clear the temporary line on click
+    setCurrentStrightMousePosition(null); // Clear the temporary line on click
     setDistance(0); // Reset distance display
   };
 
@@ -1259,6 +1265,7 @@ export const useDrawing = () => {
   return {
     addOn,
     currentMousePosition,
+    currentStrightMousePosition,
     distance,
     doorPosition,
     isDraggingDoor,
