@@ -94,6 +94,7 @@ export const useDrawing = () => {
   const [distance, setDistance] = useState(0);
   const [breakPoint, setBreakPoint] = useState([]);
   const [draggingPointIndex, setDraggingPointIndex] = useState(null);
+  const [draggingLineIndex, setDraggingLineIndex] = useState([]);
   const [doorWindowMode, setDoorWindowMode] = useState(false);
   const [addOn, setaddOn] = useState(null);
   const [isDraggingDoor, setIsDraggingDoor] = useState(false);
@@ -635,70 +636,142 @@ export const useDrawing = () => {
     const currentDistance = lastPoint.distanceTo(point);
     setDistance(currentDistance * factor[0]);
 
-    if (draggingPointIndex !== null && !roomSelectorMode) {
-      let beforeUpdation = points[draggingPointIndex];
+    // if (draggingPointIndex !== null && !roomSelectorMode) {
+    //   let beforeUpdation = points[draggingPointIndex];
 
-      let prevPoint = points[draggingPointIndex - 1];
+    //   let prevPoint = points[draggingPointIndex - 1];
 
-      let nextPoint = points[draggingPointIndex + 1];
-      // if (perpendicularLine) {
-      //   if (prevPoint && nextPoint) {
-      //     // Check if all coordinates are different
+    //   let nextPoint = points[draggingPointIndex + 1];
+    //   if (perpendicularLine) {
+    //     if (prevPoint && nextPoint) {
+    //       // Check if all coordinates are different
 
-      //     if (
-      //       point.x !== prevPoint.x &&
-      //       point.y !== prevPoint.y &&
-      //       point.x !== nextPoint.x &&
-      //       point.y !== nextPoint.y
-      //     ) {
-      //       // Calculate the direction vector of the line (prevPoint to nextPoint)
-      //       const dx = nextPoint.x - prevPoint.x;
-      //       const dy = nextPoint.y - prevPoint.y;
+    //       if (
+    //         point.x !== prevPoint.x &&
+    //         point.y !== prevPoint.y &&
+    //         point.x !== nextPoint.x &&
+    //         point.y !== nextPoint.y
+    //       ) {
+    //         // Calculate the direction vector of the line (prevPoint to nextPoint)
+    //         const dx = nextPoint.x - prevPoint.x;
+    //         const dy = nextPoint.y - prevPoint.y;
 
-      //       // Normalize the direction vector
-      //       const length = Math.sqrt(dx * dx + dy * dy);
-      //       const dirX = dx / length;
-      //       const dirY = dy / length;
+    //         // Normalize the direction vector
+    //         const length = Math.sqrt(dx * dx + dy * dy);
+    //         const dirX = dx / length;
+    //         const dirY = dy / length;
 
-      //       // Calculate the vector from prevPoint to point
-      //       const px = point.x - prevPoint.x;
-      //       const py = point.y - prevPoint.y;
+    //         // Calculate the vector from prevPoint to point
+    //         const px = point.x - prevPoint.x;
+    //         const py = point.y - prevPoint.y;
 
-      //       // Project the point onto the line
-      //       const dotProduct = px * dirX + py * dirY;
-      //       point.x = prevPoint.x + dotProduct * dirX;
-      //       point.y = prevPoint.y + dotProduct * dirY;
-      //     } else {
-      //       // Align with the previous point
-      //       if (
-      //         Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)
-      //       ) {
-      //         point.y = prevPoint.y; // Align horizontally
-      //       } else {
-      //         point.x = prevPoint.x; // Align vertically
-      //       }
-      //     }
-      //   } else if (prevPoint) {
-      //     if (
-      //       Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)
-      //     ) {
-      //       point.y = prevPoint.y; // Align horizontally
-      //     } else {
-      //       point.x = prevPoint.x; // Align vertically
-      //     }
-      //   } else if (nextPoint) {
-      //     // Align with the next point if there's no previous point
-      //     if (
-      //       Math.abs(point.x - nextPoint.x) > Math.abs(point.y - nextPoint.y)
-      //     ) {
-      //       point.y = nextPoint.y; // Align horizontally
-      //     } else {
-      //       point.x = nextPoint.x; // Align vertically
-      //     }
-      //   }
-      // }
+    //         // Project the point onto the line
+    //         const dotProduct = px * dirX + py * dirY;
+    //         point.x = prevPoint.x + dotProduct * dirX;
+    //         point.y = prevPoint.y + dotProduct * dirY;
+    //       } else {
+    //         // Align with the previous point
+    //         if (
+    //           Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)
+    //         ) {
+    //           point.y = prevPoint.y; // Align horizontally
+    //         } else {
+    //           point.x = prevPoint.x; // Align vertically
+    //         }
+    //       }
+    //     } else if (prevPoint) {
+    //       if (
+    //         Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)
+    //       ) {
+    //         point.y = prevPoint.y; // Align horizontally
+    //       } else {
+    //         point.x = prevPoint.x; // Align vertically
+    //       }
+    //     } else if (nextPoint) {
+    //       // Align with the next point if there's no previous point
+    //       if (
+    //         Math.abs(point.x - nextPoint.x) > Math.abs(point.y - nextPoint.y)
+    //       ) {
+    //         point.y = nextPoint.y; // Align horizontally
+    //       } else {
+    //         point.x = nextPoint.x; // Align vertically
+    //       }
+    //     }
+    //   }
 
-      let updatedPoints = [...points];
+    //   let updatedPoints = [...points];
+    //   const updated = replaceValue(updatedPoints, beforeUpdation, point);
+    //   dispatch(setPoints(updated));
+
+    //   const updatedLines = storeLines.map((line) => {
+    //     let updatedLine = { ...line }; // Shallow copy of the line object
+    //     if (updatedLine.points[0].equals(beforeUpdation)) {
+    //       updatedLine = {
+    //         ...updatedLine,
+    //         points: [point, updatedLine.points[1]],
+    //         length: convert(point.distanceTo(updatedLine.points[1]) * factor[0])
+    //           .from(measured)
+    //           .to("mm"),
+    //       };
+    //     }
+
+    //     if (updatedLine.points[1].equals(beforeUpdation)) {
+    //       updatedLine = {
+    //         ...updatedLine,
+    //         points: [updatedLine.points[0], point],
+    //         length: convert(updatedLine.points[0].distanceTo(point) * factor[0])
+    //           .from(measured)
+    //           .to("mm"),
+    //       };
+    //     }
+    //     return updatedLine;
+    //   });
+
+    //   dispatch(setStoreLines(updatedLines));
+    // }
+  };
+
+  const handleMouseDown = (event) => {
+    if (roomSelectorMode && expandRoomPopup) {
+      setIsSelecting(true);
+      const start = screenToNDC(event.clientX, event.clientY);
+      setStartPoint(start);
+    }
+    if (!dragMode) return;
+
+    const point = screenToNDC(event.clientX, event.clientY);
+
+    const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10);
+    if (pointIndex !== -1) {
+      setDraggingPointIndex(pointIndex);
+    }
+    const beforeUpdation = points[pointIndex];
+    let updatedDraggingLineIndex= [];
+    storeLines.map((line, index) => {
+      let updatedLine = { ...line }; 
+      if (updatedLine.points[0].equals(beforeUpdation)) {
+        const data = {
+          index: index,
+          type: "start"
+        }
+        updatedDraggingLineIndex.push(data)
+      }
+      if (updatedLine.points[1].equals(beforeUpdation)) {
+        const data = {
+          index: index,
+          type: "end"
+        }
+        updatedDraggingLineIndex.push(data)
+      }
+    });
+    setDraggingLineIndex(updatedDraggingLineIndex);
+
+  };
+
+  const handleMouseUp = (event) => {
+    const point = screenToNDC(event.clientX, event.clientY);
+    let beforeUpdation = points[draggingPointIndex];
+    let updatedPoints = [...points];
       const updated = replaceValue(updatedPoints, beforeUpdation, point);
       dispatch(setPoints(updated));
 
@@ -727,27 +800,8 @@ export const useDrawing = () => {
       });
 
       dispatch(setStoreLines(updatedLines));
-    }
-  };
-
-  const handleMouseDown = (event) => {
-    if (roomSelectorMode && expandRoomPopup) {
-      setIsSelecting(true);
-      const start = screenToNDC(event.clientX, event.clientY);
-      setStartPoint(start);
-    }
-    if (!dragMode) return;
-
-    const point = screenToNDC(event.clientX, event.clientY);
-
-    const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10);
-    if (pointIndex !== -1) {
-      setDraggingPointIndex(pointIndex);
-    }
-  };
-
-  const handleMouseUp = () => {
     setDraggingPointIndex(null);
+    setDraggingLineIndex([]);
     if (roomSelectorMode && expandRoomPopup) {
       if (!isSelecting) return;
       const selectedIds = [];
@@ -1224,5 +1278,6 @@ export const useDrawing = () => {
     startPoint,
     endPoint,
     setDraggingPointIndex,
+    draggingLineIndex
   };
 };

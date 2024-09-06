@@ -76,6 +76,7 @@ export const CanvasComponent = () => {
     isSelecting,
     startPoint,
     endPoint,
+    draggingLineIndex
   } = useDrawing();
   const { undo, redo } = useActions();
   const { toggleSelectionMode, perpendicularHandler } = useModes();
@@ -315,20 +316,24 @@ export const CanvasComponent = () => {
           )}
           <BackgroundImage />
           {/* Render lines in 2D view */}
+          {console.log(draggingLineIndex.find((line) => line.index === 10))}
           {!scale &&
-            storeLines.map((line) => (
+            storeLines.map((line, index) => {
+              const lineIndex = draggingLineIndex.find((line) => line.index === index);
+              return (
               <BoxGeometry
                 key={line.id}
-                start={line.points[0]}
-                end={line.points[1]}
+                start={lineIndex!==undefined && lineIndex.type === "start" ? currentMousePosition:line.points[0]}
+                end={lineIndex!==undefined && lineIndex.type === "end" ? currentMousePosition:line.points[1]}
                 dimension={{ width: line.width, height: line.height }}
                 typeId={line.typeId}
                 isSelected={selectedLines.includes(line.id)}
                 onClick={(e) => handleLineClick(e, line.id)}
               />
-            ))}
+              );
+            })}
           {/* {!scale && <BoxSegments lines={storeLines}/>} */}
-          {!scale && (
+          {!scale && draggingLineIndex.length === 0 && (
             // <LineSegments lines={storeLines} />
             // <BoxSegments lines={storeLines} />
             <CappedLine lines={storeLines} />
