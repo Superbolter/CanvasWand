@@ -316,7 +316,6 @@ export const CanvasComponent = () => {
           )}
           <BackgroundImage />
           {/* Render lines in 2D view */}
-          {console.log(draggingLineIndex.find((line) => line.index === 10))}
           {!scale &&
             storeLines.map((line, index) => {
               const lineIndex = draggingLineIndex.find((line) => line.index === index);
