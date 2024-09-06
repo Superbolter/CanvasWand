@@ -91,7 +91,8 @@ export const useDrawing = () => {
   const { screenToNDC } = usePoints();
 
   const [currentMousePosition, setCurrentMousePosition] = useState(null);
-  const [currentStrightMousePosition, setCurrentStrightMousePosition] = useState(null);
+  const [currentStrightMousePosition, setCurrentStrightMousePosition] =
+    useState(null);
   const [distance, setDistance] = useState(0);
   const [breakPoint, setBreakPoint] = useState([]);
   const [draggingPointIndex, setDraggingPointIndex] = useState(null);
@@ -598,7 +599,7 @@ export const useDrawing = () => {
     if (perpendicularLine && draggingPointIndex === null) {
       point = calculateAlignedPoint(points[points.length - 1], point);
     }
-    if(!perpendicularLine && draggingPointIndex === null){
+    if (!perpendicularLine && draggingPointIndex === null) {
       const position = calculateAlignedPoint(points[points.length - 1], point);
       setCurrentStrightMousePosition(position);
       const lastPoint = points[points.length - 1];
@@ -752,27 +753,27 @@ export const useDrawing = () => {
       const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10);
       if (pointIndex !== -1) {
         setDraggingPointIndex(pointIndex);
+        const beforeUpdation = points[pointIndex];
+        let updatedDraggingLineIndex = [];
+        storeLines.map((line, index) => {
+          let updatedLine = { ...line };
+          if (updatedLine.points[0].equals(beforeUpdation)) {
+            const data = {
+              index: index,
+              type: "start",
+            };
+            updatedDraggingLineIndex.push(data);
+          }
+          if (updatedLine.points[1].equals(beforeUpdation)) {
+            const data = {
+              index: index,
+              type: "end",
+            };
+            updatedDraggingLineIndex.push(data);
+          }
+        });
+        setDraggingLineIndex(updatedDraggingLineIndex);
       }
-      const beforeUpdation = points[pointIndex];
-      let updatedDraggingLineIndex = [];
-      storeLines.map((line, index) => {
-        let updatedLine = { ...line };
-        if (updatedLine.points[0].equals(beforeUpdation)) {
-          const data = {
-            index: index,
-            type: "start",
-          };
-          updatedDraggingLineIndex.push(data);
-        }
-        if (updatedLine.points[1].equals(beforeUpdation)) {
-          const data = {
-            index: index,
-            type: "end",
-          };
-          updatedDraggingLineIndex.push(data);
-        }
-      });
-      setDraggingLineIndex(updatedDraggingLineIndex);
     }
   };
 
