@@ -380,6 +380,7 @@ export const CanvasComponent = () => {
                   }
                   dimension={{ width: line.width, height: line.height }}
                   typeId={line.typeId}
+                  isCustomised={line.isCustomised}
                   isSelected={selectedLines.includes(line.id)}
                   onClick={(e) => handleLineClick(e, line.id)}
                 />
@@ -420,6 +421,7 @@ export const CanvasComponent = () => {
                 typeId={typeId}
                 isSelected={false}
                 showDimension={true}
+                isCustomised={null}
                 onClick={() => {}}
               />
               {currentStrightMousePosition && (

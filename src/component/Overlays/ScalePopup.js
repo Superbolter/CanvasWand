@@ -51,7 +51,7 @@ const ScalePopup = () => {
               variant="outlined"
               size="small"
               required={true}
-              value={userLength > 0 ? userLength : ""}
+              value={userLength !== ""  ? userLength : ""}
               onChange={(e)=> dispatch(setUserLength(e.target.value))}
               InputProps={{
                 style: {
@@ -74,7 +74,7 @@ const ScalePopup = () => {
               variant="outlined"
               size="small"
               required={true}
-              value={userWidth > 0 ? userWidth : ""}
+              value={userWidth !=="" ? userWidth : ""}
               onChange={(e)=> dispatch(setUserWidth(e.target.value))}
               InputProps={{
                 style: {

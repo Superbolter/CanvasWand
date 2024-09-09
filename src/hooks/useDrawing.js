@@ -61,6 +61,7 @@ export const useDrawing = () => {
     lineBreak,
     merge,
     snapActive,
+    userWidth
   } = useSelector((state) => state.drawing);
   const {
     typeId,
@@ -97,7 +98,6 @@ export const useDrawing = () => {
   const [draggingPointIndex, setDraggingPointIndex] = useState(null);
   const [draggingLineIndex, setDraggingLineIndex] = useState([]);
   const [draggingLine, setDraggingLine] = useState(null);
-  const [doorWindowMode, setDoorWindowMode] = useState(false);
   const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
   const [selectId, setId] = useState(null);
   const [lineClick, setLineClick] = useState(false);
@@ -114,114 +114,6 @@ export const useDrawing = () => {
   function arePointsSimilar(point1, point2) {
     return point1.x === point2.x && point1.y === point2.y;
   }
-
-  const handlePointerUp = useCallback(
-    (event, line, right, left) => {
-      const startPoint = new Vector3(
-        left.current.position.x,
-        left.current.position.y,
-        0
-      );
-      const endPoint = new Vector3(
-        right.current.position.x,
-        right.current.position.y,
-        0
-      );
-
-      let index = null;
-
-      points.forEach((ele, i) => {
-        if (ele === line.points[0] && points[i + 1] === line.points[1]) {
-          index = i;
-        }
-      });
-      let updatedPoint = [...points];
-
-      if (index != null) {
-        if (
-          endPoint.distanceTo(line.points[0]) <
-          endPoint.distanceTo(line.points[1])
-        ) {
-          updatedPoint.splice(index + 1, 0, endPoint, startPoint);
-        } else {
-          updatedPoint.splice(index + 1, 0, startPoint, endPoint);
-        }
-        dispatch(setPoints(updatedPoint));
-      }
-
-      const idx = storeLines.findIndex((ele) => ele.id === line.id);
-
-      const line1 = {
-        id: uniqueId(),
-        points: [line.points[0], startPoint],
-        length: convert(line.points[0].distanceTo(startPoint) * factor[0])
-          .from(measured)
-          .to("mm"),
-        width: convert(INITIAL_BREADTH / factor[1])
-          .from(measured)
-          .to("mm"),
-        height: convert(INITIAL_HEIGHT / factor[2])
-          .from(measured)
-          .to("mm"),
-        widthchangetype: "between",
-        widthchange: 0,
-        type: "wall",
-        typeId: 1,
-        locked: false,
-      };
-      const line2 = {
-        id: uniqueId(),
-        points: [endPoint, line.points[1]],
-        length: convert(endPoint.distanceTo(line.points[1]) * factor[0])
-          .from(measured)
-          .to("mm"),
-        width: convert(INITIAL_BREADTH / factor[1])
-          .from(measured)
-          .to("mm"),
-        height: convert(INITIAL_HEIGHT / factor[2])
-          .from(measured)
-          .to("mm"),
-        widthchangetype: "between",
-        widthchange: 0,
-        type: "wall",
-        typeId: 1,
-        locked: false,
-      };
-      const line3 = {
-        id: uniqueId(),
-        points: [startPoint, endPoint],
-        length: convert(startPoint.distanceTo(endPoint) * factor[0])
-          .from(measured)
-          .to("mm"),
-        width: convert(INITIAL_BREADTH / factor[1])
-          .from(measured)
-          .to("mm"),
-        height: convert(INITIAL_HEIGHT / factor[2])
-          .from(measured)
-          .to("mm"),
-        widthchangetype: "between",
-        widthchange: 0,
-        type: "door",
-        typeId: 2,
-        locked: false,
-      };
-
-      const updatedLine = [...storeLines];
-
-      updatedLine.splice(idx, 1, line1, line3, line2);
-
-      dispatch(setStoreLines(updatedLine));
-
-      dispatch(setSelectionMode(false));
-      dispatch(setDragMode(false));
-      setTimeout(() => {
-        setDoorWindowMode(false);
-      }, 1000);
-
-      event.stopPropagation();
-    },
-    [selectionMode, dragMode, storeLines, factor, measured, dispatch]
-  );
 
   const addPoint = (newPoint, startPoint) => {
     const previousLines = [...storeLines];
@@ -245,9 +137,10 @@ export const useDrawing = () => {
       length: convert(startPoint.distanceTo(newPoint) * factor[0])
         .from(measured)
         .to("mm"),
-      width: convert(INITIAL_BREADTH / factor[1])
-        .from(measured)
-        .to("mm"),
+      width: (1/factor[0]) * userWidth,
+      // width: convert(INITIAL_BREADTH / factor[1])
+      //   .from(measured)
+      //   .to("mm"),
       height: convert(INITIAL_HEIGHT / factor[2])
         .from(measured)
         .to("mm"),
@@ -256,7 +149,9 @@ export const useDrawing = () => {
       type,
       typeId: typeId,
       locked: false,
+      isCustomised: null,
     };
+    console.log(newLine)
 
     let updatedStoreLines = [...storeLines];
     let intersections = [];
@@ -557,7 +452,7 @@ export const useDrawing = () => {
       setEndPoint(end);
     }
     if (
-      (points.length === 0 || stop || newLine || doorWindowMode || designStep === 1) &&
+      (points.length === 0 || stop || newLine || designStep === 1) &&
       !dragMode
     )
       return; // No point to start from or not in perpendicular mode
@@ -923,7 +818,7 @@ export const useDrawing = () => {
       }
       return;
     }
-    if (selectionMode || doorWindowMode || merge || designStep === 1) return; // Prevent drawing new lines in selection mode
+    if (selectionMode || merge || designStep === 1) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
 
     let point = screenToNDC(event.clientX, event.clientY);
