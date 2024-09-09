@@ -20,6 +20,7 @@ import {
   setContextualMenuStatus,
   setRedoStack,
   setShowPopup,
+  setTypeId,
   setUndoStack,
 } from "../Actions/DrawingActions";
 import useModes from "./useModes";
@@ -259,9 +260,10 @@ export const useActions = () => {
   const handleSaveClick = () => {
     if (designStep !== 3) {
       handleApiCall();
-      if (!selectionMode) {
-        toggleSelectionMode();
-      }
+      // if (!selectionMode) {
+      //   toggleSelectionMode();
+      // }
+      dispatch(setTypeId(0));
       dispatch(setDesignStep(3));
       dispatch(showRoomNamePopup(true));
       dispatch(setShowPopup(false));

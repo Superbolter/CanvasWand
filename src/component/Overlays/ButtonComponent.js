@@ -16,16 +16,16 @@ const ButtonComponent = () => {
   const { selectedButton} = useSelector((state)=> state.drawing)
   const {designStep, selectionMode} = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch()
-  const {toggleSelectionMode , escape} = useModes();
+  const {toggleSelectionMode} = useModes();
 
   const handleButtonClick = (buttonName) => {
     if(selectionMode){
       toggleSelectionMode();
-    }else{
-      escape();
     }
     if(buttonName=== selectedButton){
       dispatch(setSelectedButton(null))
+      dispatch(setTypeId(0))
+      return
     }else{
       dispatch(setSelectedButton(buttonName))
     }

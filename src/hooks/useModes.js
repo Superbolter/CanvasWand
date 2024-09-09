@@ -59,13 +59,6 @@ const useModes = () => {
     dispatch(setSelectionMode(!selectionMode));
   };
 
-  const escape = () => {
-    dispatch(setNewLine(!newLine));
-    dispatch(setShowSnapLine(false));
-    dispatch(setContextualMenuStatus(false));
-    dispatch(setStop(!stop));
-  };
-
   const perpendicularHandler = () => {
     dispatch(setPerpendicularLine(!perpendicularLine));
     dispatch(setNewLine(true));
@@ -77,7 +70,6 @@ const useModes = () => {
     toggleSelectionMode,
     toggleDragMode,
     toggleSelectionSplitMode,
-    escape,
     perpendicularHandler
   };
 };

@@ -94,7 +94,7 @@ const RoomNamePopup = () => {
       return;
     }
     dispatch(setActiveRoomButton("add"));
-    dispatch(setTypeId(1));
+    dispatch(setTypeId(0));
     if (!selectionMode) {
       toggleSelectionMode();
     }
@@ -105,7 +105,7 @@ const RoomNamePopup = () => {
   const divideRoomClick = () => {
     if (activeRoomButton === "divide") {
       dispatch(setActiveRoomButton(""));
-      dispatch(setTypeId(1));
+      dispatch(setTypeId(0));
       if (!selectionMode) {
         toggleSelectionMode();
       }

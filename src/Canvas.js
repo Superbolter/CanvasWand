@@ -40,6 +40,7 @@ import {
   setShowPopup,
   setShowSnapLine,
   setStop,
+  setTypeId,
 } from "./Actions/DrawingActions.js";
 import UpdateDistance from "./component/Helpers/updateDistance.js";
 import { Vector3, Shape } from "three";
@@ -161,8 +162,9 @@ export const CanvasComponent = () => {
       event.key === "escape" ||
       (event.key === "Escape" && !merge && !lineBreak)
     ) {
-      if (designStep === 2) {
+      if (designStep === 2 && !selectionMode) {
         dispatch(setShowPopup(false));
+        dispatch(setTypeId(0))
         toggleSelectionMode();
       } else if (!selectionMode) {
         dispatch(setNewLine(true));
@@ -267,6 +269,12 @@ export const CanvasComponent = () => {
       canvasContainer.removeEventListener("pointermove", handlePointerMove);
     };
   })
+
+  useEffect(()=>{
+    if(typeId === 0 && !selectionMode){
+      toggleSelectionMode();
+    }
+  },[typeId])
 
   return (
     <div className="container">

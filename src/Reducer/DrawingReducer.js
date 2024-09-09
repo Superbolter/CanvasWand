@@ -1,5 +1,5 @@
 const initialState = {
-    typeId: 1,
+    typeId: 0,
     contextualMenuStatus:false,
     lineId:null,
     showPropertiesPopup: false,
