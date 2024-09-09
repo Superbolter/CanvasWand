@@ -114,6 +114,7 @@ export const CanvasComponent = () => {
 
   const [zoom, setZoomState] = useState(1);
   const [isNeeded, setIsNeeded] = useState(false);
+  const [gridFactor, setGridFactor] = useState(10);
 
   const setZoom = (zoom, val = true) => {
     setZoomState(zoom);
@@ -275,6 +276,26 @@ export const CanvasComponent = () => {
       toggleSelectionMode();
     }
   },[typeId])
+
+  useEffect(()=>{
+    switch(measured){
+      case "in":
+        setGridFactor(12);
+        break;
+      case "cm":
+        setGridFactor(10);
+        break;
+      case "m":
+        setGridFactor(0.1);
+        break;
+      case "mm":
+        setGridFactor(100);
+        break;
+      default:
+        setGridFactor(1)
+        break;
+    }
+  },[measured])
 
   return (
     <div className="container">
@@ -461,10 +482,10 @@ export const CanvasComponent = () => {
           {/* 2D grid */}
           <Grid
             rotation={[Math.PI / 2, 0, 0]}
-            cellSize={10}
+            // cellSize={(1/factor[0]) * 10}
             cellThickness={0}
             cellColor="#FFFFFF"
-            sectionSize={50}
+            sectionSize={(1/factor[0]) * gridFactor}
             //sectionThickness={1.5}
             sectionColor="#FFFFFF"
             fadeDistance={10000}
