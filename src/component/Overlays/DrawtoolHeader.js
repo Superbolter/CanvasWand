@@ -67,7 +67,7 @@ const DrawtoolHeader = ({ }) => {
           left: "20px",
           backgroundColor: "white",
           borderRadius: "12px",
-          width: "79vw",
+          width: "calc(100vw - 330px)",
           padding: "12px",
           display: "flex",
           alignItems: "center",
