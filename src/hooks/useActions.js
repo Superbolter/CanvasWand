@@ -268,6 +268,7 @@ export const useActions = () => {
       dispatch(setContextualMenuStatus(false));
       // dispatch(setPerpendicularLine(false));
     } else {
+      dispatch(setDesignStep(4))
       toast("Saving, Please Wait ...", {
         icon: "✔️",
         style: {
@@ -281,10 +282,11 @@ export const useActions = () => {
         fetchWrapper
           .post(`/floorplans/process_draw_data/${floorplanId}`)
           .then((res) => {
-            window.open(
-              `https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`,
-              "_blank"
-            );
+            // window.open(
+            //   `https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`,
+            //   "_blank"
+            // );
+            window.location = `https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`
           });
       }, 1000);
     }

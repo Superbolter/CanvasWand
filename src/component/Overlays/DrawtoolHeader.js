@@ -13,7 +13,7 @@ import {
   showRoomNamePopup,
   updateDrawData,
 } from "../../Actions/ApplicationStateAction.js";
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, Check } from "@mui/icons-material";
 import { Switch } from "@mui/material";
 import { setSeeDimensions } from "../../Actions/DrawingActions.js";
 import { useActions } from "../../hooks/useActions.js";
@@ -77,16 +77,16 @@ const DrawtoolHeader = ({ }) => {
           height: "30px",
         }}
       >
-        <Typography modifiers={["medium", "black600"]} className="header-text">
-          {designStep === 3 ? (
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <div
+        <div className="header-step-indicator">
+          {designStep> 1? 
+            <div
                 style={{
                   backgroundColor: "#F4F4F4",
                   padding: "4px 8px",
                   borderRadius: "8px",
+                  marginRight:"8px"
                 }}
-                onClick={handleBackToDrawing}
+                onClick={designStep === 2? handleBackToScale: handleBackToDrawing}
               >
                 <ArrowBack
                   style={{
@@ -96,32 +96,56 @@ const DrawtoolHeader = ({ }) => {
                   }}
                 />
               </div>
-              <Typography>Define the rooms</Typography>
+            : null
+          }
+          <div className="header-step-indicator-step">
+            <div className={`header-step-indicator-step-box ${designStep< 1? "grayBorder" : ""}`}>
+              {
+                designStep > 1 ?
+                <Check style={{fontSize:"16px"}}/>
+                :
+                <Typography modifiers={["medium", "subtitle2", "black600"]}>1</Typography>
+              }
             </div>
-          ) : designStep === 1 ? (
-            "Select the accurate scale for your floor plan"
-          ) : (
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <div
-                style={{
-                  backgroundColor: "#F4F4F4",
-                  padding: "4px 8px",
-                  borderRadius: "8px",
-                }}
-                onClick={handleBackToScale}
-              >
-                <ArrowBack
-                  style={{
-                    fontSize: "20px",
-                    cursor: "pointer",
-                    marginTop: "5px",
-                  }}
-                />
-              </div>
-              <Typography>Create your own 3D home</Typography>
+            <Typography modifiers={["medium", "subtitle", "black600"]}>Set scale</Typography>
+          </div>
+          <div className={`header-step-indicator-line ${designStep > 1 ? "blackLine" : "grayLine"}`}></div>
+          <div className="header-step-indicator-step">
+            <div className={`header-step-indicator-step-box ${designStep< 2? "grayBorder" : ""}`}>
+              {
+                designStep > 2 ?
+                <Check style={{fontSize:"16px"}}/>
+                :
+                <Typography modifiers={designStep > 1? ["medium", "subtitle2", "black600"]: ["grey","medium", "subtitle"]}>2</Typography>
+              }
             </div>
-          )}
-        </Typography>
+            <Typography modifiers={designStep > 1? ["medium", "subtitle", "black600"]: ["grey","medium", "subtitle"]}>Draw plan</Typography>
+          </div>
+          <div className={`header-step-indicator-line ${designStep > 2 ? "blackLine" : "grayLine"}`}></div>
+          <div className="header-step-indicator-step">
+            <div className={`header-step-indicator-step-box ${designStep< 3? "grayBorder" : ""}`}>
+              {
+                designStep > 3 ?
+                <Check style={{fontSize:"16px"}}/>
+                :
+                <Typography modifiers={designStep > 2? ["medium", "subtitle2", "black600"]: ["grey","medium", "subtitle"]}>3</Typography>
+              }
+            </div>
+            <Typography modifiers={designStep > 2? ["medium", "subtitle", "black600"]: ["grey","medium", "subtitle"]}>Define Rooms</Typography>
+          </div>
+          <div className={`header-step-indicator-line ${designStep > 3 ? "blackLine" : "grayLine"}`}></div>
+          <div className="header-step-indicator-step">
+            <div className={`header-step-indicator-step-box ${designStep< 4? "grayBorder" : ""}`}>
+              {
+                designStep > 3 ?
+                <Check style={{fontSize:"16px"}}/>
+                :
+                <Typography modifiers={designStep > 3? ["medium", "subtitle2", "black600"]: ["grey","medium", "subtitle"]}>4</Typography>
+              }
+            </div>
+            <Typography modifiers={designStep > 3? ["medium", "subtitle", "black600"]: ["grey","medium", "subtitle"]}>Open 3D</Typography>
+          </div>
+        </div>
         {designStep === 1 ? null : (
           <div style={{ display: "flex", gap: "8px" }}>
             <Button
@@ -153,7 +177,7 @@ const DrawtoolHeader = ({ }) => {
               modifiers={["blue"]}
               onClick={handleSaveClick}
             >
-              Save & next
+              {designStep < 3? "Save & next": "Open 3D" }
             </Button>
           </div>
         )}
