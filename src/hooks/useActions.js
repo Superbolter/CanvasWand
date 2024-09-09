@@ -3,13 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setActiveRoomButton,
   setActiveRoomIndex,
+  setDesignStep,
   setExpandRoomNamePopup,
   setFactor,
   setPoints,
   setRoomDetails,
   setRoomEditingMode,
   setRoomName,
-  setRoomSelectorMode,
   setSelectedLinesState,
   setStoreBoxes,
   setStoreLines,
@@ -27,7 +27,6 @@ import {
   setLineBreakState,
   setMergeState,
   setRoomSelectors,
-  setScale,
   setUserHeight,
   setUserLength,
 } from "../features/drawing/drwingSlice";
@@ -43,7 +42,7 @@ export const useActions = () => {
     points,
     storeBoxes,
     selectionMode,
-    roomSelectorMode,
+    designStep,
     floorplanId,
   } = useSelector((state) => state.ApplicationState);
   const {
@@ -258,12 +257,12 @@ export const useActions = () => {
   };
 
   const handleSaveClick = () => {
-    if (!roomSelectorMode) {
+    if (designStep !== 3) {
       handleApiCall();
       if (!selectionMode) {
         toggleSelectionMode();
       }
-      dispatch(setRoomSelectorMode(true));
+      dispatch(setDesignStep(3));
       dispatch(showRoomNamePopup(true));
       dispatch(setShowPopup(false));
       dispatch(setContextualMenuStatus(false));
@@ -318,7 +317,7 @@ export const useActions = () => {
     const wfactor = INITIAL_BREADTH / userWidth;
     const hfactor = INITIAL_HEIGHT / height;
     dispatch(setFactor([lfactor, wfactor, hfactor]));
-    dispatch(setScale(false));
+    dispatch(setDesignStep(2));
     handleApiCall(height);
   };
 

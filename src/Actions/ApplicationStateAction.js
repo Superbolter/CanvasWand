@@ -1,6 +1,5 @@
-import { useDispatch } from "react-redux";
 import convert from "convert-units";
-import RomeDataManager, { fetchWrapper } from "../app/RomeDataManager";
+import { fetchWrapper } from "../app/RomeDataManager";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant";
 import * as THREE from "three";
 import {
@@ -8,16 +7,16 @@ import {
   setMeasured,
   setRightPosState,
   setRoomSelectors,
-  setScale,
   setUserHeight,
   setUserLength,
   setUserWidth,
 } from "../features/drawing/drwingSlice";
-import { type } from "@testing-library/user-event/dist/type";
 import { setContextualMenuStatus, setUndoStack } from "./DrawingActions";
 
 export const drawToolData = (floorplan_id) => {
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    const state = getState();
+    const designStep = state.ApplicationState.designStep;
     const formData = new FormData();
     formData.append("floorplan_id", floorplan_id); // Assuming 'token' is the expected field name
 
@@ -103,7 +102,9 @@ export const drawToolData = (floorplan_id) => {
           const wfactor = INITIAL_BREADTH / userWidth;
           const hfactor = INITIAL_HEIGHT / userHeight;
           dispatch(setFactor([lfactor, wfactor, hfactor]));
-          dispatch(setScale(false));
+          if(designStep === 1){
+            dispatch(setDesignStep(2));
+          }
         }
       })
       .catch((error) => {
@@ -279,15 +280,6 @@ export const setActiveRoomIndex = (value) => {
   };
 };
 
-export const setRoomSelectorMode = (value) => {
-  return (dispatch) => {
-    dispatch({
-      type: "SET_ROOM_SELECTOR_MODE",
-      payload: value,
-    });
-  };
-};
-
 export const setSelectionMode = (val) => {
   return (dispatch) => {
     dispatch({
@@ -305,3 +297,12 @@ export const setSelectedLinesState = (val) => {
     });
   };
 };
+
+export const setDesignStep = (val) => {
+  return (dispatch) => {
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      designStep: val
+    })
+  }
+}

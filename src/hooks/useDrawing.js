@@ -57,7 +57,6 @@ export const useDrawing = () => {
   const {
     perpendicularLine,
     measured,
-    scale,
     roomSelectors,
     lineBreak,
     merge,
@@ -79,12 +78,12 @@ export const useDrawing = () => {
     points,
     factor,
     storeBoxes,
-    roomSelectorMode,
     selectionMode,
     selectedLines,
     expandRoomPopup,
     roomEditingMode,
     activeRoomIndex,
+    designStep
   } = useSelector((state) => state.ApplicationState);
 
   const { toggleSelectionSplitMode } = useModes();
@@ -99,9 +98,6 @@ export const useDrawing = () => {
   const [draggingLineIndex, setDraggingLineIndex] = useState([]);
   const [draggingLine, setDraggingLine] = useState(null);
   const [doorWindowMode, setDoorWindowMode] = useState(false);
-  const [addOn, setaddOn] = useState(null);
-  const [isDraggingDoor, setIsDraggingDoor] = useState(false);
-  const [doorPosition, setDoorPosition] = useState([]);
   const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
   const [selectId, setId] = useState(null);
   const [lineClick, setLineClick] = useState(false);
@@ -114,15 +110,6 @@ export const useDrawing = () => {
   const setSelectedLines = (data) => {
     dispatch(setSelectedLinesState(data));
   };
-
-  const handlePointerDown = useCallback(
-    (event) => {
-      setIsDraggingDoor(true);
-      setDoorWindowMode(true);
-      event.stopPropagation();
-    },
-    [selectionMode, dragMode]
-  );
 
   function arePointsSimilar(point1, point2) {
     return point1.x === point2.x && point1.y === point2.y;
@@ -224,7 +211,6 @@ export const useDrawing = () => {
       updatedLine.splice(idx, 1, line1, line3, line2);
 
       dispatch(setStoreLines(updatedLine));
-      setIsDraggingDoor(false);
 
       dispatch(setSelectionMode(false));
       dispatch(setDragMode(false));
@@ -233,7 +219,6 @@ export const useDrawing = () => {
       }, 1000);
 
       event.stopPropagation();
-      setaddOn(false);
     },
     [selectionMode, dragMode, storeLines, factor, measured, dispatch]
   );
@@ -566,13 +551,13 @@ export const useDrawing = () => {
   };
 
   const handleMouseMove = (event) => {
-    if (roomSelectorMode && expandRoomPopup) {
+    if (designStep === 3 && expandRoomPopup) {
       if (!isSelecting) return;
       const end = screenToNDC(event.clientX, event.clientY);
       setEndPoint(end);
     }
     if (
-      (points.length === 0 || stop || newLine || doorWindowMode || scale) &&
+      (points.length === 0 || stop || newLine || doorWindowMode || designStep === 1) &&
       !dragMode
     )
       return; // No point to start from or not in perpendicular mode
@@ -596,21 +581,21 @@ export const useDrawing = () => {
         }
       }
     }
-    if(draggingLine){
-      dispatch(setContextualMenuStatus(false));
-      const line = storeLines[draggingLine];
-      const linePoints = line.points;
-      const lineLength = linePoints[1].distanceTo(linePoints[0]);
-      if(Math.abs(linePoints[0].x - linePoints[1].x) > Math.abs(linePoints[0].y - linePoints[1].y)){
-        const newStart = new Vector3(point.x - lineLength/2, point.y, 0);
-        const newEnd = new Vector3(point.x + lineLength/2, point.y, 0);
-        setCurrentLinePostion([newStart, newEnd]);
-      } else {
-        const newStart = new Vector3(point.x , point.y - lineLength/2, 0);
-        const newEnd = new Vector3(point.x, point.y + lineLength/2, 0);
-        setCurrentLinePostion([newStart, newEnd]);
-      }
-    }
+    // if(draggingLine){
+    //   dispatch(setContextualMenuStatus(false));
+    //   const line = storeLines[draggingLine];
+    //   const linePoints = line.points;
+    //   const lineLength = linePoints[1].distanceTo(linePoints[0]);
+    //   if(Math.abs(linePoints[0].x - linePoints[1].x) > Math.abs(linePoints[0].y - linePoints[1].y)){
+    //     const newStart = new Vector3(point.x - lineLength/2, point.y, 0);
+    //     const newEnd = new Vector3(point.x + lineLength/2, point.y, 0);
+    //     setCurrentLinePostion([newStart, newEnd]);
+    //   } else {
+    //     const newStart = new Vector3(point.x , point.y - lineLength/2, 0);
+    //     const newEnd = new Vector3(point.x, point.y + lineLength/2, 0);
+    //     setCurrentLinePostion([newStart, newEnd]);
+    //   }
+    // }
 
     if (perpendicularLine && draggingPointIndex === null) {
       point = calculateAlignedPoint(points[points.length - 1], point);
@@ -763,14 +748,14 @@ export const useDrawing = () => {
   },[selectedLines])
 
   const handleMouseDown = (event) => {
-    if (roomSelectorMode && expandRoomPopup) {
+    if (designStep === 3 && expandRoomPopup) {
       setIsSelecting(true);
       const start = screenToNDC(event.clientX, event.clientY);
       setStartPoint(start);
     }
     if (!dragMode) return;
 
-    if (!roomSelectorMode) {
+    if (designStep === 2) {
       const point = screenToNDC(event.clientX, event.clientY);
       const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10);
       if (pointIndex !== -1) {
@@ -805,7 +790,7 @@ export const useDrawing = () => {
   };
 
   const handleMouseUp = (event) => {
-    if (draggingPointIndex !== null && !roomSelectorMode) {
+    if (draggingPointIndex !== null && designStep === 2) {
       const point = screenToNDC(event.clientX, event.clientY);
       let beforeUpdation = points[draggingPointIndex];
       let updatedPoints = points.map((p) => {
@@ -842,7 +827,7 @@ export const useDrawing = () => {
 
       dispatch(setStoreLines(updatedLines));
     }
-    if(draggingLine !== null && !roomSelectorMode){
+    if(draggingLine !== null && designStep === 2){
       const updatedLines = storeLines.map((line, index) => {
         let updatedLine = { ...line }; // Shallow copy of the line object
         if (index === draggingLine) {
@@ -875,7 +860,7 @@ export const useDrawing = () => {
     setCurrentLinePostion(null);
     setDraggingLine(null);
 
-    if (roomSelectorMode && expandRoomPopup) {
+    if (designStep === 3 && expandRoomPopup) {
       if (!isSelecting) return;
       const selectedIds = [];
       if (startPoint && endPoint) {
@@ -928,7 +913,7 @@ export const useDrawing = () => {
       setSelectedLines([]);
       dispatch(setContextualMenuStatus(false));
       dispatch(setShowPopup(false));
-      if (roomSelectorMode) {
+      if (designStep === 3) {
         dispatch(setExpandRoomNamePopup(false));
         dispatch(setRoomDetails(""));
         dispatch(setRoomName(""));
@@ -938,7 +923,7 @@ export const useDrawing = () => {
       }
       return;
     }
-    if (selectionMode || doorWindowMode || merge || scale) return; // Prevent drawing new lines in selection mode
+    if (selectionMode || doorWindowMode || merge || designStep === 1) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
 
     let point = screenToNDC(event.clientX, event.clientY);
@@ -962,7 +947,7 @@ export const useDrawing = () => {
 
     if (newLine) {
       dispatch(setStop(!stop));
-      if (!roomSelectorMode) {
+      if (designStep === 2) {
         const pointToSend = [point?.x + 40, point?.y + 100, point?.z];
         dispatch(setContextualMenuStatus(true, pointToSend, "neutral"));
       }
@@ -990,7 +975,7 @@ export const useDrawing = () => {
     }
 
     if (points.length >= 1) {
-      if (!roomSelectorMode) {
+      if (designStep === 2) {
         const pointToSend = [point?.x + 40, point?.y + 100, point?.z];
         dispatch(setContextualMenuStatus(true, pointToSend, "neutral"));
       }
@@ -1177,7 +1162,7 @@ export const useDrawing = () => {
       }
     }
 
-    if (!lineBreak && !merge && !roomSelectorMode) {
+    if (!lineBreak && !merge && designStep === 2) {
       const line = storeLines.find((line) => line.id === id);
       let pointToSend = [0, 0, 0];
       let idx = 0;
@@ -1226,7 +1211,7 @@ export const useDrawing = () => {
         ? [...selectedLines, id]
         : [id];
       setSelectedLines(selected);
-      if (roomSelectorMode && roomEditingMode && activeRoomIndex >= 0) {
+      if (designStep === 3 && roomEditingMode && activeRoomIndex >= 0) {
         let newRooms = [...roomSelectors];
         newRooms[activeRoomIndex] = {
           ...newRooms[activeRoomIndex],
@@ -1326,14 +1311,11 @@ export const useDrawing = () => {
   };
 
   return {
-    addOn,
     currentMousePosition,
     currentLinePostion,
     draggingLine,
     currentStrightMousePosition,
     distance,
-    doorPosition,
-    isDraggingDoor,
     dimensions,
     nearPoint,
     nearVal,
@@ -1342,10 +1324,6 @@ export const useDrawing = () => {
     handleLineClick,
     handleMouseDown,
     handleMouseUp,
-    setDoorPosition,
-    setIsDraggingDoor, // New state setter
-    handlePointerDown,
-    handlePointerUp,
     setDimensions,
     deleteSelectedLines,
     deleteSelectedRoom,
@@ -1356,5 +1334,6 @@ export const useDrawing = () => {
     endPoint,
     setDraggingPointIndex,
     draggingLineIndex,
+    setCurrentLinePostion
   };
 };

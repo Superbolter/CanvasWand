@@ -9,12 +9,11 @@ import withReactContent from "sweetalert2-react-content";
 import { useDispatch, useSelector } from "react-redux";
 import {
   drawData,
-  setRoomSelectorMode,
+  setDesignStep,
   showRoomNamePopup,
   updateDrawData,
 } from "../../Actions/ApplicationStateAction.js";
 import { ArrowBack } from "@mui/icons-material";
-import { setScale } from "../../features/drawing/drwingSlice.js";
 import { Switch } from "@mui/material";
 import { setSeeDimensions } from "../../Actions/DrawingActions.js";
 import { useActions } from "../../hooks/useActions.js";
@@ -23,13 +22,12 @@ const MySwal = withReactContent(Swal);
 
 const DrawtoolHeader = ({ }) => {
   const dispatch = useDispatch();
-  const { roomSelectorMode } = useSelector((state) => state.ApplicationState);
-  const { scale } = useSelector((state) => state.drawing);
+  const { designStep } = useSelector((state) => state.ApplicationState);
   const { seeDimensions } = useSelector((state) => state.Drawing);
   const { undo, redo, handleReset, handleResetRooms, handleSaveClick} = useActions();
 
   const handleBackToScale = () => {
-    dispatch(setScale(true));
+    dispatch(setDesignStep(1));
     handleReset();
   };
 
@@ -53,7 +51,7 @@ const DrawtoolHeader = ({ }) => {
       backdrop: true,
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(setRoomSelectorMode(false));
+        dispatch(setDesignStep(2))
         dispatch(showRoomNamePopup(false));
         handleResetRooms();
       }
@@ -80,7 +78,7 @@ const DrawtoolHeader = ({ }) => {
         }}
       >
         <Typography modifiers={["medium", "black600"]} className="header-text">
-          {roomSelectorMode ? (
+          {designStep === 3 ? (
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <div
                 style={{
@@ -100,7 +98,7 @@ const DrawtoolHeader = ({ }) => {
               </div>
               <Typography>Define the rooms</Typography>
             </div>
-          ) : scale ? (
+          ) : designStep === 1 ? (
             "Select the accurate scale for your floor plan"
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -124,7 +122,7 @@ const DrawtoolHeader = ({ }) => {
             </div>
           )}
         </Typography>
-        {scale ? null : (
+        {designStep === 1 ? null : (
           <div style={{ display: "flex", gap: "8px" }}>
             <Button
               modifiers={["outlineBlack", "sm"]}
@@ -160,7 +158,7 @@ const DrawtoolHeader = ({ }) => {
           </div>
         )}
       </div>
-      {scale ? null : (
+      {designStep === 1 ? null : (
         <div className="dimension-setter">
           <Typography modifiers={["subtitle2"]}>Dimensions</Typography>
           <label class="switch">

@@ -14,7 +14,7 @@ const ButtonComponent = () => {
   const {lineBreak,merge} = useSelector((state) => state.drawing);
   const {typeId, showPropertiesPopup} = useSelector((state) => state.Drawing);
   const { selectedButton} = useSelector((state)=> state.drawing)
-  const {roomSelectorMode, selectionMode} = useSelector((state) => state.ApplicationState);
+  const {designStep, selectionMode} = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch()
   const {toggleSelectionMode , escape} = useModes();
 
@@ -45,7 +45,7 @@ const ButtonComponent = () => {
 
   return (
     <div>
-      <div className={showPropertiesPopup || lineBreak || merge || roomSelectorMode? "scrollable-container-hidden" : "scrollable-container"}>
+      <div className={showPropertiesPopup || lineBreak || merge || designStep !== 2? "scrollable-container-hidden" : "scrollable-container"}>
         <div className="scrollable-content">
           <Typography className='btn-heading-text' modifiers={['medium']}>Structures</Typography>
           <div className="grid-container">

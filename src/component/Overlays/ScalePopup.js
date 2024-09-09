@@ -10,7 +10,8 @@ import { useActions } from "../../hooks/useActions.js";
 
 const ScalePopup = () => {
   const dispatch = useDispatch();
-  const { scale, userLength, userWidth, measured } = useSelector((state) => state.drawing);
+  const { userLength, userWidth, measured } = useSelector((state) => state.drawing);
+  const { designStep } = useSelector((state) => state.ApplicationState)
   const [error, setError] = useState(false);
   const {handleDoubleClick} = useActions();
 
@@ -30,7 +31,7 @@ const ScalePopup = () => {
 
   return (
     <div>
-      <div className={scale? "scale-popup-container": "scale-popup-container-hidden"}>
+      <div className={designStep === 1 ? "scale-popup-container": "scale-popup-container-hidden"}>
         <div className="header-container">
           <Typography
             modifiers={["header6", "medium"]}

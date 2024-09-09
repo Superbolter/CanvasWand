@@ -21,7 +21,7 @@ import { useDrawing } from "../../hooks/useDrawing.js";
 const PropertiesPopup = ({}) => {
   const dispatch = useDispatch()
   const { lineBreak, merge } = useSelector((state) => state.drawing);
-  const { roomSelectorMode, selectionMode } = useSelector((state) => state.ApplicationState);
+  const { designStep, selectionMode } = useSelector((state) => state.ApplicationState);
   const { locked,typeId, showPropertiesPopup  } = useSelector((state) => state.Drawing);
   const { toggleSelectionSplitMode } = useModes();
   const {deleteSelectedLines, handleMergeClick} = useDrawing();
@@ -69,9 +69,9 @@ const PropertiesPopup = ({}) => {
     <div>
       <div
         className={
-          (showPropertiesPopup && !roomSelectorMode) ||
-          (lineBreak && !roomSelectorMode) ||
-          (merge && !roomSelectorMode)
+          (showPropertiesPopup && designStep === 2) ||
+          (lineBreak && designStep === 2) ||
+          (merge && designStep === 2)
             ? "popup-container"
             : "popup-container-hidden"
         }

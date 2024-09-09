@@ -8,9 +8,6 @@ import { setCameraContext } from "../../Actions/DrawingActions";
 const CameraController = ({
   zoom,
   setZoom,
-  scale,
-  userLength,
-  userWidth,
   isNeeded,
 }) => {
   const { camera } = useThree();
@@ -55,19 +52,6 @@ const CameraController = ({
     <OrbitControls
       ref={controlsRef}
       enableRotate={false}
-      enableZoom={
-        scale &&
-        !(
-          userLength === 0 ||
-          userWidth === 0 ||
-          userLength === undefined ||
-          userWidth === undefined ||
-          userLength === "" ||
-          userWidth === ""
-        )
-          ? false
-          : true
-      }
       minZoom={1}
       maxZoom={4.5}
       minPan={new THREE.Vector3(-100 * camera.zoom, -100 * camera.zoom, 0)}

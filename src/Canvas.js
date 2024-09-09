@@ -51,14 +51,13 @@ import convert from "convert-units";
 import ZoomComponent from "./component/CanvasOverLays/ZoomComponent.js";
 import useModes from "./hooks/useModes.js";
 import newCursor from "./assets/linedraw.png";
+import usePoints from "./hooks/usePoints.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
-  const { scale, snapActive } = useSelector((state) => state.drawing);
   const {
     handleClick,
     handleMouseMove,
-    addOn,
     handleLineClick,
     handleMouseDown,
     handleMouseUp,
@@ -67,12 +66,6 @@ export const CanvasComponent = () => {
     draggingLine,
     currentStrightMousePosition,
     distance,
-    doorPosition,
-    setDoorPosition,
-    isDraggingDoor,
-    setIsDraggingDoor,
-    handlePointerDown,
-    handlePointerUp,
     deleteSelectedLines,
     deleteSelectedRoom,
     nearPoint,
@@ -81,9 +74,11 @@ export const CanvasComponent = () => {
     startPoint,
     endPoint,
     draggingLineIndex,
+    setCurrentLinePostion,
   } = useDrawing();
   const { undo, redo } = useActions();
   const { toggleSelectionMode, perpendicularHandler } = useModes();
+  const {screenToNDC} = usePoints();
 
   const {
     leftPos,
@@ -92,21 +87,20 @@ export const CanvasComponent = () => {
     lineBreak,
     perpendicularLine,
     linePlacementMode,
-    userLength,
-    userWidth,
     measured,
     idSelection,
     roomSelectors,
+    snapActive
   } = useSelector((state) => state.drawing);
   const {
     storeBoxes,
-    roomSelectorMode,
     selectionMode,
     selectedLines,
     storeLines,
     factor,
     points,
     activeRoomIndex,
+    designStep
   } = useSelector((state) => state.ApplicationState);
   const { typeId, stop, showSnapLine, snappingPoint } = useSelector(
     (state) => state.Drawing
@@ -167,7 +161,7 @@ export const CanvasComponent = () => {
       event.key === "escape" ||
       (event.key === "Escape" && !merge && !lineBreak)
     ) {
-      if (!roomSelectorMode) {
+      if (designStep === 2) {
         dispatch(setShowPopup(false));
         toggleSelectionMode();
       } else if (!selectionMode) {
@@ -178,7 +172,7 @@ export const CanvasComponent = () => {
       }
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
-      if (roomSelectorMode && activeRoomIndex !== -1) {
+      if (designStep === 3 && activeRoomIndex !== -1) {
         deleteSelectedRoom();
       } else {
         deleteSelectedLines();
@@ -212,7 +206,7 @@ export const CanvasComponent = () => {
     leftPos,
     rightPos,
     storeBoxes,
-    roomSelectorMode,
+    designStep,
     perpendicularLine,
     snapActive,
     linePlacementMode,
@@ -241,7 +235,7 @@ export const CanvasComponent = () => {
     shape.lineTo(p1.x, p1.y);
     return shape;
   };
-
+  const [test, setTest] = useState(null);
   const handleLineMove = (point) => {
     const line = storeLines[draggingLine];
       const linePoints = line.points;
@@ -249,13 +243,30 @@ export const CanvasComponent = () => {
       if(Math.abs(linePoints[0].x - linePoints[1].x) > Math.abs(linePoints[0].y - linePoints[1].y)){
         const newStart = new Vector3(point.x - lineLength/2, point.y, 0);
         const newEnd = new Vector3(point.x + lineLength/2, point.y, 0);
-        return [newStart, newEnd];
+        setTest([newStart, newEnd]);
+        setCurrentLinePostion([newStart, newEnd]);
       } else {
         const newStart = new Vector3(point.x , point.y - lineLength/2, 0);
         const newEnd = new Vector3(point.x, point.y + lineLength/2, 0);
-        return [newStart, newEnd];
+        setTest([newStart, newEnd]);
+        setCurrentLinePostion([newStart, newEnd]);
       }
   }
+
+  useEffect(()=>{
+    const canvasContainer = document.querySelector(".canvas-container");
+    const handlePointerMove = (event)=>{
+      const point = screenToNDC(event.clientX, event.clientY);
+      if(draggingLine){
+        dispatch(setContextualMenuStatus(false));
+        handleLineMove(point);
+      }
+    }
+    canvasContainer.addEventListener("pointermove", handlePointerMove);
+    return () => {
+      canvasContainer.removeEventListener("pointermove", handlePointerMove);
+    };
+  })
 
   return (
     <div className="container">
@@ -266,12 +277,12 @@ export const CanvasComponent = () => {
         onMouseUp={handleMouseUp}
         // onWheel={handleWheel}
         style={
-          scale
+          designStep === 1
             ? { cursor: "grab" }
             : lineBreak
             ? { cursor: `url(${blade}) 8 8, crosshair` }
             : selectionMode
-            ? roomSelectorMode
+            ? designStep === 3
               ? { cursor: "pointer" }
               : { cursor: "grab" }
             : { cursor: `url(${newCursor}) 16 16, crosshair` }
@@ -292,9 +303,6 @@ export const CanvasComponent = () => {
           <CameraController
             zoom={zoom}
             setZoom={setZoom}
-            scale={scale}
-            userLength={userLength}
-            userWidth={userWidth}
             isNeeded={isNeeded}
           />
 
@@ -320,22 +328,10 @@ export const CanvasComponent = () => {
           )}
           {nearPoint && lineBreak && <UpdateDistance nearVal={nearVal} />}
 
-          {scale && <Scale />}
-          {addOn && !scale && (
-            <DraggableDoor
-              doorPosition={doorPosition}
-              setDoorPosition={setDoorPosition}
-              setIsDraggingDoor={setIsDraggingDoor}
-              isDraggingDoor={isDraggingDoor}
-              handlePointerDown={handlePointerDown}
-              handlePointerUp={handlePointerUp}
-              setStoreLines={setStoreLines}
-              storeLines={storeLines}
-            />
-          )}
+          {designStep === 1 && <Scale />}
           <BackgroundImage />
           {/* Render lines in 2D view */}
-          {!scale &&
+          {designStep > 1 &&
             storeLines.map((line, index) => {
               const lineIndex = draggingLineIndex.find(
                 (line) => line.index === index
@@ -346,12 +342,12 @@ export const CanvasComponent = () => {
                   start={
                     lineIndex !== undefined && lineIndex.type === "start"
                       ? currentMousePosition
-                      : currentLinePostion && draggingLine === index ? currentLinePostion[0] :line.points[0]
+                      : test && draggingLine === index ? test[0] :line.points[0]
                   }
                   end={
                     lineIndex !== undefined && lineIndex.type === "end"
                       ? currentMousePosition
-                      : currentLinePostion && draggingLine === index ? currentLinePostion[1]:line.points[1]
+                      : test && draggingLine === index ? test[1]:line.points[1]
                   }
                   dimension={{ width: line.width, height: line.height }}
                   typeId={line.typeId}
@@ -360,14 +356,13 @@ export const CanvasComponent = () => {
                 />
               );
             })}
-          {/* {!scale && <BoxSegments lines={storeLines}/>} */}
-          {!scale && draggingLineIndex.length === 0 && !currentLinePostion &&(
+          {designStep > 1 && draggingLineIndex.length === 0 && !currentLinePostion &&(
             // <LineSegments lines={storeLines} />
             // <BoxSegments lines={storeLines} />
             <CappedLine lines={storeLines} />
           )}
 
-          {!scale && showSnapLine && snappingPoint.length > 0 && (
+          {designStep > 1 && showSnapLine && snappingPoint.length > 0 && (
             <Line
               points={[snappingPoint[1], snappingPoint[0]]}
               color="green"
@@ -375,7 +370,7 @@ export const CanvasComponent = () => {
             />
           )}
 
-          {!scale && currentMousePosition && points.length > 0 && !stop && (
+          {designStep > 1 && currentMousePosition && points.length > 0 && !stop && (
             <>
               <Line
                 points={[points[points.length - 1], currentMousePosition]}
@@ -431,7 +426,7 @@ export const CanvasComponent = () => {
               )}
             </>
           )}
-          {!scale &&
+          {designStep > 1 &&
             storeBoxes.map((box, index) => (
               <CreateFiller
                 key={index}
@@ -442,10 +437,9 @@ export const CanvasComponent = () => {
               />
             ))}
 
-          {!scale && <ContextualMenu />}
+          {designStep > 1 && <ContextualMenu />}
 
-          {!scale &&
-            roomSelectorMode &&
+          {designStep === 3 &&
             roomSelectors.map((room, index) => (
               <RoomFiller
                 key={room.roomId}
@@ -478,20 +472,9 @@ export const CanvasComponent = () => {
           />
         </Canvas>
         <DrawtoolHeader />
-
-        {scale &&
-        !(
-          userLength === 0 ||
-          userWidth === 0 ||
-          userLength === undefined ||
-          userWidth === undefined ||
-          userLength === "" ||
-          userWidth === ""
-        ) ? null : (
-          <ZoomComponent zoom={zoom} setZoom={setZoom} />
-        )}
+        <ZoomComponent zoom={zoom} setZoom={setZoom} />        
       </div>
-      {!scale ? (
+      {designStep > 1 ? (
         <div className="button-container">
           <div style={{ position: "relative" }}>
             <div

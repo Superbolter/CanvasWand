@@ -12,7 +12,6 @@ const initialState = {
   measured: "in",
   linePlacementMode: "midpoint",
   information: false,
-  scale:true,
   idSelection: [],
   widthChangeType: "between",
   type:"wall",
@@ -50,9 +49,6 @@ export const drawingSlice = createSlice({
           boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.25)'
         },
       });
-    },
-    setScale: (state, action) => {
-      state.scale = action.payload;
     },
     setRoomSelectors: (state, action) => {
       state.roomSelectors = action.payload;
@@ -124,8 +120,6 @@ export const {
   setLowerPoint,
   linePlacementMode, 
   setLinePlacementMode,
-  scale,
-  setScale,
   setSelectedButton,
   setLeftPosState,
   setRightPosState,

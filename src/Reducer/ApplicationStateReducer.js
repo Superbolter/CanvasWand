@@ -12,7 +12,6 @@ const initialState = {
     roomPopup:false,
     expandRoomPopup: false,
     storeBoxes: [],
-    roomSelectorMode: false,
     selectionMode: false,
     selectedLines: [],
     roomEditingMode: false,
@@ -20,6 +19,7 @@ const initialState = {
     selectedRoomType: "",
     activeRoomButton: "",
     activeRoomIndex: -1,
+    designStep: 1,
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {
@@ -74,12 +74,6 @@ const initialState = {
           ...state,
           expandRoomPopup:action.payload,
         };
-      case "SET_ROOM_SELECTOR_MODE":
-        return {
-          ...state,
-          roomSelectorMode:action.payload,
-        };
-      
       case "SET_SELECTION_MODE":
         return{
           ...state,

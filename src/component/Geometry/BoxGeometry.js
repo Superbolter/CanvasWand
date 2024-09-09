@@ -102,7 +102,7 @@ const BoxGeometry = ({
   const { measured, roomSelect, newline, linePlacementMode } = useSelector(
     (state) => state.drawing
   );
-  const { storeLines, factor, storeBoxes, points, roomSelectorMode, selectionMode } =
+  const { storeLines, factor, storeBoxes, points, designStep, selectionMode } =
     useSelector((state) => state.ApplicationState);
   const { seeDimensions } = useSelector((state) => state.Drawing);
 
@@ -303,7 +303,7 @@ const BoxGeometry = ({
   // State to manage the current texture
   const getTexture = () => {
     if (isSelected) return selectedTexture;
-    if (hovered && selectionMode && !roomSelectorMode) return newTexture; 
+    if (hovered && selectionMode && designStep === 2) return newTexture; 
     if (typeId === 1) return wallTexture;
     if (typeId === 2) return doorTexture;
     if (typeId === 3) return windowTexture;
