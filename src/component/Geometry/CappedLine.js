@@ -68,13 +68,14 @@ function CappedLine({ lines }) {
             {line.points.map((point, idx) => {
               const occurrences = countPointOccurrences(point, lines);
 
-              // Handle cap for angles
-              if (occurrences > 1 && idx < line.points.length - 1) {
+              // Handle cap for angles  
+              if (occurrences > 1) {
                 const prevLine = lines[index - 1];
+
                 if (prevLine) {
                   const angle = calculateAngleBetweenLines(
-                    { start: prevLine.points[prevLine.points.length - 2], end: prevLine.points[prevLine.points.length - 1] },
-                    { start: line.points[idx], end: line.points[idx + 1] }
+                    { start: prevLine.points[0], end: prevLine.points[1] },
+                    { start: line.points[0], end: line.points[1] }
                   );
 
                   // Only show the cap if the angle exceeds 15 degrees
@@ -82,10 +83,10 @@ function CappedLine({ lines }) {
                     return (
                       <mesh
                         key={`${index}-${idx}`}
-                        position={[point.x, point.y, point.z]}
+                        position={[point.x, point.y, - 1]}
                         geometry={capGeometry}
                       >
-                        <meshBasicMaterial map={wallTexture} transparent={true} opacity={0.9} />
+                        <meshBasicMaterial map={wallTexture} transparent={true} opacity={0.7} />
                       </mesh>
                     );
                   }

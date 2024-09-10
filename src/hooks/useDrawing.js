@@ -676,7 +676,7 @@ export const useDrawing = () => {
           if(lineIndex !== -1){
             const line = storeLines[lineIndex];
             let val = false;
-            if(Math.abs(line.points[0].x - line.points[1].x) < Math.abs(line.points[0].y - line.points[1].y) < 10){
+            if(Math.abs(line.points[0].x - line.points[1].x) > Math.abs(line.points[0].y - line.points[1].y)){
               val = Math.abs(line.points[0].y - point.y) < 10 || Math.abs(line.points[1].y - point.y) < 10;
             }else{
               val = Math.abs(line.points[0].x - point.x) < 10 || Math.abs(line.points[1].x - point.x) < 10;
@@ -728,17 +728,24 @@ export const useDrawing = () => {
       dispatch(setStoreLines(updatedLines));
     }
     if(draggingLine !== null && designStep === 2){
+      let pts = [];
+      storeLines.map((line) => {
+        const startPoint = line.points[0];
+        const endPoint = line.points[1];
+        if (startPoint && pts.find((pt) =>pt.x === startPoint.x && pt.y === startPoint.y && pt.z === startPoint.z) === undefined){
+          pts.push(startPoint);
+        }
+        if (endPoint && pts.find((pt) =>pt.x === endPoint.x && pt.y === endPoint.y && pt.z === endPoint.z) === undefined) {
+          pts.push(endPoint);
+        }
+      });
       var startPoint = currentLinePostion[0]; 
       var endPoint = currentLinePostion[1];
-      storeLines.map((line) => {
-        if(currentLinePostion[0].distanceTo(line.points[0]) < 15){
-          startPoint = line.points[0];
-        }else if(currentLinePostion[1].distanceTo(line.points[0]) < 15){
-          endPoint = line.points[0];
-        }else if(currentLinePostion[0].distanceTo(line.points[1]) < 15){
-          startPoint = line.points[1];
-        }else if(currentLinePostion[1].distanceTo(line.points[1]) < 15){
-          endPoint = line.points[1];
+      pts.map((pt) => {
+        if(currentLinePostion[0].distanceTo(pt) < 15){
+          startPoint=pt;
+        }else if(currentLinePostion[1].distanceTo(pt) < 15){
+          endPoint=pt;
         }
       });
       const updatedLines = storeLines.map((line, index) => {
