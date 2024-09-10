@@ -309,8 +309,8 @@ export const useDrawing = () => {
       factor,
       measured
     );
-    console.log("hello this is working");
-    console.log(pointUpper);
+    // console.log("hello this is working");
+    // console.log(pointUpper);
 
     // Dispatch the calculated points to the store
     dispatch(setUpperPoint(pointUpper));
@@ -492,10 +492,11 @@ export const useDrawing = () => {
     //   }
     // }
 
-    if (perpendicularLine && draggingPointIndex === null) {
+    if (perpendicularLine && draggingPointIndex === null && dragMode && points.length > 0) {
       point = calculateAlignedPoint(points[points.length - 1], point);
     }
-    if (!perpendicularLine && draggingPointIndex === null) {
+    if (!perpendicularLine && draggingPointIndex === null && dragMode && points.length > 0) {
+      alert(true)
       const position = calculateAlignedPoint(points[points.length - 1], point);
       setCurrentStrightMousePosition(position);
       const lastPoint = points[points.length - 1];
@@ -637,11 +638,6 @@ export const useDrawing = () => {
     // }
   };
 
-  const selectedLineRef = useRef(null);
-  useEffect(()=>{
-    selectedLineRef.current = selectedLines[0];
-  },[selectedLines])
-
   const handleMouseDown = (event) => {
     if (designStep === 3 && expandRoomPopup) {
       setIsSelecting(true);
@@ -678,7 +674,16 @@ export const useDrawing = () => {
       }else if(selectedLines.length > 0){
           const lineIndex = storeLines.findIndex((line) => line.id === selectedLines[0]);
           if(lineIndex !== -1){
-            setDraggingLine(lineIndex);
+            const line = storeLines[lineIndex];
+            let val = false;
+            if(Math.abs(line.points[0].x - line.points[1].x) < Math.abs(line.points[0].y - line.points[1].y) < 10){
+              val = Math.abs(line.points[0].y - point.y) < 10 || Math.abs(line.points[1].y - point.y) < 10;
+            }else{
+              val = Math.abs(line.points[0].x - point.x) < 10 || Math.abs(line.points[1].x - point.x) < 10;
+            }
+            if(val){
+              setDraggingLine(lineIndex);
+            }
           }
       }
     }

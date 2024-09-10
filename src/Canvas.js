@@ -238,7 +238,9 @@ export const CanvasComponent = () => {
     shape.lineTo(p1.x, p1.y);
     return shape;
   };
+  
   const [test, setTest] = useState(null);
+
   const handleLineMove = (point) => {
     const line = storeLines[draggingLine];
       const linePoints = line.points;
