@@ -728,6 +728,19 @@ export const useDrawing = () => {
       dispatch(setStoreLines(updatedLines));
     }
     if(draggingLine !== null && designStep === 2){
+      var startPoint = currentLinePostion[0]; 
+      var endPoint = currentLinePostion[1];
+      storeLines.map((line) => {
+        if(currentLinePostion[0].distanceTo(line.points[0]) < 15){
+          startPoint = line.points[0];
+        }else if(currentLinePostion[1].distanceTo(line.points[0]) < 15){
+          endPoint = line.points[0];
+        }else if(currentLinePostion[0].distanceTo(line.points[1]) < 15){
+          startPoint = line.points[1];
+        }else if(currentLinePostion[1].distanceTo(line.points[1]) < 15){
+          endPoint = line.points[1];
+        }
+      });
       const updatedLines = storeLines.map((line, index) => {
         let updatedLine = { ...line }; // Shallow copy of the line object
         if (index === draggingLine) {
@@ -735,17 +748,17 @@ export const useDrawing = () => {
           const beforeUpdation2 = line.points[1];
           let updatedPoints = points.map((p) => {
             if (p.equals(beforeUpdation1)) {
-              return currentLinePostion[0];
+              return startPoint;
             }else if(p.equals(beforeUpdation2)){
-              return currentLinePostion[1];
+              return endPoint;
             }
             return p;
           });
           dispatch(setPoints(updatedPoints));
           updatedLine = {
             ...updatedLine,
-            points: currentLinePostion,
-            length: convert(currentLinePostion[0].distanceTo(currentLinePostion[1]) * factor[0])
+            points: [startPoint, endPoint],
+            length: convert(startPoint.distanceTo(endPoint) * factor[0])
               .from(measured)
               .to("mm"),
           };
