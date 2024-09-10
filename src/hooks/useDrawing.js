@@ -492,11 +492,10 @@ export const useDrawing = () => {
     //   }
     // }
 
-    if (perpendicularLine && draggingPointIndex === null && dragMode && points.length > 0) {
+    if (perpendicularLine && draggingPointIndex === null && points.length > 0) {
       point = calculateAlignedPoint(points[points.length - 1], point);
     }
-    if (!perpendicularLine && draggingPointIndex === null && dragMode && points.length > 0) {
-      alert(true)
+    if (!perpendicularLine && draggingPointIndex === null && points.length > 0) {
       const position = calculateAlignedPoint(points[points.length - 1], point);
       setCurrentStrightMousePosition(position);
       const lastPoint = points[points.length - 1];
@@ -670,6 +669,7 @@ export const useDrawing = () => {
             updatedDraggingLineIndex.push(data);
           }
         });
+        setCurrentMousePosition(point);
         setDraggingLineIndex(updatedDraggingLineIndex);
       }else if(selectedLines.length > 0){
           const lineIndex = storeLines.findIndex((line) => line.id === selectedLines[0]);
