@@ -16,12 +16,7 @@ const convertToJSON = (lines, points,roomSelectors,storeBoxes) => {
             type:line.type,
             typeId: line.typeId
         })),
-        rooms: roomSelectors.map(room => ({
-            roomId: room.roomId,
-            roomName: room.roomName,
-            roomType: room.roomType,
-            wallIds: room.wallIds,
-        })),
+        rooms: roomSelectors,
         storeBoxes
     };
     return JSON.stringify(jsonData);

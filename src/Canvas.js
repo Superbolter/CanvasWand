@@ -362,7 +362,7 @@ export const CanvasComponent = () => {
           {designStep === 1 && <Scale />}
           <BackgroundImage />
           {/* Render lines in 2D view */}
-          {designStep > 1 &&
+          {designStep === 2 &&
             storeLines.map((line, index) => {
               const lineIndex = draggingLineIndex.find(
                 (line) => line.index === index
@@ -388,13 +388,13 @@ export const CanvasComponent = () => {
                 />
               );
             })}
-          {designStep > 1 && draggingLineIndex.length === 0 && !currentLinePostion &&(
+          {designStep === 2 && draggingLineIndex.length === 0 && !currentLinePostion &&(
             // <LineSegments lines={storeLines} />
             // <BoxSegments lines={storeLines} />
             <CappedLine lines={storeLines} />
           )}
 
-          {designStep > 1 && showSnapLine && snappingPoint.length > 0 && (
+          {designStep === 2 && showSnapLine && snappingPoint.length > 0 && (
             <Line
               points={[snappingPoint[1], snappingPoint[0]]}
               color="green"
@@ -402,7 +402,7 @@ export const CanvasComponent = () => {
             />
           )}
 
-          {designStep > 1 && currentMousePosition && points.length > 0 && !stop && (
+          {designStep === 2 && currentMousePosition && points.length > 0 && !stop && (
             <>
               <Line
                 points={[points[points.length - 1], currentMousePosition]}
@@ -459,7 +459,7 @@ export const CanvasComponent = () => {
               )}
             </>
           )}
-          {designStep > 1 &&
+          {designStep === 2 &&
             storeBoxes.map((box, index) => (
               <CreateFiller
                 key={index}
@@ -476,6 +476,7 @@ export const CanvasComponent = () => {
             roomSelectors.map((room, index) => (
               <RoomFiller
                 key={room.roomId}
+                polygon={room.polygon}
                 roomName={room.roomName}
                 roomType={room?.roomType}
                 wallIds={room.wallIds}

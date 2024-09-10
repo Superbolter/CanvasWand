@@ -1,22 +1,30 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { extend } from "@react-three/fiber";
 import { Shape, ShapeGeometry, MeshBasicMaterial, Vector3, Box3 } from "three";
-import { Html } from "@react-three/drei";
+import { Html, Line } from "@react-three/drei";
 import { useDrawing } from "../../hooks/useDrawing";
 import { useDispatch, useSelector } from "react-redux";
-import { setActiveRoomIndex, setExpandRoomNamePopup, setRoomDetails, setRoomEditingMode, setRoomName, setSelectedLinesState } from "../../Actions/ApplicationStateAction";
+import {
+  setActiveRoomIndex,
+  setExpandRoomNamePopup,
+  setRoomDetails,
+  setRoomEditingMode,
+  setRoomName,
+  setSelectedLinesState,
+} from "../../Actions/ApplicationStateAction";
 import { Check } from "@mui/icons-material";
+import DraggablePoint from "./DraggablePoints";
+import { setRoomSelectors } from "../../features/drawing/drwingSlice";
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
 
-const sortPointsClockwise = (points) => {
-  const centroid = getCentroid(points);
-  return points.sort((a, b) => {
-    const angleA = Math.atan2(a.y - centroid.y, a.x - centroid.x);
-    const angleB = Math.atan2(b.y - centroid.y, b.x - centroid.x);
-    return angleA - angleB;
+const getPointsFromArray = (points) => {
+  const newPoints = [];
+  points.map((point) => {
+    newPoints.push(new Vector3(point[0], point[1], point[2] || 0));
   });
+  return newPoints;
 };
 
 const createShape = (points) => {
@@ -46,37 +54,37 @@ const calculateBoundingBox = (points) => {
   return box;
 };
 
-const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
-  const {selectedRoomName, activeRoomButton,storeLines, points} = useSelector((state) => state.ApplicationState);
+const updateSharedPoints = (rooms, draggedPoint, newPosition) => {
+  return rooms.map((room) => ({
+    ...room,
+    polygon: room.polygon.map((point) =>
+      point[0] === draggedPoint.x && point[1] === draggedPoint.y
+        ? [newPosition.x, newPosition.y]
+        : point
+    ),
+  }));
+};
+
+const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
+  const { selectedRoomName, activeRoomButton, storeLines, points } =
+    useSelector((state) => state.ApplicationState);
+  const { roomSelectors } = useSelector((state) => state.drawing);
   const dispatch = useDispatch();
 
-  const roomPoints = useMemo(() => {
-    let pts = [];
-    wallIds.forEach((id) => {
-      const line = storeLines.find((line) => line.id === id);
-      if (line) {
-        const startPoint = line.points[0];
-        const endPoint = line.points[1];
-        if (startPoint && pts.find((pt) =>pt.x === startPoint.x && pt.y === startPoint.y && pt.z === startPoint.z) === undefined){
-          pts.push(startPoint);
-        }
-        if (endPoint && pts.find((pt) =>pt.x === endPoint.x && pt.y === endPoint.y && pt.z === endPoint.z) === undefined) {
-          pts.push(endPoint);
-        }
-      }
-    });
-    return pts;
-  }, [wallIds, storeLines, points]);
-
-  if (roomPoints.length < 3) {
-    console.error("Not enough points to form a shape", roomPoints);
-    return null;
-  }
+  const handleDragPoint = (newPosition, draggedPoint) => {
+    // Update the shared points in all rooms
+    const updatedRooms = updateSharedPoints(
+      roomSelectors,
+      draggedPoint,
+      newPosition
+    );
+    dispatch(setRoomSelectors(updatedRooms));
+  };
 
   const handleRoomClick = (e) => {
-    if(activeRoomButton === "add") return;
+    if (activeRoomButton === "add") return;
     e.stopPropagation();
-    if(selectedRoomName === roomName) {
+    if (selectedRoomName === roomName) {
       dispatch(setSelectedLinesState([]));
       dispatch(setExpandRoomNamePopup(false));
       dispatch(setRoomEditingMode(false));
@@ -91,12 +99,15 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
     dispatch(setRoomName(roomName));
     dispatch(setRoomDetails(roomType));
     dispatch(setActiveRoomIndex(index));
-  }
-
-  const sortedPoints = sortPointsClockwise(roomPoints);
+  };
+  const sortedPoints = getPointsFromArray(polygon);
   const shape = createShape(sortedPoints);
   const geometry = new ShapeGeometry(shape);
-  const material = new MeshBasicMaterial({ color: "#4B73EC", transparent: true , opacity: 0.1});
+  const material = new MeshBasicMaterial({
+    color: "#4B73EC",
+    transparent: true,
+    opacity: 0.1,
+  });
 
   const centroid = getCentroid(sortedPoints);
   const boundingBox = calculateBoundingBox(sortedPoints);
@@ -111,36 +122,90 @@ const RoomFiller = ({ roomName, roomType, wallIds, index }) => {
       <mesh>
         <shapeGeometry attach="geometry" args={[shape]} />
         <meshBasicMaterial attach="material" args={[material]} />
-        {activeRoomButton === "divide" ? null:  
-      <Html
-        position={[centroid.x - fontSize, centroid.y, centroid.z]}
-        zIndexRange={[0, 0]}
-        style={{zIndex:"12"}}
-      >
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          padding: "8px 12px",
-          backgroundColor: selectedRoomName === roomName? "#4B73EC":"white",
-          borderRadius: "8px",
-          width: "max-content",
-          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
-          fontFamily: "'DM Sans', sans-serif",
-          fontWeight: "500",
-          fontSize: fontSize < 18? (fontSize > 9? fontSize: "9px"): "18px",
-          color: selectedRoomName === roomName? "white":roomType!==null? "#4B73EC":"black", 
-          border: selectedRoomName === roomName || roomType!==null? "2px solid #4B73EC":"0.7px solid #B6BABD",
-          pointerEvents: activeRoomButton === "add" ? "none":"auto",
-          opacity: activeRoomButton === "add"? 0.5: 1,
-        }}
-          onClick={handleRoomClick}
-        >
-          {roomType!==null && selectedRoomName !== roomName ? <Check sx={{color: "#4B73EC", fontSize: fontSize < 18? (fontSize > 9? fontSize + 4: "9px"): "18px", marginRight: "4px"}} /> : null}
-          {roomName}
-        </div>
-      </Html>
-      }
+        {activeRoomButton === "divide" ? null : (
+          <Html
+            position={[centroid.x - fontSize, centroid.y, centroid.z]}
+            zIndexRange={[0, 0]}
+            style={{ zIndex: "12" }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "8px 12px",
+                backgroundColor:
+                  selectedRoomName === roomName ? "#4B73EC" : "white",
+                borderRadius: "8px",
+                width: "max-content",
+                boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+                fontFamily: "'DM Sans', sans-serif",
+                fontWeight: "500",
+                fontSize:
+                  fontSize < 18 ? (fontSize > 9 ? fontSize : "9px") : "18px",
+                color:
+                  selectedRoomName === roomName
+                    ? "white"
+                    : roomType !== null && roomType !== ""
+                    ? "#4B73EC"
+                    : "black",
+                border:
+                  selectedRoomName === roomName || (roomType !== null && roomType !== "")
+                    ? "2px solid #4B73EC"
+                    : "0.7px solid #B6BABD",
+                pointerEvents: activeRoomButton === "add" ? "none" : "auto",
+                opacity: activeRoomButton === "add" ? 0.5 : 1,
+              }}
+              onClick={handleRoomClick}
+            >
+              {roomType !== null && selectedRoomName !== roomName && roomType!== ""? (
+                <Check
+                  sx={{
+                    color: "#4B73EC",
+                    fontSize:
+                      fontSize < 18
+                        ? fontSize > 9
+                          ? fontSize + 4
+                          : "9px"
+                        : "18px",
+                    marginRight: "4px",
+                  }}
+                />
+              ) : null}
+              {roomName}
+            </div>
+          </Html>
+        )}
       </mesh>
+      {sortedPoints.map((point, index) => (
+        <>
+          <DraggablePoint
+            key={index}
+            index={index}
+            point={point}
+            onDrag={(newPosition) => handleDragPoint(newPosition, point)}
+          />
+          {index < sortedPoints.length - 1 ? (
+            <Line
+              points={[
+                [point.x, point.y, 0],
+                [sortedPoints[index + 1].x, sortedPoints[index + 1].y, 0],
+              ]}
+              color="blue"
+              lineWidth={2}
+            />
+          ) : null}
+          {index === sortedPoints.length - 1 ? (
+            <Line
+              points={[
+                [point.x, point.y, 0],
+                [sortedPoints[0].x, sortedPoints[0].y, 0],
+              ]}
+              color="blue"
+              lineWidth={2}
+            />
+          ) : null}
+        </>
+      ))}
     </>
   );
 };

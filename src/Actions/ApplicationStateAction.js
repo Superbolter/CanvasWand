@@ -72,6 +72,7 @@ export const drawToolData = (floorplan_id) => {
               (point) => new THREE.Vector3(point.x, point.y, point.z)
             );
         }
+        console.log(drawData)
         dispatch(setStoreLines(lines));
         dispatch(setPoints(point));
         dispatch(setRoomSelectors(drawData.rooms));

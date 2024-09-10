@@ -137,10 +137,10 @@ export const useDrawing = () => {
       length: convert(startPoint.distanceTo(newPoint) * factor[0])
         .from(measured)
         .to("mm"),
-      width: (1/factor[0]) * userWidth,
-      // width: convert(INITIAL_BREADTH / factor[1])
-      //   .from(measured)
-      //   .to("mm"),
+      // width: (1/factor[0]) * userWidth,
+      width: convert(INITIAL_BREADTH / factor[1])
+        .from(measured)
+        .to("mm"),
       height: convert(INITIAL_HEIGHT / factor[2])
         .from(measured)
         .to("mm"),
@@ -457,6 +457,7 @@ export const useDrawing = () => {
     )
       return; // No point to start from or not in perpendicular mode
     // if(roomSelectorMode) return;
+    if(designStep === 3) return;
 
     let point = screenToNDC(event.clientX, event.clientY);
 
@@ -840,11 +841,13 @@ export const useDrawing = () => {
         dispatch(setRoomEditingMode(false));
         dispatch(setActiveRoomButton(""));
         dispatch(setActiveRoomIndex(-1));
+        
       }
       return;
     }
     if (selectionMode || merge || designStep === 1) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
+    
 
     let point = screenToNDC(event.clientX, event.clientY);
 

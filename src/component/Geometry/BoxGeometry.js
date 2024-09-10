@@ -139,10 +139,10 @@ const BoxGeometry = ({
   )
 
   const length = start.distanceTo(end);
-  // const width = convert(dimension.width * factor[1])
-  //   .from("mm")
-  //   .to(measured);
-  const width = isCustomised ? (1/factor[0]) * dimension.width :(1/factor[0]) * userWidth;
+  const width = convert(dimension.width * factor[1])
+    .from("mm")
+    .to(measured);
+  // const width = isCustomised ? (1/factor[0]) * dimension.width :(1/factor[0]) * userWidth;
 
   const midpoint = new Vector3().addVectors(start, end).multiplyScalar(0.5);
   const angle = Math.atan2(end.y - start.y, end.x - start.x);
