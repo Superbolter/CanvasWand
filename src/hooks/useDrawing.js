@@ -74,7 +74,8 @@ export const useDrawing = () => {
     dragMode,
     mergeLine,
     shiftPressed,
-    temporaryPolygon
+    temporaryPolygon,
+    enablePolygonSelection
   } = useSelector((state) => state.Drawing);
   const {
     storeLines,
@@ -641,7 +642,7 @@ export const useDrawing = () => {
 
   const handleMouseDown = (event) => {
     if (designStep === 3 && expandRoomPopup) {
-      setIsSelecting(true);
+      setIsSelecting(false);
       const start = screenToNDC(event.clientX, event.clientY);
       setStartPoint(start);
     }
@@ -850,7 +851,7 @@ export const useDrawing = () => {
 
     let point = screenToNDC(event.clientX, event.clientY);
 
-    if(designStep ===3 && activeRoomButton === "add" && expandRoomPopup){
+    if(designStep ===3 && enablePolygonSelection){
       const polygon = [...temporaryPolygon];
       polygon.push(point);
       dispatch(updateTemoraryPolygon(polygon));
@@ -1093,6 +1094,15 @@ export const useDrawing = () => {
   }, [lineClick]);
 
   const handleLineClick = (event, id) => {
+    if(designStep === 3){
+      if(activeRoomButton === "add"){
+        if(enablePolygonSelection){
+          return
+        }
+      }else{
+        return
+      }
+    }
     setLineClick(true);
     let storeid = [];
     if (merge) {

@@ -15,6 +15,7 @@ import {
 import { Check } from "@mui/icons-material";
 import DraggablePoint from "./DraggablePoints";
 import { setRoomSelectors } from "../../features/drawing/drwingSlice";
+import usePoints from "../../hooks/usePoints";
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -50,8 +51,8 @@ const updateSharedPoints = (rooms, draggedPoint, newPosition) => {
   return rooms.map((room) => ({
     ...room,
     polygon: room.polygon.map((point) =>
-      point[0] === draggedPoint.x && point[1] === draggedPoint.y
-        ? [newPosition.x, newPosition.y]
+      point.x === draggedPoint.x && point.y === draggedPoint.y
+        ? new Vector3(newPosition.x, newPosition.y, point.z || 0)
         : point
     ),
   }));
@@ -61,6 +62,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
   const { selectedRoomName, activeRoomButton, storeLines, points } =
     useSelector((state) => state.ApplicationState);
   const { roomSelectors } = useSelector((state) => state.drawing);
+  const { isPointInsidePolygon} = usePoints();
   const dispatch = useDispatch();
 
   const handleDragPoint = (newPosition, draggedPoint) => {
@@ -71,6 +73,13 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
       newPosition
     );
     dispatch(setRoomSelectors(updatedRooms));
+    const newLine = []
+      storeLines.map((line) => {
+        if(isPointInsidePolygon(polygon, line.points[0]) && isPointInsidePolygon(polygon, line.points[1])){
+          newLine.push(line.id)
+        }
+      })
+      dispatch(setSelectedLinesState(newLine));
   };
 
   const handleRoomClick = (e) => {
@@ -173,7 +182,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
           <DraggablePoint
             key={index}
             index={index}
-            point={point}
+            point={new Vector3(point.x, point.y, 0)}
             onDrag={(newPosition) => handleDragPoint(newPosition, point)}
           />
           {index < sortedPoints.length - 1 ? (

@@ -35,6 +35,7 @@ import ScalePopup from "./component/Overlays/ScalePopup.js";
 import blade from "./assets/blade.png";
 import {
   setContextualMenuStatus,
+  setEnablePolygonSelection,
   setNewLine,
   setShiftPressed,
   setShowPopup,
@@ -170,7 +171,10 @@ export const CanvasComponent = () => {
         dispatch(setShowPopup(false));
         dispatch(setTypeId(0))
         toggleSelectionMode();
-      } else if (!selectionMode) {
+      } else if(activeRoomButton === "add" && designStep === 3){
+        dispatch(setEnablePolygonSelection(!enablePolygonSelection))
+      } 
+      else if (!selectionMode) {
         dispatch(setNewLine(true));
         dispatch(setStop(true));
         dispatch(setShowSnapLine(false));
@@ -217,6 +221,7 @@ export const CanvasComponent = () => {
     snapActive,
     linePlacementMode,
     roomSelectors,
+    enablePolygonSelection
   ]);
 
   useEffect(() => {
@@ -340,7 +345,7 @@ export const CanvasComponent = () => {
             isNeeded={isNeeded}
           />
 
-          {isSelecting && startPoint && endPoint && (
+          {/* {isSelecting && startPoint && endPoint && (
             <mesh>
               <shapeGeometry
                 attach="geometry"
@@ -359,7 +364,7 @@ export const CanvasComponent = () => {
                 opacity={0.2}
               />
             </mesh>
-          )}
+          )} */}
           {nearPoint && lineBreak && <UpdateDistance nearVal={nearVal} />}
 
           {designStep === 1 && <Scale />}
@@ -487,7 +492,7 @@ export const CanvasComponent = () => {
               />
             ))}
           
-          {designStep===3 && enablePolygonSelection && temporaryPolygon.length> 0 && (
+          {designStep===3 && activeRoomButton === "add" && temporaryPolygon.length> 0 && (
             <TemporaryFiller polygon={temporaryPolygon} />
           )}
           {designStep === 3 && enablePolygonSelection && currentMousePosition && temporaryPolygon.length> 0 && (

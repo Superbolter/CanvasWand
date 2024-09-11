@@ -1,6 +1,11 @@
 import React from "react";
 import { Shape, ShapeGeometry, MeshBasicMaterial, Vector3, Box3 } from "three";
 import { Line } from "@react-three/drei";
+import DraggablePoint from "./DraggablePoints";
+import { useDispatch, useSelector } from "react-redux";
+import { updateTemoraryPolygon } from "../../Actions/DrawingActions";
+import { setSelectedLinesState } from "../../Actions/ApplicationStateAction";
+import usePoints from "../../hooks/usePoints";
 
 const createShape = (points) => {
   const shape = new Shape();
@@ -14,11 +19,31 @@ const createShape = (points) => {
 
 const TemporaryFiller = ({ polygon }) => {
   const shape = createShape(polygon);
+  const {storeLines} = useSelector((state) => state.ApplicationState);
+  const {isPointInsidePolygon} = usePoints();
+  const dispatch = useDispatch();
   const material = new MeshBasicMaterial({
     color: "#4B73EC",
     transparent: true,
     opacity: 0.1,
   });
+  const handleDragPoint = (newPosition, point) => {
+    const index = polygon.findIndex((p) => p.x === point.x && p.y === point.y);
+    const newPolygon = polygon.map((p, i) => {
+      if (i === index) {
+        return newPosition;
+      }
+      return p;
+    });
+    dispatch(updateTemoraryPolygon(newPolygon))
+    const newLine = []
+      storeLines.map((line) => {
+        if(isPointInsidePolygon(polygon, line.points[0]) && isPointInsidePolygon(polygon, line.points[1])){
+          newLine.push(line.id)
+        }
+      })
+    dispatch(setSelectedLinesState(newLine));
+  };
   return (
     <>
       <mesh>
@@ -27,10 +52,12 @@ const TemporaryFiller = ({ polygon }) => {
       </mesh>
       {polygon.map((point, index) => (
         <>
-          <mesh position={point}>
-            <sphereGeometry args={[6, 6, 32]} />
-            <meshBasicMaterial color="#4B73EC" />
-          </mesh>
+          <DraggablePoint
+            key={index}
+            index={index}
+            point={new Vector3(point.x, point.y, 0)}
+            onDrag={(newPosition) => handleDragPoint(newPosition, point)}
+          />
           {index < polygon.length - 1 ? (
             <Line
               points={[
