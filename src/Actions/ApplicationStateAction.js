@@ -18,7 +18,7 @@ export const drawToolData = (floorplan_id) => {
     const state = getState();
     const designStep = state.ApplicationState.designStep;
     const formData = new FormData();
-    formData.append("floorplan_id", floorplan_id); // Assuming 'token' is the expected field name
+    formData.append("floorplan_uuid", floorplan_id); // Assuming 'token' is the expected field name
 
     const requestOptions = {
       headers: {
@@ -33,6 +33,10 @@ export const drawToolData = (floorplan_id) => {
           type: "GET_DRAW_DATA",
           payload: response.data, // assuming the response contains some data you might need
         });
+        dispatch({
+          type:"UPDATE_APPLICATION_STATE",
+          floorplanId: floorplan_id,
+        })
         const drawData = JSON.parse(response.data.draw_data);
         let lines = [];
         let point = [];

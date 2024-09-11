@@ -27,7 +27,7 @@ const initialState = {
       case "GET_DRAW_DATA":
         return {
           ...state,
-          floorplanId:action.payload.id,
+          // floorplanId:action.payload.id,
           img:action.payload.image_uri,
           drawnBy:action.payload.drawed_by,
           workStatus:action.payload.work_status,

@@ -250,7 +250,7 @@ export const useActions = () => {
     };
     const data = handleDownload(lines, points, rooms, storeBoxes);
     const finalData = {
-      floorplan_id: floorplanId,
+      floorplan_uuid: floorplanId,
       draw_data: data,
       scale: scaleData,
     };
