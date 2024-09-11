@@ -40,6 +40,9 @@ export const getLineIntersection = (p1, p2, p3, p4,snapActive) => {
       intersection.distanceToSquared(p3) < tolerance ||
       intersection.distanceToSquared(p4) < tolerance
     ) {
+      if((p3.y - p1.y) * (p2.x - p1.x) - (p2.y - p1.y) * (p3.x - p1.x) === 0)
+      return p3;
+  
       return null;
     }
 
