@@ -53,6 +53,7 @@ import ZoomComponent from "./component/CanvasOverLays/ZoomComponent.js";
 import useModes from "./hooks/useModes.js";
 import newCursor from "./assets/linedraw.png";
 import usePoints from "./hooks/usePoints.js";
+import TemporaryFiller from "./component/Geometry/temporaryFiller.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -101,9 +102,11 @@ export const CanvasComponent = () => {
     factor,
     points,
     activeRoomIndex,
-    designStep
+    designStep,
+    expandRoomPopup,
+    activeRoomButton
   } = useSelector((state) => state.ApplicationState);
-  const { typeId, stop, showSnapLine, snappingPoint } = useSelector(
+  const { typeId, stop, showSnapLine, snappingPoint, temporaryPolygon, enablePolygonSelection } = useSelector(
     (state) => state.Drawing
   );
 
@@ -362,7 +365,7 @@ export const CanvasComponent = () => {
           {designStep === 1 && <Scale />}
           <BackgroundImage />
           {/* Render lines in 2D view */}
-          {designStep === 2 &&
+          {designStep > 1 &&
             storeLines.map((line, index) => {
               const lineIndex = draggingLineIndex.find(
                 (line) => line.index === index
@@ -483,6 +486,19 @@ export const CanvasComponent = () => {
                 index={index}
               />
             ))}
+          
+          {designStep===3 && enablePolygonSelection && temporaryPolygon.length> 0 && (
+            <TemporaryFiller polygon={temporaryPolygon} />
+          )}
+          {designStep === 3 && enablePolygonSelection && currentMousePosition && temporaryPolygon.length> 0 && (
+            <>
+              <Line
+                points={[temporaryPolygon[temporaryPolygon.length - 1], currentMousePosition]}
+                color="blue"
+                lineWidth={2}
+              /> 
+            </>
+          )}
 
           {/* 2D grid */}
           <Grid

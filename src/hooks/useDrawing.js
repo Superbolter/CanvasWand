@@ -43,6 +43,7 @@ import {
   setStop,
   setTypeId,
   setUndoStack,
+  updateTemoraryPolygon,
 } from "../Actions/DrawingActions.js";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -73,6 +74,7 @@ export const useDrawing = () => {
     dragMode,
     mergeLine,
     shiftPressed,
+    temporaryPolygon
   } = useSelector((state) => state.Drawing);
   const {
     storeLines,
@@ -84,11 +86,12 @@ export const useDrawing = () => {
     expandRoomPopup,
     roomEditingMode,
     activeRoomIndex,
-    designStep
+    designStep,
+    activeRoomButton
   } = useSelector((state) => state.ApplicationState);
 
   const { toggleSelectionSplitMode } = useModes();
-  const { screenToNDC } = usePoints();
+  const { screenToNDC, isPointInsidePolygon, arePointsSimilar } = usePoints();
 
   const [currentMousePosition, setCurrentMousePosition] = useState(null);
   const [currentLinePostion, setCurrentLinePostion] = useState(null);
@@ -110,10 +113,6 @@ export const useDrawing = () => {
   const setSelectedLines = (data) => {
     dispatch(setSelectedLinesState(data));
   };
-
-  function arePointsSimilar(point1, point2) {
-    return point1.x === point2.x && point1.y === point2.y;
-  }
 
   const addPoint = (newPoint, startPoint) => {
     const previousLines = [...storeLines];
@@ -447,8 +446,10 @@ export const useDrawing = () => {
 
   const handleMouseMove = (event) => {
     if (designStep === 3 && expandRoomPopup) {
+      const point = screenToNDC(event.clientX, event.clientY);
+      setCurrentMousePosition(point);
       if (!isSelecting) return;
-      const end = screenToNDC(event.clientX, event.clientY);
+      const end = point;
       setEndPoint(end);
     }
     if (
@@ -458,7 +459,6 @@ export const useDrawing = () => {
       return; // No point to start from or not in perpendicular mode
     // if(roomSelectorMode) return;
     if(designStep === 3) return;
-
     let point = screenToNDC(event.clientX, event.clientY);
 
     if (lineBreak) {
@@ -493,7 +493,7 @@ export const useDrawing = () => {
     //   }
     // }
 
-    if (perpendicularLine && draggingPointIndex === null && points.length > 0) {
+    if (perpendicularLine && draggingPointIndex === null && points.length > 0 && designStep !==3) {
       point = calculateAlignedPoint(points[points.length - 1], point);
     }
     if (!perpendicularLine && draggingPointIndex === null && points.length > 0) {
@@ -506,6 +506,7 @@ export const useDrawing = () => {
 
 
     setCurrentMousePosition(point);
+
 
     let cuuPoint = point;
     // Check for snapping
@@ -821,12 +822,14 @@ export const useDrawing = () => {
   const addRoom = (roomName, roomType) => {
     const room = {
       roomId: uniqueId(),
+      polygon: temporaryPolygon,
       roomName: roomName,
       roomType: roomType,
       wallIds: [...selectedLines],
     };
     dispatch(setRoomSelectors([...roomSelectors, room]));
     setSelectedLines([]);
+    dispatch(updateTemoraryPolygon([]))
   };
 
   const handleClick = (event) => {
@@ -841,15 +844,29 @@ export const useDrawing = () => {
         dispatch(setRoomEditingMode(false));
         dispatch(setActiveRoomButton(""));
         dispatch(setActiveRoomIndex(-1));
-        
       }
       return;
+    }
+
+    let point = screenToNDC(event.clientX, event.clientY);
+
+    if(designStep ===3 && activeRoomButton === "add" && expandRoomPopup){
+      const polygon = [...temporaryPolygon];
+      polygon.push(point);
+      dispatch(updateTemoraryPolygon(polygon));
+      const newLine = [...selectedLines]
+      storeLines.map((line) => {
+        if(isPointInsidePolygon(polygon, line.points[0]) && isPointInsidePolygon(polygon, line.points[1])){
+          newLine.push(line.id)
+        }
+      })
+      dispatch(setSelectedLinesState(newLine));
+      return
     }
     if (selectionMode || merge || designStep === 1) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
     
 
-    let point = screenToNDC(event.clientX, event.clientY);
 
     if (lineBreak) {
       if (findLineForPoint(point, storeLines, snapActive)) {

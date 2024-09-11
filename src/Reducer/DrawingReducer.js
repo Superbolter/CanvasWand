@@ -17,6 +17,8 @@ const initialState = {
     dragMode: false,
     mergeLine: [],
     shiftPressed: false,
+    temporaryPolygon: [],
+    enablePolygonSelection: false,
   };
   
   const DrawingReducer = (state = initialState, action) => {

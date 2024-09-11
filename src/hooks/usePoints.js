@@ -22,8 +22,41 @@ const usePoints = () => {
     return new THREE.Vector3(intersectionPoint.x, intersectionPoint.y, 0);
   };
 
+  const isPointInsidePolygon = (vertices, point) => {
+    const { x: x0, y: y0 } = point;
+    let windingNumber = 0;
+    const n = vertices.length;
+
+    for (let i = 0; i < n; i++) {
+      const { x: x1, y: y1 } = vertices[i];
+      const { x: x2, y: y2 } = vertices[(i + 1) % n];
+
+      // Calculate the angle between the point and the polygon edge
+      const angle1 = Math.atan2(y1 - y0, x1 - x0);
+      const angle2 = Math.atan2(y2 - y0, x2 - x0);
+      let diff = angle2 - angle1;
+
+      // Adjust for angles that cross the -π/π boundary
+      if (diff > Math.PI) {
+        diff -= 2 * Math.PI;
+      } else if (diff < -Math.PI) {
+        diff += 2 * Math.PI;
+      }
+
+      windingNumber += diff;
+    }
+
+    return Math.abs(windingNumber) > Math.PI; // Non-zero winding number means inside
+  }
+
+  function arePointsSimilar(point1, point2) {
+    return point1.x === point2.x && point1.y === point2.y;
+  }
+
   return {
     screenToNDC,
+    isPointInsidePolygon,
+    arePointsSimilar
   };
 };
 

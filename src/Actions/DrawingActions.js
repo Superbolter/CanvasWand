@@ -135,3 +135,13 @@ export const setShiftPressed = (val) => ({
   type: "UPDATE_DRAWING_STATE",
   shiftPressed: val
 })
+
+export const updateTemoraryPolygon = (val) => ({
+  type: "UPDATE_DRAWING_STATE",
+  temporaryPolygon: val
+})
+
+export const setEnablePolygonSelection = (val) => ({
+  type: "UPDATE_DRAWING_STATE",
+  enablePolygonSelection: val
+})

@@ -6,7 +6,9 @@ import "./PropertiesPopup.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setContextualMenuStatus,
+  setEnablePolygonSelection,
   setTypeId,
+  updateTemoraryPolygon,
 } from "../../Actions/DrawingActions.js";
 import {
   setActiveRoomButton,
@@ -84,6 +86,7 @@ const RoomNamePopup = () => {
     dispatch(setActiveRoomIndex(-1));
     dispatch(setSelectedLinesState([]));
     dispatch(setExpandRoomNamePopup(val));
+    dispatch(updateTemoraryPolygon([]))
   };
 
   const addRoomClick = () => {
@@ -91,9 +94,12 @@ const RoomNamePopup = () => {
       dispatch(setActiveRoomButton(""));
       setName("");
       handleReset(false);
+      dispatch(setEnablePolygonSelection(false))
+      dispatch(updateTemoraryPolygon([]))
       return;
     }
     dispatch(setActiveRoomButton("add"));
+    dispatch(setEnablePolygonSelection(true))
     dispatch(setTypeId(0));
     if (!selectionMode) {
       toggleSelectionMode();
@@ -111,6 +117,7 @@ const RoomNamePopup = () => {
       }
       return;
     }
+    dispatch(setEnablePolygonSelection(false))
     dispatch(setActiveRoomButton("divide"));
     dispatch(setTypeId(5));
     if (selectionMode) {
@@ -170,6 +177,7 @@ const RoomNamePopup = () => {
     dispatch(setRoomSelectors(newRooms));
     dispatch(setActiveRoomButton(""));
     handleReset(false);
+    dispatch(setEnablePolygonSelection(false))
   };
 
   useEffect(() => {

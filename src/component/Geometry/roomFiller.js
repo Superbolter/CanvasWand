@@ -19,14 +19,6 @@ import { setRoomSelectors } from "../../features/drawing/drwingSlice";
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
 
-const getPointsFromArray = (points) => {
-  const newPoints = [];
-  points.map((point) => {
-    newPoints.push(new Vector3(point[0], point[1], point[2] || 0));
-  });
-  return newPoints;
-};
-
 const createShape = (points) => {
   const shape = new Shape();
   shape.moveTo(points[0].x, points[0].y);
@@ -100,7 +92,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
     dispatch(setRoomDetails(roomType));
     dispatch(setActiveRoomIndex(index));
   };
-  const sortedPoints = getPointsFromArray(polygon);
+  const sortedPoints = polygon
   const shape = createShape(sortedPoints);
   const geometry = new ShapeGeometry(shape);
   const material = new MeshBasicMaterial({
