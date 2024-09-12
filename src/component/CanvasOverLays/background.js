@@ -22,10 +22,13 @@ const BackgroundImage = () => {
   },[screenHeight,screenWidth,aspectRatio])
 
   return (
+    image? 
     <mesh position={[0, 0, -3]}>
       <planeGeometry args={[fixedWidth, fixedHeight]}  />
       <meshBasicMaterial map={texture}  transparent = {0.9} opacity={0.8}/>
     </mesh>
+    : 
+    null
   );
 };
 

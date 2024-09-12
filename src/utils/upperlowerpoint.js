@@ -8,7 +8,7 @@ export const calculateUpperAndLowerPoints = (storeLines, factor, measured) => {
 
   
     storeLines.forEach((storeLine) => {
-      console.log("Hello i am storing point ");
+      // console.log("Hello i am storing point ");
       const start = storeLine.points[0];
       const end = storeLine.points[1];
       const width = convert(storeLine.width * factor[1])
