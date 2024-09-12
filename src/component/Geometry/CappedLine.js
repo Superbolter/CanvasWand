@@ -4,12 +4,13 @@ import Window from "../../assets/Window.png";
 import Door from "../../assets/Door.png";
 import Railing from "../../assets/Railing.png";
 import Wall from "../../assets/Walll.png";
+import newWall from "../../assets/newWall.jpeg";
 import { useSelector } from 'react-redux';
 
 function CappedLine({ lines }) {
   const textureLoader = useMemo(() => new THREE.TextureLoader(), []);
   const windowTexture = useMemo(() => textureLoader.load(Window), [textureLoader]);
-  const wallTexture = useMemo(() => textureLoader.load(Wall), [textureLoader]);
+  const wallTexture = useMemo(() => textureLoader.load(newWall), [textureLoader]);
   const railingTexture = useMemo(() => textureLoader.load(Railing), [textureLoader]);
   const doorTexture = useMemo(() => textureLoader.load(Door), [textureLoader]);
 

@@ -97,7 +97,7 @@ body, html {
   top: 86px;
   background-color: white;
   left: calc(100vw - 460px);
-  padding: 8px 8px 8px 8px;
+  padding: 8px 8px 8px 12px;
   border-radius: 24px;
   box-shadow: 0 3px 7px 0 #8F8F8F08;
   display: flex;
