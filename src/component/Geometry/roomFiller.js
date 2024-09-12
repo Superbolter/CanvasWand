@@ -59,7 +59,7 @@ const updateSharedPoints = (rooms, draggedPoint, newPosition) => {
 };
 
 const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
-  const { selectedRoomName, activeRoomButton, storeLines, points } =
+  const { selectedRoomName, activeRoomButton, storeLines, points, activeRoomIndex } =
     useSelector((state) => state.ApplicationState);
   const { roomSelectors } = useSelector((state) => state.drawing);
   const { isPointInsidePolygon} = usePoints();
@@ -73,13 +73,13 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
       newPosition
     );
     dispatch(setRoomSelectors(updatedRooms));
-    const newLine = []
-      storeLines.map((line) => {
-        if(isPointInsidePolygon(polygon, line.points[0]) && isPointInsidePolygon(polygon, line.points[1])){
-          newLine.push(line.id)
-        }
-      })
-      dispatch(setSelectedLinesState(newLine));
+    // const newLine = []
+    //   storeLines.map((line) => {
+    //     if(isPointInsidePolygon(polygon, line.points[0]) && isPointInsidePolygon(polygon, line.points[1])){
+    //       newLine.push(line.id)
+    //     }
+    //   })
+    //   dispatch(setSelectedLinesState(newLine));
   };
 
   const handleRoomClick = (e) => {
@@ -135,7 +135,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
                 alignItems: "center",
                 padding: "8px 12px",
                 backgroundColor:
-                  selectedRoomName === roomName ? "#4B73EC" : "white",
+                  activeRoomIndex === index ? "#4B73EC" : "white",
                 borderRadius: "8px",
                 width: "max-content",
                 boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
@@ -144,21 +144,22 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
                 fontSize:
                   fontSize < 18 ? (fontSize > 9 ? fontSize : "9px") : "18px",
                 color:
-                  selectedRoomName === roomName
+                  activeRoomIndex === index
                     ? "white"
                     : roomType !== null && roomType !== ""
                     ? "#4B73EC"
                     : "black",
                 border:
-                  selectedRoomName === roomName || (roomType !== null && roomType !== "")
+                activeRoomIndex === index || (roomType !== null && roomType !== "")
                     ? "2px solid #4B73EC"
                     : "0.7px solid #B6BABD",
                 pointerEvents: activeRoomButton === "add" ? "none" : "auto",
                 opacity: activeRoomButton === "add" ? 0.5 : 1,
+                cursor: "pointer",
               }}
               onClick={handleRoomClick}
             >
-              {roomType !== null && selectedRoomName !== roomName && roomType!== ""? (
+              {roomType !== null && activeRoomIndex !== index && roomType!== ""? (
                 <Check
                   sx={{
                     color: "#4B73EC",
@@ -179,12 +180,18 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
       </mesh>
       {sortedPoints.map((point, index) => (
         <>
+        {activeRoomIndex === index ?
           <DraggablePoint
             key={index}
             index={index}
             point={new Vector3(point.x, point.y, 0)}
             onDrag={(newPosition) => handleDragPoint(newPosition, point)}
-          />
+          />:
+          <mesh key={index} position={[point.x, point.y, 0]}>
+            <sphereGeometry args={[6, 6, 32]} />
+            <meshBasicMaterial color="#4B73EC" />
+          </mesh>
+        }
           {index < sortedPoints.length - 1 ? (
             <Line
               points={[

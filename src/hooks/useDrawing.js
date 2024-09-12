@@ -857,7 +857,7 @@ export const useDrawing = () => {
       dispatch(updateTemoraryPolygon(polygon));
       const newLine = [...selectedLines]
       storeLines.map((line) => {
-        if(isPointInsidePolygon(polygon, line.points[0]) && isPointInsidePolygon(polygon, line.points[1])){
+        if(isPointInsidePolygon(polygon, line.points[0]) || isPointInsidePolygon(polygon, line.points[1])){
           newLine.push(line.id)
         }
       })
@@ -1095,7 +1095,7 @@ export const useDrawing = () => {
 
   const handleLineClick = (event, id) => {
     if(designStep === 3){
-      if(activeRoomButton === "add"){
+      if(expandRoomPopup){
         if(enablePolygonSelection){
           return
         }

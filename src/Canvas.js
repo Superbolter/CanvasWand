@@ -321,8 +321,10 @@ export const CanvasComponent = () => {
             : lineBreak
             ? { cursor: `url(${blade}) 8 8, crosshair` }
             : selectionMode
-            ? designStep === 3
-              ? { cursor: "pointer" }
+            ? designStep === 3? 
+                enablePolygonSelection
+                ? { cursor:`url(${newCursor}) 16 16, crosshair`}
+                : { cursor: "default" }
               : { cursor: "grab" }
             : { cursor: `url(${newCursor}) 16 16, crosshair` }
         }
