@@ -730,7 +730,7 @@ export const useDrawing = () => {
 
       dispatch(setStoreLines(updatedLines));
     }
-    if(draggingLine !== null && designStep === 2){
+    if(draggingLine !== null && designStep === 2 && currentLinePostion){
       let pts = [];
       storeLines.map((line) => {
         const startPoint = line.points[0];
