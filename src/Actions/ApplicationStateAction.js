@@ -311,3 +311,12 @@ export const setDesignStep = (val) => {
     })
   }
 }
+
+export const setImageOpacity = (val) => {
+  return (dispatch) => {
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      imageOpacity: val
+    })
+  }
+}

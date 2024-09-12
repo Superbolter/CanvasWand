@@ -50,7 +50,7 @@ import { setSnapActive } from "./features/drawing/drwingSlice.js";
 import CameraController from "./component/Helpers/CameraController.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "./constant/constant.js";
 import convert from "convert-units";
-import ZoomComponent from "./component/CanvasOverLays/ZoomComponent.js";
+import BottomComponent from "./component/CanvasOverLays/BottomComponent.js";
 import useModes from "./hooks/useModes.js";
 import newCursor from "./assets/linedraw.png";
 import usePoints from "./hooks/usePoints.js";
@@ -530,7 +530,7 @@ export const CanvasComponent = () => {
           />
         </Canvas>
         <DrawtoolHeader />
-        <ZoomComponent zoom={zoom} setZoom={setZoom} />        
+        <BottomComponent zoom={zoom} setZoom={setZoom} />        
       </div>
       {designStep > 1 ? (
         <div className="button-container">

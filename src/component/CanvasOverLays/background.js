@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 
 const BackgroundImage = () => {
   const image=useSelector((state)=>state.ApplicationState.img);
+  const imageOpacity = useSelector((state)=>state.ApplicationState.imageOpacity);
   const texture = useLoader(TextureLoader, image? `https://${image}`: Image);
   const screenWidth = window.innerWidth * 0.7;
   const screenHeight = window.innerHeight * 0.7;
@@ -25,7 +26,7 @@ const BackgroundImage = () => {
     image? 
     <mesh position={[0, 0, -3]}>
       <planeGeometry args={[fixedWidth, fixedHeight]}  />
-      <meshBasicMaterial map={texture}  transparent = {0.9} opacity={0.8}/>
+      <meshBasicMaterial map={texture}  transparent = {imageOpacity === 1 ? false: true} opacity={imageOpacity}/>
     </mesh>
     : 
     null

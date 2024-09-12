@@ -115,7 +115,7 @@ const BoxGeometry = ({
     [textureLoader]
   );
   const wallTexture = useMemo(
-    () => textureLoader.load(newWall), // Replace with the path to your window image
+    () => textureLoader.load(Wall), // Replace with the path to your window image
     [textureLoader]
   );
   const railingTexture = useMemo(
@@ -306,9 +306,9 @@ const BoxGeometry = ({
 
   // State to manage the current texture
   const getTexture = () => {
+    if (isSelected) return selectedTexture;
     if (hovered && selectionMode && designStep === 2) return newTexture; 
     if (hovered && selectionMode && designStep === 3 && activeRoomIndex !== -1) return newTexture;
-    if (isSelected) return selectedTexture;
     if (typeId === 1) return wallTexture;
     if (typeId === 2) return doorTexture;
     if (typeId === 3) return windowTexture;

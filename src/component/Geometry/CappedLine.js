@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 function CappedLine({ lines }) {
   const textureLoader = useMemo(() => new THREE.TextureLoader(), []);
   const windowTexture = useMemo(() => textureLoader.load(Window), [textureLoader]);
-  const wallTexture = useMemo(() => textureLoader.load(newWall), [textureLoader]);
+  const wallTexture = useMemo(() => textureLoader.load(Wall), [textureLoader]);
   const railingTexture = useMemo(() => textureLoader.load(Railing), [textureLoader]);
   const doorTexture = useMemo(() => textureLoader.load(Door), [textureLoader]);
 

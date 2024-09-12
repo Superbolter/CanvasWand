@@ -20,6 +20,7 @@ const initialState = {
     activeRoomButton: "",
     activeRoomIndex: -1,
     designStep: 1,
+    imageOpacity: 0.8,
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {
