@@ -453,6 +453,11 @@ export const useDrawing = () => {
   };
 
   const handleMouseMove = (event) => {
+    if(designStep === 3 && activeRoomButton === "divide"){
+      const point = screenToNDC(event.clientX, event.clientY);
+      setCurrentMousePosition(point);
+      return
+    }
     if (designStep === 3 && expandRoomPopup) {
       const point = screenToNDC(event.clientX, event.clientY);
       setCurrentMousePosition(point);

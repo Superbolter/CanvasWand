@@ -123,7 +123,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
       <mesh>
         <shapeGeometry attach="geometry" args={[shape]} />
         <meshBasicMaterial attach="material" args={[material]} />
-        {activeRoomButton === "divide" ? null : (
+        {activeRoomButton === "divide" || (activeRoomIndex !== -1 && activeRoomIndex !== index) ? null : (
           <Html
             position={[centroid.x - fontSize, centroid.y, centroid.z]}
             zIndexRange={[0, 0]}
@@ -184,12 +184,12 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
           <DraggablePoint
             key={i}
             index={i}
-            point={new Vector3(point.x, point.y, 0)}
+            point={new Vector3(point.x, point.y, 5)}
             onDrag={(newPosition) => handleDragPoint(newPosition, point)}
           />:
           <mesh key={i} position={[point.x, point.y, 0]}>
             <sphereGeometry args={[6, 6, 32]} />
-            <meshBasicMaterial color="#4B73EC" />
+            <meshBasicMaterial color="skyblue" />
           </mesh>
         }
           {i < sortedPoints.length - 1 ? (

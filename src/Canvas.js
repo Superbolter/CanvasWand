@@ -420,7 +420,7 @@ export const CanvasComponent = () => {
             />
           )}
 
-          {designStep === 2 && currentMousePosition && points.length > 0 && !stop && (
+          {designStep > 1 && currentMousePosition && points.length > 0 && !stop && (
             <>
               <Line
                 points={[points[points.length - 1], currentMousePosition]}
