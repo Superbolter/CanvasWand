@@ -31,6 +31,18 @@
     transition:all 0.2s ease-in-out
 
 }
+.scale-popup-overlay{
+    display: flex;
+    flex-direction: column;
+    height: 353px;
+    width: 350px;
+    padding: 12px;
+    gap:16px;
+    border-radius: 16px;
+    border: 1px solid #ECECEC;
+    background-color: white;
+    transition:all 0.2s ease-in-out
+}
 .scale-popup-container{
     display: flex;
     flex-direction: column;

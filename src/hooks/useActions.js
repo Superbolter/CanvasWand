@@ -47,6 +47,7 @@ export const useActions = () => {
     selectionMode,
     designStep,
     floorplanId,
+    showSetScalePopup
   } = useSelector((state) => state.ApplicationState);
   const {
     lineBreak,
@@ -329,8 +330,14 @@ export const useActions = () => {
       dispatch(setUserLength(length));
       dispatch(setUserWidth(width));
     }
+    let left = leftPos;
+    let right = rightPos;
+    if(showSetScalePopup){
+      left = storeLines[0].points[0];
+      right = storeLines[0].points[1];
+    }
     dispatch(setUserHeight(height));
-    const lfactor = length / leftPos.distanceTo(rightPos);
+    const lfactor = length / left.distanceTo(right);
     const wfactor = INITIAL_BREADTH / width;
     const hfactor = INITIAL_HEIGHT / height;
     dispatch(setFactor([lfactor, wfactor, hfactor]));

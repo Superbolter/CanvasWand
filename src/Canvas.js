@@ -56,6 +56,7 @@ import newCursor from "./assets/linedraw.png";
 import usePoints from "./hooks/usePoints.js";
 import TemporaryFiller from "./component/Geometry/temporaryFiller.js";
 import cursor from "./assets/Default.png"
+import SetScalePopup from "./component/Popups/SetScalePopup.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -106,7 +107,8 @@ export const CanvasComponent = () => {
     activeRoomIndex,
     designStep,
     expandRoomPopup,
-    activeRoomButton
+    activeRoomButton,
+    showSetScalePopup
   } = useSelector((state) => state.ApplicationState);
   const { typeId, stop, showSnapLine, snappingPoint, temporaryPolygon, enablePolygonSelection } = useSelector(
     (state) => state.Drawing
@@ -514,7 +516,7 @@ export const CanvasComponent = () => {
             // cellSize={(1/factor[0]) * 10}
             cellThickness={0}
             cellColor="#FFFFFF"
-            sectionSize={ designStep ===1 ?  50 : (1/factor[0]) * gridFactor}
+            sectionSize={ designStep ===1 || showSetScalePopup ?  50 : (1/factor[0]) * gridFactor}
             //sectionThickness={1.5}
             sectionColor="#FFFFFF"
             fadeDistance={10000}
@@ -609,6 +611,7 @@ export const CanvasComponent = () => {
             <PropertiesPopup />
             <RoomNamePopup />
             <ButtonComponent />
+            {showSetScalePopup && <SetScalePopup/>}
           </div>
         </div>
       ) : (

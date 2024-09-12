@@ -323,3 +323,12 @@ export const setImageOpacity = (val) => {
     })
   }
 }
+
+export const setShowSetScalePopup = (val) => {
+  return (dispatch) => {
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      showSetScalePopup: val
+    })
+  }
+}

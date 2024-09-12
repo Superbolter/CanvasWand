@@ -10,13 +10,14 @@ import {
 import { Button } from "../../design_system/StyledComponents/components/Button.js";
 import LengthConverter from "./LengthConverter.js";
 import { useActions } from "../../hooks/useActions.js";
+import { setShowSetScalePopup } from "../../Actions/ApplicationStateAction.js";
 
 const ScalePopup = () => {
   const dispatch = useDispatch();
   const { userLength, userWidth, measured } = useSelector(
     (state) => state.drawing
   );
-  const { designStep } = useSelector((state) => state.ApplicationState);
+  const { designStep, showSetScalePopup } = useSelector((state) => state.ApplicationState);
   const [error, setError] = useState(false);
   const { handleDoubleClick } = useActions();
   const [lengthFoot, setLengthFoot] = useState(0);
@@ -47,6 +48,9 @@ const ScalePopup = () => {
       }
       handleDoubleClick(userLength, userWidth);
     }
+    if(showSetScalePopup){
+      dispatch(setShowSetScalePopup(false))
+    }
   };
 
   useEffect(() => {
@@ -59,6 +63,7 @@ const ScalePopup = () => {
     <div>
       <div
         className={
+          showSetScalePopup ? "scale-popup-overlay":
           designStep === 1
             ? "scale-popup-container"
             : "scale-popup-container-hidden"

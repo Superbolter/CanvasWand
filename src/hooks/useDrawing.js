@@ -30,6 +30,7 @@ import {
   setRoomName,
   setActiveRoomButton,
   setActiveRoomIndex,
+  setShowSetScalePopup,
 } from "../Actions/ApplicationStateAction.js";
 import {
   setContextualMenuStatus,
@@ -62,6 +63,7 @@ export const useDrawing = () => {
     lineBreak,
     merge,
     snapActive,
+    userLength,
     userWidth
   } = useSelector((state) => state.drawing);
   const {
@@ -88,7 +90,8 @@ export const useDrawing = () => {
     roomEditingMode,
     activeRoomIndex,
     designStep,
-    activeRoomButton
+    activeRoomButton,
+    img
   } = useSelector((state) => state.ApplicationState);
 
   const { toggleSelectionSplitMode } = useModes();
@@ -115,7 +118,7 @@ export const useDrawing = () => {
     dispatch(setSelectedLinesState(data));
   };
 
-  const addPoint = (newPoint, startPoint) => {
+  const addPoint = async (newPoint, startPoint) => {
     const previousLines = [...storeLines];
     const previousPoints = [...points];
     const previousBoxes = [...storeBoxes];
@@ -271,6 +274,10 @@ export const useDrawing = () => {
     });
 
     dispatch(setStoreLines(finalLines));
+    if(storeLines.length===0 && userLength === 0 && userWidth === 0 && !img){
+      dispatch(setShowSetScalePopup(true))
+      dispatch(setContextualMenuStatus(false))
+    }
     const history = [...actionHistory];
     history.push({
       type: "addPoint",

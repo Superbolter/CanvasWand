@@ -21,6 +21,7 @@ const initialState = {
     activeRoomIndex: -1,
     designStep: 1,
     imageOpacity: 0.8,
+    showSetScalePopup: false,
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {
