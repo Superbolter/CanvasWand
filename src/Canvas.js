@@ -286,7 +286,7 @@ export const CanvasComponent = () => {
     if(typeId === 0 && !selectionMode){
       toggleSelectionMode();
     }
-  },[typeId])
+  },[typeId, selectionMode])
 
   useEffect(()=>{
     switch(measured){
