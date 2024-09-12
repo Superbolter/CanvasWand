@@ -405,7 +405,7 @@ export const CanvasComponent = () => {
             <CappedLine lines={storeLines} />
           )}
 
-          {designStep === 2 && showSnapLine && snappingPoint.length > 0 && (
+          {designStep >1 && showSnapLine && snappingPoint.length > 0 && (
             <Line
               points={[snappingPoint[1], snappingPoint[0]]}
               color="green"

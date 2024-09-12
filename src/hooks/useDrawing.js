@@ -449,6 +449,47 @@ export const useDrawing = () => {
     if (designStep === 3 && expandRoomPopup) {
       const point = screenToNDC(event.clientX, event.clientY);
       setCurrentMousePosition(point);
+
+      let cuuPoint = point;
+      let newarr = [];
+      // Check for snapping
+      let snapFound = false;
+      roomSelectors.forEach((room, index) => {
+        const points = room.polygon;
+        for (let i = 0; i < points.length; i++) {
+          if (
+            Math.abs(points[i].x - point.x) < 2 
+            // points[points.length - 1].y !== points[i].y &&
+            // points[points.length - 1].x !== points[i].x &&
+            && enablePolygonSelection
+          ) {
+            cuuPoint.x = points[i].x;
+            newarr = [cuuPoint, new Vector3(points[i].x, points[i].y, 0)];
+            snapFound = true;
+            break;
+          } else if (
+            Math.abs(points[i].y - point.y) < 2 
+            // points[points.length - 1].y !== points[i].y &&
+            // points[points.length - 1].x !== points[i].x &&
+            && enablePolygonSelection
+          ) {
+            cuuPoint.y = points[i].y;
+            newarr = [cuuPoint, new Vector3(points[i].x, points[i].y, 0)];
+            snapFound = true;
+            break;
+          }
+        }
+      });
+      
+      if (!snapFound) {
+        dispatch(setSnappingPoint([]));
+      }else{
+        dispatch(setSnappingPoint(newarr));
+      }
+
+      dispatch(setShowSnapLine(snapFound));
+
+      
       if (!isSelecting) return;
       const end = point;
       setEndPoint(end);
@@ -459,6 +500,7 @@ export const useDrawing = () => {
     )
       return; // No point to start from or not in perpendicular mode
     // if(roomSelectorMode) return;
+
     if(designStep === 3) return;
     let point = screenToNDC(event.clientX, event.clientY);
 
@@ -853,7 +895,22 @@ export const useDrawing = () => {
 
     if(designStep ===3 && enablePolygonSelection){
       const polygon = [...temporaryPolygon];
-      polygon.push(point);
+      if(showSnapLine){
+        polygon.push(snappingPoint[0])
+      }else{
+        let cuuPoint = point;
+        roomSelectors.forEach((room) => {
+          const points = room.polygon;
+          for (let i = 0; i < points.length; i++) {
+            const currPoint = new Vector3(points[i].x, points[i].y, 0);
+            if (point.distanceTo(currPoint) < 10) {
+              cuuPoint = points[i];
+              break;
+            }
+          }
+        });
+        polygon.push(cuuPoint);
+      }
       dispatch(updateTemoraryPolygon(polygon));
       const newLine = [...selectedLines]
       storeLines.map((line) => {
