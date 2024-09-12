@@ -53,10 +53,21 @@ const usePoints = () => {
     return point1.x === point2.x && point1.y === point2.y;
   }
 
+  function decimalToFeetInches(decimalFeet) {
+    // Extract the whole number part (feet)
+    const feet = Math.floor(decimalFeet);
+  
+    // Extract the decimal part, then convert to inches
+    const inches = Math.round((decimalFeet - feet) * 12);
+  
+    return { feet, inches };
+  }
+
   return {
     screenToNDC,
     isPointInsidePolygon,
-    arePointsSimilar
+    arePointsSimilar,
+    decimalToFeetInches
   };
 };
 

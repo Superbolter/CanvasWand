@@ -11,6 +11,7 @@ import { Button } from "../../design_system/StyledComponents/components/Button.j
 import LengthConverter from "./LengthConverter.js";
 import { useActions } from "../../hooks/useActions.js";
 import { setShowSetScalePopup } from "../../Actions/ApplicationStateAction.js";
+import usePoints from "../../hooks/usePoints.js";
 
 const ScalePopup = () => {
   const dispatch = useDispatch();
@@ -20,6 +21,7 @@ const ScalePopup = () => {
   const { designStep, showSetScalePopup } = useSelector((state) => state.ApplicationState);
   const [error, setError] = useState(false);
   const { handleDoubleClick } = useActions();
+  const {decimalToFeetInches} = usePoints();
   const [lengthFoot, setLengthFoot] = useState(0);
   const [widthFoot, setWidthFoot] = useState(0);
   const [lengthInch, setLengthInch] = useState(0);
@@ -59,6 +61,17 @@ const ScalePopup = () => {
     }
   }, [userLength]);
 
+  useEffect(()=>{
+    if(measured === "ft"){
+      const length = decimalToFeetInches(userLength);
+      const width = decimalToFeetInches(userWidth);
+      setLengthFoot(length.feet);
+      setLengthInch(length.inches);
+      setWidthFoot(width.feet);
+      setWidthInch(width.inches);
+    }
+  },[userLength, userWidth, measured])
+
   return (
     <div>
       <div
@@ -91,7 +104,7 @@ const ScalePopup = () => {
                   size="small"
                   required={true}
                   value={lengthFoot !== "" ? lengthFoot : ""}
-                  onChange={(e) => setLengthFoot(e.target.value)}
+                  onChange={(e) => setLengthFoot(e.target.value? parseInt(e.target.value) : 0 )}
                   InputProps={{
                     style: {
                       fontSize: "16px",
@@ -111,7 +124,7 @@ const ScalePopup = () => {
                   size="small"
                   required={true}
                   value={lengthInch !== "" ? lengthInch : ""}
-                  onChange={(e) => {if(e.target.value.length <= 11) setLengthInch(e.target.value)}}
+                  onChange={(e) => {if(e.target.value.length <= 11) setLengthInch(e.target.value? parseInt(e.target.value) : 0)}}
                   InputProps={{
                     style: {
                       fontSize: "16px",
@@ -159,7 +172,7 @@ const ScalePopup = () => {
                   size="small"
                   required={true}
                   value={widthFoot !== "" ? widthFoot : ""}
-                  onChange={(e) => setWidthFoot(e.target.value)}
+                  onChange={(e) => setWidthFoot(e.target.value? parseInt(e.target.value) : 0)}
                   InputProps={{
                     style: {
                       fontSize: "16px",
@@ -179,7 +192,7 @@ const ScalePopup = () => {
                   size="small"
                   required={true}
                   value={widthInch !== "" ? widthInch : ""}
-                  onChange={(e) => {if(e.target.value <= 11) setWidthInch(e.target.value)}}
+                  onChange={(e) => {if(e.target.value <= 11) setWidthInch(e.target.value? parseInt(e.target.value) : 0)}}
                   InputProps={{
                     style: {
                       fontSize: "16px",

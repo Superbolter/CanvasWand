@@ -20,6 +20,7 @@ import Opening from "../../assets/Opening.png"
 import newWall from "../../assets/newWall.jpeg"
 import { setStoreBoxes } from "../../Actions/ApplicationStateAction";
 import cursor from "../../assets/Default.png"
+import usePoints from "../../hooks/usePoints";
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
 
@@ -108,6 +109,8 @@ const BoxGeometry = ({
   const { storeLines, factor, storeBoxes, points, designStep, selectionMode, activeRoomIndex } =
     useSelector((state) => state.ApplicationState);
   const { seeDimensions } = useSelector((state) => state.Drawing);
+
+  const {decimalToFeetInches} = usePoints();
 
   const textureLoader = useMemo(() => new TextureLoader(), []);
   const windowTexture = useMemo(
@@ -316,6 +319,10 @@ const BoxGeometry = ({
     if (typeId === 5) return hiddenWallTexture;
     return "";
   };
+  var feetLength = 0;
+  if(measured === "ft"){
+    feetLength = decimalToFeetInches(length * factor[0]);
+  }
 
   //linePlacementMode === "midpoint" ? adjustedMidpoint : middlepoint
   return (
@@ -360,7 +367,7 @@ const BoxGeometry = ({
           anchorX="center"
           anchorY="middle"
         >
-          {`${(length * factor[0]).toFixed(2)} ${measured}`}
+          { measured === "ft"? `${feetLength.feet}'${feetLength.inches} ${measured}`:`${(length * factor[0]).toFixed(2)} ${measured}`}
         </Text>
       )}
 

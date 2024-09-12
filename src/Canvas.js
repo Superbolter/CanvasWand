@@ -83,7 +83,7 @@ export const CanvasComponent = () => {
   } = useDrawing();
   const { undo, redo } = useActions();
   const { toggleSelectionMode, perpendicularHandler } = useModes();
-  const {screenToNDC} = usePoints();
+  const {screenToNDC, decimalToFeetInches} = usePoints();
 
   const {
     leftPos,
@@ -310,6 +310,11 @@ export const CanvasComponent = () => {
     }
   },[measured])
 
+  var feetLength = 0;
+  if(measured === "ft"){
+    feetLength = decimalToFeetInches(distance);
+  }
+
   return (
     <div className="container">
       <div
@@ -439,7 +444,7 @@ export const CanvasComponent = () => {
                 isCustomised={null}
                 onClick={() => {}}
               />
-              {currentStrightMousePosition && (
+              {currentStrightMousePosition && !perpendicularLine && (
                 <>
                   <Line
                     points={[points[points.length - 1], currentStrightMousePosition]}
@@ -466,7 +471,7 @@ export const CanvasComponent = () => {
                     fontSize={8}
                     fontWeight="bold"
                   >
-                    {`${distance.toFixed(2)} ${measured}`}
+                    { measured === "ft"? `${feetLength.feet}'${feetLength.inches} ${measured}`:`${distance.toFixed(2)} ${measured}`}
                   </Text>
                 </>
               )}

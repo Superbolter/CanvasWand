@@ -258,6 +258,7 @@ export const useActions = () => {
       userWidth: newWidth,
       userHeight: height,
       unitType: unit,
+      userUnit: measured,
     };
     const data = handleDownload(lines, points, rooms, storeBoxes);
     const finalData = {
