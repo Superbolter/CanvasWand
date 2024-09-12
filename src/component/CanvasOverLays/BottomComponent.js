@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setImageOpacity } from "../../Actions/ApplicationStateAction";
 
 const BottomComponent = ({ zoom, setZoom }) => {
-  const {imageOpacity} = useSelector((state) => state.ApplicationState);
+  const {imageOpacity, img} = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch();
   const [value, setValue] = useState(imageOpacity * 100); // Default value of 30%
 
@@ -48,29 +48,29 @@ const BottomComponent = ({ zoom, setZoom }) => {
           <ZoomInIcon />
         </button>
       </div>
-      <div className="slider-container">
-        <div className="slider-wrapper">
-          <input
-            type="range"
-            id="opacity-slider"
-            min="0"
-            max="100"
-            value={value}
-            className="opacity-slider"
-            onChange={handleSliderChange}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          />
-          {isHovered && (
-            <div className="tooltip" style={{ left: `${value}%` }}>
-              <Typography modifiers={["helpText"]}>{value}%</Typography>
-            </div>
-          )}
+      {img && (
+        <div className="slider-container">
+          <div className="slider-wrapper">
+            <input
+              type="range"
+              id="opacity-slider"
+              min="0"
+              max="100"
+              value={value}
+              className="opacity-slider"
+              onChange={handleSliderChange}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            />
+            {isHovered && (
+              <div className="tooltip" style={{ left: `${value}%` }}>
+                <Typography modifiers={["helpText"]}>{value}%</Typography>
+              </div>
+            )}
+          </div>
+          <Typography>Image opacity</Typography>
         </div>
-        <Typography>
-          Image opacity
-        </Typography>
-      </div>
+      )}
     </div>
   );
 };

@@ -30,11 +30,13 @@ import {
   setRoomSelectors,
   setUserHeight,
   setUserLength,
+  setUserWidth,
 } from "../features/drawing/drwingSlice";
 import { handleDownload } from "../component/Helpers/ConvertToJson.js";
 import { fetchWrapper } from "../app/RomeDataManager.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import { toast } from "react-hot-toast";
+import convert from "convert-units";
 
 export const useActions = () => {
   const { actionHistory, redoStack } = useSelector((state) => state.Drawing);
@@ -224,7 +226,7 @@ export const useActions = () => {
   const handleResetRooms = () => {
     const rooms = [];
     dispatch(setRoomSelectors(rooms));
-    handleApiCall(userHeight, rooms);
+    handleApiCall(userLength, userWidth,userHeight, rooms);
     dispatch(setExpandRoomNamePopup(false));
     dispatch(setRoomDetails(""));
     dispatch(setRoomName(""));
@@ -234,19 +236,27 @@ export const useActions = () => {
     dispatch(setSelectedLinesState([]));
   };
 
-  const handleApiCall = (height = userHeight, rooms = roomSelectors) => {
+  const handleApiCall = (length = userLength, width = userWidth,height = userHeight, rooms = roomSelectors) => {
     const lines = storeLines;
     const distance = Math.sqrt(
       (rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2
     );
+    let newLength = length;
+    let newWidth = width;
+    let unit = measured;
+    if(measured === "ft"){
+      newLength = convert(newLength).from("ft").to("in");
+      newWidth = convert(newWidth).from("ft").to("in");
+      unit = "in";
+    }
     const scaleData = {
       leftPos,
       rightPos,
       distance: distance,
-      unitLength: userLength,
-      userWidth: userWidth,
+      unitLength: newLength,
+      userWidth: newWidth,
       userHeight: height,
-      unitType: measured,
+      unitType: unit,
     };
     const data = handleDownload(lines, points, rooms, storeBoxes);
     const finalData = {
@@ -294,7 +304,7 @@ export const useActions = () => {
     }
   };
 
-  const handleDoubleClick = async () => {
+  const handleDoubleClick = async (length, width) => {
     let height = userHeight;
     switch (measured) {
       case "in":
@@ -315,14 +325,17 @@ export const useActions = () => {
       default:
         break;
     }
+    if(measured === "ft"){
+      dispatch(setUserLength(length));
+      dispatch(setUserWidth(width));
+    }
     dispatch(setUserHeight(height));
-    dispatch(setUserLength(userLength));
-    const lfactor = userLength / leftPos.distanceTo(rightPos);
-    const wfactor = INITIAL_BREADTH / userWidth;
+    const lfactor = length / leftPos.distanceTo(rightPos);
+    const wfactor = INITIAL_BREADTH / width;
     const hfactor = INITIAL_HEIGHT / height;
     dispatch(setFactor([lfactor, wfactor, hfactor]));
     dispatch(setDesignStep(2));
-    handleApiCall(height);
+    handleApiCall(length, width,height);
   };
 
   return {

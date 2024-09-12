@@ -514,7 +514,7 @@ export const CanvasComponent = () => {
             // cellSize={(1/factor[0]) * 10}
             cellThickness={0}
             cellColor="#FFFFFF"
-            sectionSize={(1/factor[0]) * gridFactor}
+            sectionSize={ designStep ===1 ?  50 : (1/factor[0]) * gridFactor}
             //sectionThickness={1.5}
             sectionColor="#FFFFFF"
             fadeDistance={10000}

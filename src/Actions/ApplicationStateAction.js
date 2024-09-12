@@ -111,6 +111,9 @@ export const drawToolData = (floorplan_id) => {
             dispatch(setDesignStep(2));
           }
         }
+        if(!response.data.image_uri){
+          dispatch(setDesignStep(2));
+        }
       })
       .catch((error) => {
         console.error("Error", error);
