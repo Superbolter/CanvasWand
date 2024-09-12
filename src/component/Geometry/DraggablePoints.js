@@ -4,6 +4,7 @@ import { useThree } from '@react-three/fiber';
 import usePoints from '../../hooks/usePoints';
 import { useSelector } from 'react-redux';
 import newCursor from "../../assets/linedraw.png";
+import cursor from "../../assets/Default.png"
 
 const DraggablePoint = ({ point, onDrag, index }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -29,7 +30,7 @@ const DraggablePoint = ({ point, onDrag, index }) => {
     if(enablePolygonSelection){
       document.getElementsByClassName('canvas-container')[0].style.cursor = `url(${newCursor}) 16 16, crosshair`
     }else{
-      document.getElementsByClassName('canvas-container')[0].style.cursor = "default"
+      document.getElementsByClassName('canvas-container')[0].style.cursor = `url(${cursor}) 8 8, default`
     }
   };
 
@@ -67,7 +68,7 @@ const DraggablePoint = ({ point, onDrag, index }) => {
       onPointerOut={() => { if(enablePolygonSelection){
         document.getElementsByClassName('canvas-container')[0].style.cursor = `url(${newCursor}) 16 16, crosshair`  
       }else{
-        document.getElementsByClassName('canvas-container')[0].style.cursor = "default"
+        document.getElementsByClassName('canvas-container')[0].style.cursor = `url(${cursor}) 8 8, default`
       }
     }}
     >

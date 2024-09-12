@@ -55,6 +55,7 @@ import useModes from "./hooks/useModes.js";
 import newCursor from "./assets/linedraw.png";
 import usePoints from "./hooks/usePoints.js";
 import TemporaryFiller from "./component/Geometry/temporaryFiller.js";
+import cursor from "./assets/Default.png"
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -324,7 +325,7 @@ export const CanvasComponent = () => {
             ? designStep === 3? 
                 enablePolygonSelection
                 ? { cursor:`url(${newCursor}) 16 16, crosshair`}
-                : { cursor: "default" }
+                : { cursor: `url(${cursor}) 8 8, default` }
               : { cursor: "grab" }
             : { cursor: `url(${newCursor}) 16 16, crosshair` }
         }

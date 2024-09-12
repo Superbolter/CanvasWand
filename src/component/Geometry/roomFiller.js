@@ -178,31 +178,31 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
           </Html>
         )}
       </mesh>
-      {sortedPoints.map((point, index) => (
+      {sortedPoints.map((point, i) => (
         <>
         {activeRoomIndex === index ?
           <DraggablePoint
-            key={index}
-            index={index}
+            key={i}
+            index={i}
             point={new Vector3(point.x, point.y, 0)}
             onDrag={(newPosition) => handleDragPoint(newPosition, point)}
           />:
-          <mesh key={index} position={[point.x, point.y, 0]}>
+          <mesh key={i} position={[point.x, point.y, 0]}>
             <sphereGeometry args={[6, 6, 32]} />
             <meshBasicMaterial color="#4B73EC" />
           </mesh>
         }
-          {index < sortedPoints.length - 1 ? (
+          {i < sortedPoints.length - 1 ? (
             <Line
               points={[
                 [point.x, point.y, 0],
-                [sortedPoints[index + 1].x, sortedPoints[index + 1].y, 0],
+                [sortedPoints[i + 1].x, sortedPoints[i + 1].y, 0],
               ]}
               color="blue"
               lineWidth={2}
             />
           ) : null}
-          {index === sortedPoints.length - 1 ? (
+          {i === sortedPoints.length - 1 ? (
             <Line
               points={[
                 [point.x, point.y, 0],

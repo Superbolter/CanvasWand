@@ -19,7 +19,7 @@ import HiddenWall from "../../assets/hiddenwall.png"
 import Opening from "../../assets/Opening.png"
 import newWall from "../../assets/newWall.jpeg"
 import { setStoreBoxes } from "../../Actions/ApplicationStateAction";
-
+import cursor from "../../assets/Default.png"
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
 
@@ -104,7 +104,8 @@ const BoxGeometry = ({
   const { measured, roomSelect, newline, linePlacementMode, userWidth } = useSelector(
     (state) => state.drawing
   );
-  const { storeLines, factor, storeBoxes, points, designStep, selectionMode } =
+
+  const { storeLines, factor, storeBoxes, points, designStep, selectionMode, activeRoomIndex } =
     useSelector((state) => state.ApplicationState);
   const { seeDimensions } = useSelector((state) => state.Drawing);
 
@@ -305,8 +306,9 @@ const BoxGeometry = ({
 
   // State to manage the current texture
   const getTexture = () => {
-    if (isSelected) return selectedTexture;
     if (hovered && selectionMode && designStep === 2) return newTexture; 
+    if (hovered && selectionMode && designStep === 3 && activeRoomIndex !== -1) return newTexture;
+    if (isSelected) return selectedTexture;
     if (typeId === 1) return wallTexture;
     if (typeId === 2) return doorTexture;
     if (typeId === 3) return windowTexture;
@@ -319,8 +321,8 @@ const BoxGeometry = ({
   return (
     <>
       <mesh position={midpoint} rotation={[0, 0, angle]} onClick={onClick}
-        onPointerOver={() => setHovered(true)}  // Set hovered to true on mouse over
-        onPointerOut={() => setHovered(false)}  // Set hovered to false on mouse out
+        onPointerOver={() => {if(activeRoomIndex!== -1){document.getElementsByClassName('canvas-container')[0].style.cursor = "pointer"} setHovered(true)}}  // Set hovered to true on mouse over
+        onPointerOut={() => {if(activeRoomIndex!==-1){document.getElementsByClassName('canvas-container')[0].style.cursor = `url(${cursor}) 8 8, default`} setHovered(false)}}  // Set hovered to false on mouse out
       >
         <boxGeometry args={[length, typeId === 4 ? width / 2 : width, 0.1]} />
         <meshBasicMaterial
