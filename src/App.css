@@ -5,28 +5,101 @@ body, html {
   overflow: hidden;
 }
 
+.swal2-popup {
+  border-radius: 16px !important; /* Apply the desired border radius */
+  padding: 16px;
+  width: 350px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for better visibility */
+}
+/* Title customization */
 .swal2-title-custom {
   font-family: 'DM Sans', sans-serif;
-  font-size: 25px;
+  font-size: 21px;
+  line-height: 24px;
+  color: #2E2E2E;
+  font-weight: 500;
+  text-align: left;
+  width: 80%;
+  padding: 0;
+  margin-bottom: 8px; /* Added a small margin below title */
 }
 
-.swal2-text-custom {
+/* Text customization */
+.swal2-html-custom {
   font-family: 'DM Sans', sans-serif;
+  margin: 0 !important;
+  padding: 0  !important;
 }
 
-.swal2-input-custom {
-  font-family: 'DM Sans', sans-serif;
+.swal2-html-custom p{
+  font-size: 16px;
+  color: #2E2E2E;
+  line-height: 20px;
+  text-align: left;
+  margin: 0 !important;
+  padding: 0  !important;
+}
+.swal2-actions-custom {
+  display: flex;
+  justify-content: space-between; /* Ensures equal spacing */
+  gap: 8px; /* 8px gap between the buttons */
+  width: 100%; /* Make sure the actions container takes full width */
+  margin: 0 !important;
+  padding: 0  !important;
+  margin-top: 16px !important; /* Add some space between the text and buttons */
+}
+/* Confirm button style */
+.swal2-confirm-button-custom {
+  background-color: #000; /* Match the second image's black button */
+  color: #fff;
+  border: none;
+  border-radius: 8px; /* Rounded corners */
+  font-size: 14px;
+  padding: 8px 16px;
+  height: 42px;
+  margin: 0 !important;
+  display: block;
+  width: 48%;
+  transform: all 0.2s ease-in-out;
+  &:hover {
+    background-color: #2E2E2E;
+    color: #fff;
+    transform: scale(1.02);
+  }
 }
 
-.swal2-validation-message{
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
+/* Cancel button style */
+.swal2-cancel-button-custom {
+  background-color: transparent;
+  border: 1px solid #000; /* Add border for cancel button */
+  color: #000;
+  border-radius: 8px;
+  font-size: 14px;
+  height: 42px;
+  padding: 8px 16px;
+  margin: 0 !important;
+  display: block;
+  width: 48%;
+  transform: all 0.2s ease-in-out;
+  &:hover {
+    transform: scale(1.02);
+  }
 }
 
-.swal2-html-custom{
-  font-family: 'DM Sans', sans-serif;
+/* Close icon positioning */
+.swal2-close {
+  font-size: 28px;
+  background-color: #F4F4F4;
+  color: #2E2E2E;
+  position: absolute; /* Make it absolutely positioned */
+  top: 12px; /* Adjust as needed to move it vertically */
+  right: 12px; /* Adjust as needed to move it horizontally */
+  &:hover {
+    background-color: #eaeaea;
+    color: #2E2E2E !important;
+    transform: scale(1.05);
+  }
 }
-
 
 .container {
   display: flex;

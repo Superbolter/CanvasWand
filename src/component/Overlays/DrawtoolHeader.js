@@ -33,25 +33,27 @@ const DrawtoolHeader = ({ }) => {
 
   const handleBackToDrawing = () => {
     MySwal.fire({
-      title: "Are you sure?",
+      title: "Are you sure you want to go back?",
       html: `
-          <p>All your room data will be lost and only the structures will be available to you</p>
+          <p>You will lose the changes you have made here.</p>
         `,
-      icon: "warning",
-      confirmButtonText: "Yes",
+      confirmButtonText: "Go back",
       showCancelButton: true,
+      showCloseButton: true, // Add close button (X) in top-right corner
       customClass: {
         title: "swal2-title-custom",
         htmlContainer: "swal2-html-custom",
+        actions: "swal2-actions-custom",
         confirmButton: "swal2-confirm-button-custom",
+        cancelButton: "swal2-cancel-button-custom",
       },
-      width: "400px",
-      padding: "16px",
-      borderRadius: "16px",
+      width: "350px",
+      padding: "24px", // Reduced padding for a compact look
+      borderRadius: "12px", // Adjusted to match second image style
       backdrop: true,
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(setDesignStep(2))
+        dispatch(setDesignStep(2));
         dispatch(showRoomNamePopup(false));
         handleResetRooms();
       }

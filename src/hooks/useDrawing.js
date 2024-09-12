@@ -454,7 +454,7 @@ export const useDrawing = () => {
       let newarr = [];
       // Check for snapping
       let snapFound = false;
-      roomSelectors.forEach((room, index) => {
+      roomSelectors.forEach((room) => {
         const points = room.polygon;
         for (let i = 0; i < points.length; i++) {
           if (
