@@ -263,7 +263,7 @@ body, html {
 /* Wrapper to control the positioning of the tooltip */
 .slider-wrapper {
   position: relative;
-  width: 200px;
+  width: 126px;
 }
 
 /* Customizing the slider (input range) */
