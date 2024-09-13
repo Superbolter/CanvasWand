@@ -305,7 +305,8 @@ export const useActions = () => {
             //   `https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`,
             //   "_blank"
             // );
-            window.location = `https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`
+            // window.location = `https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`
+            window.history.back();
           });
       }, 1000);
     }
