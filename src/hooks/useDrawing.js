@@ -710,7 +710,7 @@ export const useDrawing = () => {
 
     if (designStep === 2) {
       const point = screenToNDC(event.clientX, event.clientY);
-      const pointIndex = points.findIndex((p) => p.distanceTo(point) < 10);
+      const pointIndex = points.findIndex((p) => p.distanceTo(point) < 6.5);
       if (pointIndex !== -1) {
         setDraggingPointIndex(pointIndex);
         const beforeUpdation = points[pointIndex];

@@ -54,6 +54,20 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+const roomTypes = [{ order: 1, key: 'bedroom', value: 'Bedroom' }, { order: 8, key: 'balcony', value: 'Balcony' },
+  { order: 4, key: 'dining', value: 'Dining' }, { order: 3, key: 'kitchen', value: 'Kitchen' }, { order: 9, key: 'utility', value: 'Utility' },
+  { order: 2, key: 'livingroom', value: 'Living room' }, { order: 5, key: 'pooja', value: 'Pooja' },
+  { order: 10, key: 'toilet', value: 'Toilet' }, { order: 2, key: 'living-dining', value: 'Living dining' },
+  { order: 6, key: 'foyer', value: 'Foyer' }, { order: 8, key: 'dress', value: 'Dress' }, { order: 7, key: 'drawing', value: 'Drawing' },
+  { order: 10, key: 'wash', value: 'Wash' }, { order: 10, key: 'hall', value: 'Hall' }, { order: 7, key: 'sitout', value: 'Sitout' },
+  { order: 7, key: 'walkinwardrobe', value: 'Walk in wardrobe' },
+  { order: 10, key: 'entrance', value: 'Entrance' }, { order: 10, key: 'stairs', value: 'Stairs' }, { order: 9, key: 'studyroom', value: 'Study Room' },
+  { order: 9, key: 'powderroom', value: 'Powder Room' }, { order: 8, key: 'store', value: 'Store' }, { order: 10, key: 'lift', value: 'Lift' },
+  { order: 8, key: 'maidroom', value: 'Maid room' }, { order: 7, key: 'restroom', value: 'Rest Room' }, { order: 10, key: 'dgroom', value: 'DG Room' },
+  { order: 10, key: 'petroom', value: 'Pet room' }, { order: 8, key: 'commonarea', value: 'Common Area' },
+  { order: 10, key: 'passagearea', value: 'Passage Area' }, { order: 10, key: 'gardenarea', value: 'Garden Area' }, { order: 10, key: 'parkingarea', value: 'Parking Area' }
+  ]
+
 const RoomNamePopup = () => {
   const [error, setError] = useState("");
   const [roomName, setName] = useState("");
@@ -127,13 +141,16 @@ const RoomNamePopup = () => {
   };
 
   const handleChange = (event) => {
+    const selectedItem = roomTypes.find(
+      (item) => item.key === event.target.value
+    );
     dispatch(setRoomDetails(event.target.value));
     const length = roomSelectors.filter((room) =>
       room.roomName.includes(event.target.value)
     ).length;
-    let name = event.target.value;
+    let name = selectedItem.value;
     if (length > 0) {
-      name = event.target.value + " " + (length + 1);
+      name = name + " " + (length + 1);
       setName(name);
     } else {
       setName(name);
@@ -272,43 +289,18 @@ const RoomNamePopup = () => {
                       </Typography>
                     );
                   }
-                  return selectedRoomType;
+                  const selectedItem = roomTypes.find(
+                    (item) => item.key === selectedRoomType
+                  );
+                  return selectedItem ? selectedItem.value : "Select room type";
                 }}
               >
-                {[
-                  "Living Room",
-                  "Bedroom",
-                  "Kitchen",
-                  "Dining Room",
-                  "Balcony",
-                  "Kids Room",
-                  "Toilet",
-                  "Study Room",
-                  "Utility",
-                  "Pooja",
-                  "Foyer",
-                  "Dress",
-                  "Drawing",
-                  "Wash",
-                  "Walk in wardrobe",
-                  "Entrance",
-                  "Study Room",
-                  "Powder Room",
-                  "Store",
-                  "Lift",
-                  "Maid room",
-                  "Rest Room",
-                  "DG Room",
-                  "Pet room",
-                  "Common Area",
-                  "Passage Area",
-                  "Garden Area",
-                  "Parking Area",
-                ].map((name) => (
+                {roomTypes.map((item) => (
                   <MenuItem
-                    key={name}
-                    value={name}
-                    selectedRoomType={selectedRoomType === name}
+                    key={item.key}
+                    value={item.key}
+                    name={item.value}
+                    selectedRoomType={selectedRoomType === item.key}
                     style={{
                       padding: "10px 8px 10px 12px",
                       borderRadius: "8px",
@@ -316,18 +308,18 @@ const RoomNamePopup = () => {
                       display: "flex",
                       justifyContent: "space-between",
                       backgroundColor:
-                        selectedRoomType === name ? "#4B73EC" : "",
+                        selectedRoomType === item.key ? "#4B73EC" : "",
                     }}
                   >
                     <Typography
                       modifiers={["medium", "black600", "body"]}
                       style={{
-                        color: selectedRoomType === name ? "white" : "",
+                        color: selectedRoomType === item.key ? "white" : "",
                       }}
                     >
-                      {name}
+                      {item.value}
                     </Typography>
-                    {selectedRoomType === name && (
+                    {selectedRoomType === item.key && (
                       <CheckIcon sx={{ color: "white" }} />
                     )}
                   </MenuItem>
