@@ -16,6 +16,7 @@ import { Check } from "@mui/icons-material";
 import DraggablePoint from "./DraggablePoints";
 import { setRoomSelectors } from "../../features/drawing/drwingSlice";
 import usePoints from "../../hooks/usePoints";
+import {colors} from "../../utils/colors"
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -105,7 +106,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
   const shape = createShape(sortedPoints);
   const geometry = new ShapeGeometry(shape);
   const material = new MeshBasicMaterial({
-    color: "#4B73EC",
+    color: activeRoomIndex === index ? "#4B73EC" :  colors[index % colors.length],
     transparent: true,
     opacity: 0.1,
   });
@@ -117,7 +118,6 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
 
   // Adjust font size based on bounding box dimensions
   const fontSize = Math.min(boxSize.x, boxSize.y) * 0.1;
-
   return (
     <>
       <mesh>
@@ -189,26 +189,26 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
           />:
           <mesh key={i} position={[point.x, point.y, 0]}>
             <sphereGeometry args={[6, 6, 32]} />
-            <meshBasicMaterial color="skyblue" />
+            <meshBasicMaterial color={colors[index % colors.length]} />
           </mesh>
         }
           {i < sortedPoints.length - 1 ? (
             <Line
               points={[
-                [point.x, point.y, 0],
-                [sortedPoints[i + 1].x, sortedPoints[i + 1].y, 0],
+                [point.x, point.y, activeRoomIndex === index ? 5 : 0],
+                [sortedPoints[i + 1].x, sortedPoints[i + 1].y, activeRoomIndex === index ? 5 : 0],
               ]}
-              color="blue"
+              color={activeRoomIndex === index ? "blue" : colors[index % colors.length]}
               lineWidth={2}
             />
           ) : null}
           {i === sortedPoints.length - 1 ? (
             <Line
               points={[
-                [point.x, point.y, 0],
-                [sortedPoints[0].x, sortedPoints[0].y, 0],
+                [point.x, point.y, activeRoomIndex === index ? 5 : 0],
+                [sortedPoints[0].x, sortedPoints[0].y, activeRoomIndex === index ? 5 : 0],
               ]}
-              color="blue"
+              color={activeRoomIndex === index ? "blue" : colors[index % colors.length]}
               lineWidth={2}
             />
           ) : null}
