@@ -31,6 +31,7 @@ import {
   setActiveRoomButton,
   setActiveRoomIndex,
   setShowSetScalePopup,
+  setFirstLinePoints,
 } from "../Actions/ApplicationStateAction.js";
 import {
   setContextualMenuStatus,
@@ -118,7 +119,14 @@ export const useDrawing = () => {
     dispatch(setSelectedLinesState(data));
   };
 
-  const addPoint = async (newPoint, startPoint) => {
+  const addPoint = (newPoint, startPoint, fact = factor, length = userLength, width = userWidth) => {
+    if(storeLines.length===0 && length === 0 && width === 0 && !img){
+      dispatch(setShowSetScalePopup(true))
+      dispatch(setContextualMenuStatus(false))
+      dispatch(setFirstLinePoints([newPoint, startPoint]));
+      return;
+    }
+    console.log(fact)
     const previousLines = [...storeLines];
     const previousPoints = [...points];
     const previousBoxes = [...storeBoxes];
@@ -134,17 +142,18 @@ export const useDrawing = () => {
         : typeId === 5
         ? "imaginary"
         : "";
+
     let newLine = {
       id: uniqueId(),
       points: [startPoint, newPoint],
-      length: convert(startPoint.distanceTo(newPoint) * factor[0])
+      length: convert(startPoint.distanceTo(newPoint) * fact[0])
         .from(measured)
         .to("mm"),
       // width: (1/factor[0]) * userWidth,
-      width: convert(INITIAL_BREADTH / factor[1])
+      width: convert(INITIAL_BREADTH / fact[1])
         .from(measured)
         .to("mm"),
-      height: convert(INITIAL_HEIGHT / factor[2])
+      height: convert(INITIAL_HEIGHT / fact[2])
         .from(measured)
         .to("mm"),
       widthchangetype: "between",
@@ -195,7 +204,7 @@ export const useDrawing = () => {
         points: [currentStartPoint, intersection],
       };
       splitNewLine.length = convert(
-        splitNewLine.points[0].distanceTo(splitNewLine.points[1]) * factor[0]
+        splitNewLine.points[0].distanceTo(splitNewLine.points[1]) * fact[0]
       )
         .from(measured)
         .to("mm");
@@ -218,7 +227,7 @@ export const useDrawing = () => {
       finalNewLineSegment.length = convert(
         finalNewLineSegment.points[0].distanceTo(
           finalNewLineSegment.points[1]
-        ) * factor[0]
+        ) * fact[0]
       )
         .from(measured)
         .to("mm");
@@ -242,12 +251,12 @@ export const useDrawing = () => {
 
       // Calculate lengths for new segments
       splitLine1.length = convert(
-        splitLine1.points[0].distanceTo(splitLine1.points[1]) * factor[0]
+        splitLine1.points[0].distanceTo(splitLine1.points[1]) * fact[0]
       )
         .from(measured)
         .to("mm");
       splitLine2.length = convert(
-        splitLine2.points[0].distanceTo(splitLine2.points[1]) * factor[0]
+        splitLine2.points[0].distanceTo(splitLine2.points[1]) * fact[0]
       )
         .from(measured)
         .to("mm");
@@ -274,10 +283,7 @@ export const useDrawing = () => {
     });
 
     dispatch(setStoreLines(finalLines));
-    if(storeLines.length===0 && userLength === 0 && userWidth === 0 && !img){
-      dispatch(setShowSetScalePopup(true))
-      dispatch(setContextualMenuStatus(false))
-    }
+
     const history = [...actionHistory];
     history.push({
       type: "addPoint",
@@ -1330,6 +1336,7 @@ export const useDrawing = () => {
   };
 
   return {
+    addPoint,
     currentMousePosition,
     currentLinePostion,
     draggingLine,

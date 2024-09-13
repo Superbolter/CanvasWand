@@ -76,8 +76,12 @@ export const drawToolData = (floorplan_id) => {
               (point) => new THREE.Vector3(point.x, point.y, point.z)
             );
         }
-        dispatch(setStoreLines(lines));
-        dispatch(setPoints(point));
+        if(lines && lines.length > 0){
+          dispatch(setStoreLines(lines));
+        }
+        if(point && point.length > 0){
+          dispatch(setPoints(point));
+        }
         if(drawData?.rooms && drawData?.rooms?.length > 0){
           dispatch(setRoomSelectors(drawData.rooms));
         }
@@ -336,6 +340,15 @@ export const setShowSetScalePopup = (val) => {
     dispatch({
       type: "UPDATE_APPLICATION_STATE",
       showSetScalePopup: val
+    })
+  }
+}
+
+export const setFirstLinePoints = (val) => {
+  return (dispatch) => {
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      firstLinePoints: val
     })
   }
 }

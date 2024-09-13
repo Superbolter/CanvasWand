@@ -6,6 +6,7 @@ import {
   setDesignStep,
   setExpandRoomNamePopup,
   setFactor,
+  setFirstLinePoints,
   setPoints,
   setRoomDetails,
   setRoomEditingMode,
@@ -37,6 +38,7 @@ import { fetchWrapper } from "../app/RomeDataManager.js";
 import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import { toast } from "react-hot-toast";
 import convert from "convert-units";
+import { useDrawing } from "./useDrawing.js";
 
 export const useActions = () => {
   const { actionHistory, redoStack } = useSelector((state) => state.Drawing);
@@ -47,7 +49,9 @@ export const useActions = () => {
     selectionMode,
     designStep,
     floorplanId,
-    showSetScalePopup
+    showSetScalePopup,
+    img,
+    firstLinePoints
   } = useSelector((state) => state.ApplicationState);
   const {
     lineBreak,
@@ -62,6 +66,7 @@ export const useActions = () => {
   } = useSelector((state) => state.drawing);
   const dispatch = useDispatch();
   const { toggleSelectionMode } = useModes();
+  const { addPoint } = useDrawing();
 
   const undo = () => {
     const newStack = [...actionHistory];
@@ -237,10 +242,10 @@ export const useActions = () => {
     dispatch(setSelectedLinesState([]));
   };
 
-  const handleApiCall = (length = userLength, width = userWidth,height = userHeight, rooms = roomSelectors) => {
+  const handleApiCall = (length = userLength, width = userWidth,height = userHeight, rooms = roomSelectors, left = leftPos, right = rightPos) => {
     const lines = storeLines;
     const distance = Math.sqrt(
-      (rightPos.x - leftPos.x) ** 2 + (rightPos.y - leftPos.y) ** 2
+      (right.x - left.x) ** 2 + (right.y - left.y) ** 2
     );
     let newLength = length;
     let newWidth = width;
@@ -334,8 +339,8 @@ export const useActions = () => {
     let left = leftPos;
     let right = rightPos;
     if(showSetScalePopup){
-      left = storeLines[0].points[0];
-      right = storeLines[0].points[1];
+      left = firstLinePoints[0];
+      right = firstLinePoints[1];
     }
     dispatch(setUserHeight(height));
     const lfactor = length / left.distanceTo(right);
@@ -343,7 +348,11 @@ export const useActions = () => {
     const hfactor = INITIAL_HEIGHT / height;
     dispatch(setFactor([lfactor, wfactor, hfactor]));
     dispatch(setDesignStep(2));
-    handleApiCall(length, width,height);
+    handleApiCall(length, width, height, roomSelectors, left, right);
+    if(showSetScalePopup){
+      addPoint(left, right, [lfactor, wfactor, hfactor], length, width);
+      dispatch(setFirstLinePoints([]));  
+    }
   };
 
   return {

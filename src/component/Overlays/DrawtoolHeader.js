@@ -22,7 +22,7 @@ const MySwal = withReactContent(Swal);
 
 const DrawtoolHeader = ({ }) => {
   const dispatch = useDispatch();
-  const { designStep } = useSelector((state) => state.ApplicationState);
+  const { designStep, img } = useSelector((state) => state.ApplicationState);
   const { seeDimensions } = useSelector((state) => state.Drawing);
   const { undo, redo, handleReset, handleResetRooms, handleSaveClick} = useActions();
 
@@ -100,6 +100,7 @@ const DrawtoolHeader = ({ }) => {
               </div>
             : null
           }
+          {!img? null: 
           <div className="header-step-indicator-step">
             <div className={`header-step-indicator-step-box ${designStep< 1? "grayBorder" : ""}`}>
               {
@@ -110,15 +111,16 @@ const DrawtoolHeader = ({ }) => {
               }
             </div>
             <Typography modifiers={["medium", "subtitle", "black600"]}>Set scale</Typography>
-          </div>
-          <div className={`header-step-indicator-line ${designStep > 1 ? "blackLine" : "grayLine"}`}></div>
+          </div>}
+          {!img ?null:
+          <div className={`header-step-indicator-line ${designStep > 1 ? "blackLine" : "grayLine"}`}></div>}
           <div className="header-step-indicator-step">
             <div className={`header-step-indicator-step-box ${designStep< 2? "grayBorder" : ""}`}>
               {
                 designStep > 2 ?
                 <Check style={{fontSize:"16px"}}/>
                 :
-                <Typography modifiers={designStep > 1? ["medium", "subtitle2", "black600"]: ["grey","medium", "subtitle"]}>2</Typography>
+                <Typography modifiers={designStep > 1? ["medium", "subtitle2", "black600"]: ["grey","medium", "subtitle"]}>{!img? 1: 2}</Typography>
               }
             </div>
             <Typography modifiers={designStep > 1? ["medium", "subtitle", "black600"]: ["grey","medium", "subtitle"]}>Draw plan</Typography>
@@ -130,7 +132,7 @@ const DrawtoolHeader = ({ }) => {
                 designStep > 3 ?
                 <Check style={{fontSize:"16px"}}/>
                 :
-                <Typography modifiers={designStep > 2? ["medium", "subtitle2", "black600"]: ["grey","medium", "subtitle"]}>3</Typography>
+                <Typography modifiers={designStep > 2? ["medium", "subtitle2", "black600"]: ["grey","medium", "subtitle"]}>{!img? 2: 3}</Typography>
               }
             </div>
             <Typography modifiers={designStep > 2? ["medium", "subtitle", "black600"]: ["grey","medium", "subtitle"]}>Define Rooms</Typography>
@@ -142,7 +144,7 @@ const DrawtoolHeader = ({ }) => {
                 designStep > 3 ?
                 <Check style={{fontSize:"16px"}}/>
                 :
-                <Typography modifiers={designStep > 3? ["medium", "subtitle2", "black600"]: ["grey","medium", "subtitle"]}>4</Typography>
+                <Typography modifiers={designStep > 3? ["medium", "subtitle2", "black600"]: ["grey","medium", "subtitle"]}>{!img? 3: 4}</Typography>
               }
             </div>
             <Typography modifiers={designStep > 3? ["medium", "subtitle", "black600"]: ["grey","medium", "subtitle"]}>Open 3D</Typography>

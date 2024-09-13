@@ -22,6 +22,7 @@ const initialState = {
     designStep: 1,
     imageOpacity: 0.8,
     showSetScalePopup: false,
+    firstLinePoints: [],
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {

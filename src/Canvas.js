@@ -95,7 +95,9 @@ export const CanvasComponent = () => {
     measured,
     idSelection,
     roomSelectors,
-    snapActive
+    snapActive,
+    userLength,
+    userWidth
   } = useSelector((state) => state.drawing);
   const {
     storeBoxes,
@@ -108,7 +110,8 @@ export const CanvasComponent = () => {
     designStep,
     expandRoomPopup,
     activeRoomButton,
-    showSetScalePopup
+    showSetScalePopup,
+    img
   } = useSelector((state) => state.ApplicationState);
   const { typeId, stop, showSnapLine, snappingPoint, temporaryPolygon, enablePolygonSelection } = useSelector(
     (state) => state.Drawing
@@ -442,6 +445,7 @@ export const CanvasComponent = () => {
                 isSelected={false}
                 showDimension={true}
                 isCustomised={null}
+                distance={storeLines.length===0 && userLength === 0 && userWidth === 0 && !img ? true: null}
                 onClick={() => {}}
               />
               {currentStrightMousePosition && !perpendicularLine && (

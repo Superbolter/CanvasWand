@@ -97,6 +97,7 @@ const BoxGeometry = ({
   showDimension=false,
   isCustomised,
   opacity = 0.5,
+  distance = null
 }) => {
   const dispatch = useDispatch();
   const [hovered, setHovered] = useState(false);
@@ -324,6 +325,7 @@ const BoxGeometry = ({
     feetLength = decimalToFeetInches(length * factor[0]);
   }
 
+
   //linePlacementMode === "midpoint" ? adjustedMidpoint : middlepoint
   return (
     <>
@@ -366,8 +368,8 @@ const BoxGeometry = ({
           color="black"
           anchorX="center"
           anchorY="middle"
-        >
-          { measured === "ft"? `${feetLength.feet}'${feetLength.inches} ${measured}`:`${(length * factor[0]).toFixed(2)} ${measured}`}
+        > 
+          { distance ? `${length.toFixed(2)}` : measured === "ft"? `${feetLength.feet}'${feetLength.inches} ${measured}`:`${(length * factor[0]).toFixed(2)} ${measured}`}
         </Text>
       )}
 
