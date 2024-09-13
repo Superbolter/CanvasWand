@@ -32,6 +32,7 @@ import {
   setActiveRoomIndex,
   setShowSetScalePopup,
   setFirstLinePoints,
+  setHelpVideo,
 } from "../Actions/ApplicationStateAction.js";
 import {
   setContextualMenuStatus,
@@ -894,6 +895,7 @@ export const useDrawing = () => {
   };
 
   const handleClick = (event) => {
+    dispatch(setHelpVideo(false))
     if (selectionMode && !lineClick && !expandRoomPopup) {
       setSelectedLines([]);
       dispatch(setContextualMenuStatus(false));

@@ -6,10 +6,10 @@ import { useDispatch, useSelector } from 'react-redux'
 
 const HowTo = ({type}) => {
   const dispatch = useDispatch();
-  const {helpVideo} = useSelector(state => state.ApplicationState)
+  const { helpVideoType} = useSelector(state => state.ApplicationState)
 
   return (
-    <div onClick={()=> dispatch(setHelpVideo(!helpVideo, type))} style={{cursor:"pointer", display:"flex", justifyContent:"center", alignItems:"center", gap:"4px"}}>
+    <div onClick={()=> dispatch(setHelpVideo(helpVideoType !== type, type))} style={{cursor:"pointer", display:"flex", justifyContent:"center", alignItems:"center", gap:"4px"}}>
       <Typography modifiers={["helpText", "blue"]}>How to </Typography>
       <img src={play} alt="play" />
     </div>

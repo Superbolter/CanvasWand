@@ -24,6 +24,7 @@ import DrawtoolHeader from "./component/Overlays/DrawtoolHeader.js";
 import { useDispatch, useSelector } from "react-redux";
 import {
   drawToolData,
+  setHelpVideo,
   setStoreLines,
 } from "./Actions/ApplicationStateAction.js";
 import ContextualMenu from "./component/CanvasOverLays/ContextualMenu.js";
@@ -313,6 +314,10 @@ export const CanvasComponent = () => {
         break;
     }
   },[measured])
+
+  useEffect(()=>{
+    dispatch(setHelpVideo(false));
+  },[designStep])
 
   var feetLength = 0;
   if(measured === "ft"){
