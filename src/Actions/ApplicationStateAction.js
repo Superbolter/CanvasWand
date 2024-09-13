@@ -122,7 +122,7 @@ export const drawToolData = (floorplan_id) => {
             dispatch(setDesignStep(2));
           }
         }
-        if(!response.data.image_uri){
+        if(!response.data.image_uri && response.data.scale !== null){
           dispatch(setDesignStep(2));
         }
       })
