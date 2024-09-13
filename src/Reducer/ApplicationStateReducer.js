@@ -23,6 +23,8 @@ const initialState = {
     imageOpacity: 0.8,
     showSetScalePopup: false,
     firstLinePoints: [],
+    helpVideo: false,
+    helpVideoType: "addRoom",
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {

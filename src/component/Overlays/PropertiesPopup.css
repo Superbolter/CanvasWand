@@ -183,9 +183,18 @@ margin-bottom: 4px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 8px;
     margin-bottom: 16px;
+}
+
+.room-popup-header-left{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
 }
 
 .room-popup-header-text{
@@ -197,7 +206,8 @@ margin-bottom: 4px;
     gap: 8px;
     align-items: center;
     justify-content: center;
-    width: 50%;
+    /* width: 100%; */
+    width: 90px;
     cursor: pointer;
     border: 2px solid #F4F4F4;
 }

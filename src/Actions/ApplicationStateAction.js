@@ -352,3 +352,14 @@ export const setFirstLinePoints = (val) => {
     })
   }
 }
+
+export const setHelpVideo = (val, type = "addRoom") =>{
+  return (dispatch) => {
+    console.log("setScale")
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      helpVideo: val,
+      helpVideoType: type
+    })
+  }
+}

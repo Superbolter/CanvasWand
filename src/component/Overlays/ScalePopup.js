@@ -12,6 +12,7 @@ import LengthConverter from "./LengthConverter.js";
 import { useActions } from "../../hooks/useActions.js";
 import { setShowSetScalePopup } from "../../Actions/ApplicationStateAction.js";
 import usePoints from "../../hooks/usePoints.js";
+import HowTo from "./HowTo.js";
 
 const ScalePopup = () => {
   const dispatch = useDispatch();
@@ -90,6 +91,7 @@ const ScalePopup = () => {
             Set scale for your floor plan
           </Typography>
         </div>
+        <HowTo type="setScale" />
         <div className="input-container">
           <div className="height-input-container">
             <Typography className="height-text">Length</Typography>

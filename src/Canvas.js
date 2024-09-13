@@ -57,6 +57,7 @@ import usePoints from "./hooks/usePoints.js";
 import TemporaryFiller from "./component/Geometry/temporaryFiller.js";
 import cursor from "./assets/Default.png"
 import SetScalePopup from "./component/Popups/SetScalePopup.js";
+import HelpVideoPopup from "./component/Popups/HelpVideoPopup.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -520,7 +521,7 @@ export const CanvasComponent = () => {
           )}
 
           {/* 2D grid */}
-          <Grid
+          {/* <Grid
             rotation={[Math.PI / 2, 0, 0]}
             // cellSize={(1/factor[0]) * 10}
             cellThickness={0}
@@ -538,7 +539,7 @@ export const CanvasComponent = () => {
               transparent: true,
               opacity: 0.3,
             }}
-          />
+          /> */}
         </Canvas>
         <DrawtoolHeader />
         <BottomComponent zoom={zoom} setZoom={setZoom} />        
@@ -620,12 +621,14 @@ export const CanvasComponent = () => {
             <PropertiesPopup />
             <RoomNamePopup />
             <ButtonComponent />
+            <HelpVideoPopup />
             {showSetScalePopup && <SetScalePopup/>}
           </div>
         </div>
       ) : (
         <div className="button-container">
           <ScalePopup />
+          <HelpVideoPopup />
         </div>
       )}
     </div>

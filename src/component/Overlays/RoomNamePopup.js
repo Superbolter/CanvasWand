@@ -14,6 +14,7 @@ import {
   setActiveRoomButton,
   setActiveRoomIndex,
   setExpandRoomNamePopup,
+  setHelpVideo,
   setRoomDetails,
   setRoomEditingMode,
   setRoomName,
@@ -32,6 +33,7 @@ import edit from "../../assets/edit.svg";
 import { Check } from "@mui/icons-material";
 import useModes from "../../hooks/useModes.js";
 import { useDrawing } from "../../hooks/useDrawing.js";
+import HowTo from "./HowTo.js";
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   "label + &": {
@@ -214,33 +216,39 @@ const RoomNamePopup = () => {
         style={{ height: "fit-content" }}
       >
         <div className="room-popup-header">
-          <div
-            onClick={divideRoomClick}
-            className="room-popup-header-text"
-            style={
-              activeRoomButton === "divide"
-                ? { borderColor: "cornflowerblue" }
-                : {}
-            }
-          >
-            <img src={divide} alt="divider" />
-            <Typography modifiers={["black600", "subtitle2"]}>
-              Divide room
-            </Typography>
+          <div className="room-popup-header-left">
+            <div
+              onClick={divideRoomClick}
+              className="room-popup-header-text"
+              style={
+                activeRoomButton === "divide"
+                  ? { borderColor: "cornflowerblue" }
+                  : {}
+              }
+            >
+              <img src={divide} alt="divider" />
+              <Typography modifiers={["black600", "subtitle2"]}>
+                Divide room
+              </Typography>
+            </div>
+            <HowTo type="divideRoom"/>
           </div>
-          <div
-            onClick={addRoomClick}
-            className="room-popup-header-text"
-            style={
-              activeRoomButton === "add"
-                ? { borderColor: "cornflowerblue" }
-                : {}
-            }
-          >
-            <img src={plus} alt="plus" />
-            <Typography modifiers={["black600", "subtitle2"]}>
-              Add room
-            </Typography>
+          <div className="room-popup-header-left">
+            <div
+              onClick={addRoomClick}
+              className="room-popup-header-text"
+              style={
+                activeRoomButton === "add"
+                  ? { borderColor: "cornflowerblue" }
+                  : {}
+              }
+            >
+              <img src={plus} alt="plus" />
+              <Typography modifiers={["black600", "subtitle2"]}>
+                Add room
+              </Typography>
+            </div>
+            <HowTo type="addRoom"/>
           </div>
         </div>
         {expandRoomPopup && (

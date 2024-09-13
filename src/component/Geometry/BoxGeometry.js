@@ -17,7 +17,7 @@ import New from "../../assets/New.png";
 import Wall from "../../assets/Walll.png";
 import HiddenWall from "../../assets/hiddenwall.png"
 import Opening from "../../assets/Opening.png"
-import newWall from "../../assets/newWall.jpeg"
+import newWall from "../../assets/newWall.png"
 import { setStoreBoxes } from "../../Actions/ApplicationStateAction";
 import cursor from "../../assets/Default.png"
 import usePoints from "../../hooks/usePoints";
@@ -119,7 +119,7 @@ const BoxGeometry = ({
     [textureLoader]
   );
   const wallTexture = useMemo(
-    () => textureLoader.load(Wall), // Replace with the path to your window image
+    () => textureLoader.load(newWall), // Replace with the path to your window image
     [textureLoader]
   );
   const railingTexture = useMemo(

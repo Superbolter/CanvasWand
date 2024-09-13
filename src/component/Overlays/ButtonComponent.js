@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setShowPopup, setTypeId } from '../../Actions/DrawingActions.js';
 import { setSelectedButton } from '../../features/drawing/drwingSlice.js';
 import useModes from '../../hooks/useModes.js';
+import HowTo from './HowTo.js';
 
 const ButtonComponent = () => {
   const {lineBreak,merge} = useSelector((state) => state.drawing);
@@ -49,12 +50,15 @@ const ButtonComponent = () => {
         <div className="scrollable-content">
           <Typography className='btn-heading-text' modifiers={['medium']}>Structures</Typography>
           <div className="grid-container">
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <div
               className={`drawtool-btn ${selectedButton === 'Walls' ? 'selected' : ''}`}
               onClick={() => handleButtonClick('Walls')}
             >
               <img src={WallIcon} alt="" style={{ width: "24px", height: "24px",}} />
               <Typography className='btn-text' style={{color:selectedButton==="Walls"&&"#4B73EC" }}>Walls</Typography>
+            </div>
+            <HowTo type="addWall" />
             </div>
             {/* <div
               className={`drawtool-btn ${selectedButton === 'Room' ? 'selected' : ''}`}
