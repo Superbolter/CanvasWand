@@ -76,11 +76,14 @@ export const drawToolData = (floorplan_id) => {
               (point) => new THREE.Vector3(point.x, point.y, point.z)
             );
         }
-        console.log(drawData)
         dispatch(setStoreLines(lines));
         dispatch(setPoints(point));
-        dispatch(setRoomSelectors(drawData.rooms));
-        dispatch(setStoreBoxes(drawData.storeBoxes));
+        if(drawData?.rooms && drawData?.rooms?.length > 0){
+          dispatch(setRoomSelectors(drawData.rooms));
+        }
+        if (drawData?.storeBoxes && drawData?.storeBoxes?.length > 0) {
+          dispatch(setStoreBoxes(drawData.storeBoxes));
+        }
         if (response.data.scale !== null) {
           const scaleData = JSON.parse(response.data.scale);
           const measured = scaleData?.userUnit || "mm";
