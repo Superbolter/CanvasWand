@@ -36,6 +36,9 @@ import {
 } from "../Actions/ApplicationStateAction.js";
 import {
   setContextualMenuStatus,
+  setCurrentMousePosition,
+  setCurrentStrightMousePosition,
+  setDistance,
   setDragMode,
   setMergeLine,
   setNewLine,
@@ -99,22 +102,10 @@ export const useDrawing = () => {
   const { toggleSelectionSplitMode } = useModes();
   const { screenToNDC, isPointInsidePolygon, arePointsSimilar } = usePoints();
 
-  const [currentMousePosition, setCurrentMousePosition] = useState(null);
-  const [currentLinePostion, setCurrentLinePostion] = useState(null);
-  const [currentStrightMousePosition, setCurrentStrightMousePosition] = useState(null);
-  const [distance, setDistance] = useState(0);
   const [breakPoint, setBreakPoint] = useState([]);
-  const [draggingPointIndex, setDraggingPointIndex] = useState(null);
-  const [draggingLineIndex, setDraggingLineIndex] = useState([]);
-  const [draggingLine, setDraggingLine] = useState(null);
   const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
   const [selectId, setId] = useState(null);
   const [lineClick, setLineClick] = useState(false);
-  const [nearPoint, setNearPoint] = useState(false);
-  const [nearVal, setNearVal] = useState();
-  const [isSelecting, setIsSelecting] = useState(false);
-  const [startPoint, setStartPoint] = useState(null);
-  const [endPoint, setEndPoint] = useState(null);
 
   const setSelectedLines = (data) => {
     dispatch(setSelectedLinesState(data));
@@ -127,7 +118,6 @@ export const useDrawing = () => {
       dispatch(setFirstLinePoints([newPoint, startPoint]));
       return;
     }
-    console.log(fact)
     const previousLines = [...storeLines];
     const previousPoints = [...points];
     const previousBoxes = [...storeBoxes];
@@ -459,326 +449,6 @@ export const useDrawing = () => {
     }
   };
 
-  const handleMouseMove = (event) => {
-    let point = screenToNDC(event.clientX, event.clientY);
-    if(designStep === 3 && activeRoomButton === "divide"){
-      setCurrentMousePosition(point);
-      return
-    }
-    if (designStep === 3 && enablePolygonSelection) {
-      setCurrentMousePosition(point);
-
-      let cuuPoint = point;
-      let newarr = [];
-      // Check for snapping
-      let snapFound = false;
-      roomSelectors.forEach((room) => {
-        const points = room.polygon;
-        for (let i = 0; i < points.length; i++) {
-          if (
-            Math.abs(points[i].x - point.x) < 2 
-            // points[points.length - 1].y !== points[i].y &&
-            // points[points.length - 1].x !== points[i].x &&
-            && enablePolygonSelection
-          ) {
-            cuuPoint.x = points[i].x;
-            newarr = [cuuPoint, new Vector3(points[i].x, points[i].y, 0)];
-            snapFound = true;
-            break;
-          } else if (
-            Math.abs(points[i].y - point.y) < 2 
-            // points[points.length - 1].y !== points[i].y &&
-            // points[points.length - 1].x !== points[i].x &&
-            && enablePolygonSelection
-          ) {
-            cuuPoint.y = points[i].y;
-            newarr = [cuuPoint, new Vector3(points[i].x, points[i].y, 0)];
-            snapFound = true;
-            break;
-          }
-        }
-      });
-      
-      if (!snapFound) {
-        dispatch(setSnappingPoint([]));
-      }else{
-        dispatch(setSnappingPoint(newarr));
-      }
-
-      dispatch(setShowSnapLine(snapFound));
-
-      
-      if (!isSelecting) return;
-      const end = point;
-      setEndPoint(end);
-    }
-    if (
-      (points.length === 0 || designStep === 1) || (selectionMode ) 
-    )
-      return; 
-
-    if(designStep === 3) return;
-
-    if (lineBreak) {
-      if (findLineForPoint(point, storeLines, snapActive)) {
-        let { closestPointOnLine, line } = findLineForPoint(
-          point,
-          storeLines,
-          snapActive
-        );
-        if (closestPointOnLine) {
-          setNearPoint(true);
-          setNearVal({ line: line, point: closestPointOnLine });
-        } else {
-          setNearPoint(false);
-          setNearVal(null);
-        }
-      }
-    }
-    // if(draggingLine){
-    //   dispatch(setContextualMenuStatus(false));
-    //   const line = storeLines[draggingLine];
-    //   const linePoints = line.points;
-    //   const lineLength = linePoints[1].distanceTo(linePoints[0]);
-    //   if(Math.abs(linePoints[0].x - linePoints[1].x) > Math.abs(linePoints[0].y - linePoints[1].y)){
-    //     const newStart = new Vector3(point.x - lineLength/2, point.y, 0);
-    //     const newEnd = new Vector3(point.x + lineLength/2, point.y, 0);
-    //     setCurrentLinePostion([newStart, newEnd]);
-    //   } else {
-    //     const newStart = new Vector3(point.x , point.y - lineLength/2, 0);
-    //     const newEnd = new Vector3(point.x, point.y + lineLength/2, 0);
-    //     setCurrentLinePostion([newStart, newEnd]);
-    //   }
-    // }
-
-    let cuuPoint = point;
-    // Check for snapping
-    let snapFound = false;
-    for (let i = 0; i < points.length; i++) {
-      if (
-        Math.abs(points[i].x - point.x) < 2 &&
-        points[points.length - 1].y !== points[i].y &&
-        points[points.length - 1].x !== points[i].x &&
-        !selectionMode
-      ) {
-        cuuPoint.x = points[i].x;
-        let newarr = [cuuPoint, points[i]];
-        dispatch(setSnappingPoint([...newarr]));
-        snapFound = true;
-        break;
-      } else if (
-        Math.abs(points[i].y - point.y) < 2 &&
-        points[points.length - 1].y !== points[i].y &&
-        points[points.length - 1].x !== points[i].x &&
-        !selectionMode
-      ) {
-        cuuPoint.y = points[i].y;
-        let newarr = [cuuPoint, points[i]];
-        dispatch(setSnappingPoint([...newarr]));
-        snapFound = true;
-        break;
-      }
-    }
-
-    if (!snapFound) {
-      dispatch(setSnappingPoint([]));
-    }
-
-    dispatch(setShowSnapLine(snapFound));
-
-    if (perpendicularLine && draggingPointIndex === null && points.length > 0 && designStep !==3) {
-      point = calculateAlignedPoint(points[points.length - 1], point);
-    }
-    if (!perpendicularLine && draggingPointIndex === null && points.length > 0) {
-      const position = calculateAlignedPoint(points[points.length - 1], point);
-      setCurrentStrightMousePosition(position);
-      const lastPoint = points[points.length - 1];
-      const currentDistance = lastPoint.distanceTo(position);
-      setDistance(currentDistance * factor[0]);
-    }
-
-    setCurrentMousePosition(point);
-  };
-
-  const handleMouseDown = (event) => {
-    // if (designStep === 3 && expandRoomPopup) {
-    //   setIsSelecting(false);
-    //   const start = screenToNDC(event.clientX, event.clientY);
-    //   setStartPoint(start);
-    // }
-    if (!dragMode) return;
-
-    if (designStep === 2) {
-      const point = screenToNDC(event.clientX, event.clientY);
-      const pointIndex = points.findIndex((p) => p.distanceTo(point) < 6.5);
-      if (pointIndex !== -1) {
-        setDraggingPointIndex(pointIndex);
-        const beforeUpdation = points[pointIndex];
-        let updatedDraggingLineIndex = [];
-        storeLines.map((line, index) => {
-          let updatedLine = { ...line };
-          if (updatedLine.points[0].equals(beforeUpdation)) {
-            const data = {
-              index: index,
-              type: "start",
-            };
-            updatedDraggingLineIndex.push(data);
-          }
-          if (updatedLine.points[1].equals(beforeUpdation)) {
-            const data = {
-              index: index,
-              type: "end",
-            };
-            updatedDraggingLineIndex.push(data);
-          }
-        });
-        setCurrentMousePosition(point);
-        setDraggingLineIndex(updatedDraggingLineIndex);
-      }else if(selectedLines.length > 0){
-          const lineIndex = storeLines.findIndex((line) => line.id === selectedLines[0]);
-          if(lineIndex !== -1){
-            const line = storeLines[lineIndex];
-            let val = false;
-            if(Math.abs(line.points[0].x - line.points[1].x) > Math.abs(line.points[0].y - line.points[1].y)){
-              val = Math.abs(line.points[0].y - point.y) < 10 || Math.abs(line.points[1].y - point.y) < 10;
-            }else{
-              val = Math.abs(line.points[0].x - point.x) < 10 || Math.abs(line.points[1].x - point.x) < 10;
-            }
-            if(val){
-              setDraggingLine(lineIndex);
-            }
-          }
-      }
-    }
-  };
-
-  const handleMouseUp = (event) => {
-    if (draggingPointIndex !== null && designStep === 2) {
-      const point = screenToNDC(event.clientX, event.clientY);
-      let beforeUpdation = points[draggingPointIndex];
-      let updatedPoints = points.map((p) => {
-        if (p.equals(beforeUpdation)) {
-          return point;
-        }
-        return p;
-      });
-      dispatch(setPoints(updatedPoints));
-
-      const updatedLines = storeLines.map((line) => {
-        let updatedLine = { ...line }; // Shallow copy of the line object
-        if (updatedLine.points[0].equals(beforeUpdation)) {
-          updatedLine = {
-            ...updatedLine,
-            points: [point, updatedLine.points[1]],
-            length: convert(point.distanceTo(updatedLine.points[1]) * factor[0])
-              .from(measured)
-              .to("mm"),
-          };
-        }
-
-        if (updatedLine.points[1].equals(beforeUpdation)) {
-          updatedLine = {
-            ...updatedLine,
-            points: [updatedLine.points[0], point],
-            length: convert(updatedLine.points[0].distanceTo(point) * factor[0])
-              .from(measured)
-              .to("mm"),
-          };
-        }
-        return updatedLine;
-      });
-
-      dispatch(setStoreLines(updatedLines));
-    }
-    if(draggingLine !== null && designStep === 2 && currentLinePostion){
-      let pts = [];
-      storeLines.map((line) => {
-        const startPoint = line.points[0];
-        const endPoint = line.points[1];
-        if (startPoint && pts.find((pt) =>pt.x === startPoint.x && pt.y === startPoint.y && pt.z === startPoint.z) === undefined){
-          pts.push(startPoint);
-        }
-        if (endPoint && pts.find((pt) =>pt.x === endPoint.x && pt.y === endPoint.y && pt.z === endPoint.z) === undefined) {
-          pts.push(endPoint);
-        }
-      });
-      var startPoint = currentLinePostion[0]; 
-      var endPoint = currentLinePostion[1];
-      pts.map((pt) => {
-        if(currentLinePostion[0].distanceTo(pt) < 15){
-          startPoint=pt;
-        }else if(currentLinePostion[1].distanceTo(pt) < 15){
-          endPoint=pt;
-        }
-      });
-      const updatedLines = storeLines.map((line, index) => {
-        let updatedLine = { ...line }; // Shallow copy of the line object
-        if (index === draggingLine) {
-          const beforeUpdation1 = line.points[0];
-          const beforeUpdation2 = line.points[1];
-          let updatedPoints = points.map((p) => {
-            if (p.equals(beforeUpdation1)) {
-              return startPoint;
-            }else if(p.equals(beforeUpdation2)){
-              return endPoint;
-            }
-            return p;
-          });
-          dispatch(setPoints(updatedPoints));
-          updatedLine = {
-            ...updatedLine,
-            points: [startPoint, endPoint],
-            length: convert(startPoint.distanceTo(endPoint) * factor[0])
-              .from(measured)
-              .to("mm"),
-          };
-        }
-        return updatedLine;
-        });
-        dispatch(setStoreLines(updatedLines));
-        
-    }
-    setDraggingPointIndex(null);
-    setDraggingLineIndex([]);
-    setCurrentLinePostion(null);
-    setDraggingLine(null);
-
-    if (designStep === 3 && expandRoomPopup) {
-      if (!isSelecting) return;
-      const selectedIds = [];
-      if (startPoint && endPoint) {
-        const minX = Math.min(startPoint.x, endPoint.x);
-        const maxX = Math.max(startPoint.x, endPoint.x);
-        const minY = Math.min(startPoint.y, endPoint.y);
-        const maxY = Math.max(startPoint.y, endPoint.y);
-
-        storeLines.forEach((line) => {
-          const startPos = line.points[0];
-
-          const endPos = line.points[1];
-
-          if (
-            startPos.x >= minX &&
-            startPos.x <= maxX &&
-            startPos.y >= minY &&
-            startPos.y <= maxY &&
-            endPos.x >= minX &&
-            endPos.x <= maxX &&
-            endPos.y >= minY &&
-            endPos.y <= maxY
-          ) {
-            selectedIds.push(line.id);
-          }
-        });
-
-        dispatch(setSelectedLinesState(selectedIds));
-      }
-
-      setIsSelecting(false);
-      setStartPoint(null);
-      setEndPoint(null);
-    }
-  };
 
   const addRoom = (roomName, roomType) => {
     const room = {
@@ -936,9 +606,6 @@ export const useDrawing = () => {
     //   };
     //   dispatch(setStoreLines([newLine]));
     // }
-    setCurrentMousePosition(null); // Clear the temporary line on click
-    setCurrentStrightMousePosition(null); // Clear the temporary line on click
-    setDistance(0); // Reset distance display
   };
 
   const handleMergeClick = () => {
@@ -1238,29 +905,13 @@ export const useDrawing = () => {
 
   return {
     addPoint,
-    currentMousePosition,
-    currentLinePostion,
-    draggingLine,
-    currentStrightMousePosition,
-    distance,
     dimensions,
-    nearPoint,
-    nearVal,
     handleClick,
-    handleMouseMove,
     handleLineClick,
-    handleMouseDown,
-    handleMouseUp,
     setDimensions,
     deleteSelectedLines,
     deleteSelectedRoom,
     handleMergeClick,
     addRoom,
-    isSelecting,
-    startPoint,
-    endPoint,
-    setDraggingPointIndex,
-    draggingLineIndex,
-    setCurrentLinePostion
   };
 };
