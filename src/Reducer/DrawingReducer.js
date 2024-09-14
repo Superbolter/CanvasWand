@@ -19,6 +19,7 @@ const initialState = {
     shiftPressed: false,
     temporaryPolygon: [],
     enablePolygonSelection: false,
+    higlightPoint: null,
   };
   
   const DrawingReducer = (state = initialState, action) => {

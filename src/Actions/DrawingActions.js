@@ -145,3 +145,8 @@ export const setEnablePolygonSelection = (val) => ({
   type: "UPDATE_DRAWING_STATE",
   enablePolygonSelection: val
 })
+
+export const setHiglightPoint = (val) => ({
+  type: "UPDATE_DRAWING_STATE",
+  higlightPoint: val
+})

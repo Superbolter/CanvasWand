@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import usePoints from "./usePoints";
 import { Vector3 } from "three";
-import { setShowSnapLine, setSnappingPoint } from "../Actions/DrawingActions";
+import { setHiglightPoint, setShowSnapLine, setSnappingPoint } from "../Actions/DrawingActions";
 import { findLineForPoint } from "../utils/coolinear.js";
 import convert from "convert-units";
 import { calculateAlignedPoint } from "../utils/uniqueId";
@@ -152,22 +152,12 @@ const useMouse = () => {
       }
     }
 
-    // let cuuPoint = point;
-    // const x = points.find((pt) => Math.abs(pt.x - point.x) < 2);
-    // const y = points.find((pt) => Math.abs(pt.y - point.y) < 2);
-    // if (x) {
-    //   cuuPoint.x = x.x;
-    // }
-    // if (y) {
-    //   cuuPoint.y = y.y;
-    // }
-    // if (x || y) {
-    //   dispatch(setSnappingPoint([cuuPoint, x || y]));
-    //   dispatch(setShowSnapLine(true));
-    // } else {
-    //   dispatch(setSnappingPoint([]));
-    //   dispatch(setShowSnapLine(false));
-    // }
+    const highlightPoint = points.find((pt) => pt.distanceTo(point) < 5);
+    if(highlightPoint){
+        dispatch(setHiglightPoint(highlightPoint))
+    }else{
+        dispatch(setHiglightPoint(null))
+    }
     let cuuPoint = point; // Copy the point
     const lastPoint = points[points.length - 1];
     if (cuuPoint.x !== lastPoint.x && cuuPoint.y !== lastPoint.y) {

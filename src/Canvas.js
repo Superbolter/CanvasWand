@@ -430,7 +430,6 @@ export const CanvasComponent = () => {
             // <BoxSegments lines={storeLines} />
             <CappedLine lines={storeLines} />
           )}
-          {console.log(showSnapLine, snappingPoint,designStep >1 && showSnapLine && snappingPoint.length > 0 && !lineBreak )}
           {designStep >1 && showSnapLine && snappingPoint.length > 0 && !lineBreak && (
             <Line
               points={[snappingPoint[1], snappingPoint[0]]}

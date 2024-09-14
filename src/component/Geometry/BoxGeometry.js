@@ -15,12 +15,12 @@ import Door from "../../assets/Door.png";
 import Railing from "../../assets/Railing.png";
 import New from "../../assets/New.png";
 import Wall from "../../assets/Walll.png";
-import HiddenWall from "../../assets/hiddenwall.png";
-import Opening from "../../assets/Opening.png";
-import newWall from "../../assets/newWall.png";
-import newWall2 from "../../assets/newWall2.png";
+import HiddenWall from "../../assets/hiddenwall.png"
+import Opening from "../../assets/Opening.png"
+import newWall from "../../assets/newWall.png"
+import newWall2 from "../../assets/newWall2.png"
 import { setStoreBoxes } from "../../Actions/ApplicationStateAction";
-import cursor from "../../assets/Default.png";
+import cursor from "../../assets/Default.png"
 import usePoints from "../../hooks/usePoints";
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -95,29 +95,24 @@ const BoxGeometry = ({
   isSelected,
   typeId,
   onClick,
-  showDimension = false,
+  showDimension=false,
   isCustomised,
   opacity = 0.5,
-  distance = null,
+  distance = null
 }) => {
   const dispatch = useDispatch();
   const [hovered, setHovered] = useState(false);
 
-  const { measured, roomSelect, newline, linePlacementMode, userWidth } =
-    useSelector((state) => state.drawing);
 
-  const {
-    storeLines,
-    factor,
-    storeBoxes,
-    points,
-    designStep,
-    selectionMode,
-    activeRoomIndex,
-  } = useSelector((state) => state.ApplicationState);
-  const { seeDimensions } = useSelector((state) => state.Drawing);
+  const { measured, roomSelect, newline, linePlacementMode, userWidth } = useSelector(
+    (state) => state.drawing
+  );
 
-  const { decimalToFeetInches } = usePoints();
+  const { storeLines, factor, storeBoxes, points, designStep, selectionMode, activeRoomIndex } =
+    useSelector((state) => state.ApplicationState);
+  const { seeDimensions, higlightPoint } = useSelector((state) => state.Drawing);
+
+  const {decimalToFeetInches} = usePoints();
 
   const textureLoader = useMemo(() => new TextureLoader(), []);
   const windowTexture = useMemo(
@@ -143,12 +138,12 @@ const BoxGeometry = ({
   const hiddenWallTexture = useMemo(
     () => textureLoader.load(HiddenWall),
     [textureLoader]
-  );
+  )
 
   const selectedTexture = useMemo(
     () => textureLoader.load(Opening),
     [textureLoader]
-  );
+  )
 
   const length = start.distanceTo(end);
   const width = convert(dimension.width * factor[1])
@@ -161,15 +156,14 @@ const BoxGeometry = ({
   const direction = new Vector3().subVectors(end, start).normalize();
 
   // Calculate the perpendicular vector
-  const perpVector = new Vector3(-direction.y, direction.x, 0).multiplyScalar(
-    width / 2
-  );
+  const perpVector = new Vector3(-direction.y, direction.x, 0).multiplyScalar(width / 2);
 
   // Calculate the four corners
   const upperLeft = new Vector3().addVectors(start, perpVector);
   const lowerLeft = new Vector3().subVectors(start, perpVector);
   const upperRight = new Vector3().addVectors(end, perpVector);
   const lowerRight = new Vector3().subVectors(end, perpVector);
+
 
   let p1, p2, p3, p4, mid1, mid2, prevAngle;
   if (linePlacementMode === "below") {
@@ -181,6 +175,8 @@ const BoxGeometry = ({
     );
     const adjustedMidpoint = midpoint.add(offset);
     //console.log("hello adjustmid :", adjustedMidpoint);
+
+   
 
     let idx = storeLines.findIndex(
       (line) => line.points[0] === start && line.points[1] === end
@@ -262,6 +258,8 @@ const BoxGeometry = ({
     // console.log(p2);
     // console.log(p3);
     // console.log(p4);
+
+   
   }
   useEffect(() => {
     if (mid1 && mid2 && mid1 !== mid2) {
@@ -295,6 +293,8 @@ const BoxGeometry = ({
     }
   }, [points]);
 
+ 
+
   if (!start || !end) return null;
 
   // Calculate the text position slightly above the midpoint
@@ -312,9 +312,8 @@ const BoxGeometry = ({
   // State to manage the current texture
   const getTexture = () => {
     if (isSelected) return wallTexture;
-    if (hovered && selectionMode && designStep === 2) return selectedTexture;
-    if (hovered && selectionMode && designStep === 3 && activeRoomIndex !== -1)
-      return selectedTexture;
+    if (hovered && selectionMode && designStep === 2) return selectedTexture; 
+    if (hovered && selectionMode && designStep === 3 && activeRoomIndex !== -1) return selectedTexture;
     if (typeId === 1) return newTexture;
     if (typeId === 2) return doorTexture;
     if (typeId === 3) return windowTexture;
@@ -323,42 +322,32 @@ const BoxGeometry = ({
     return "";
   };
   var feetLength = 0;
-  if (measured === "ft") {
+  if(measured === "ft"){
     feetLength = decimalToFeetInches(length * factor[0]);
   }
 
   //linePlacementMode === "midpoint" ? adjustedMidpoint : middlepoint
   return (
     <>
-      <mesh
-        position={midpoint}
-        rotation={[0, 0, angle]}
-        onClick={onClick}
-        onPointerOver={() => {
-          if (activeRoomIndex !== -1) {
-            document.getElementsByClassName(
-              "canvas-container"
-            )[0].style.cursor = "pointer";
-          }
-          setHovered(true);
-        }} // Set hovered to true on mouse over
-        onPointerOut={() => {
-          if (activeRoomIndex !== -1) {
-            document.getElementsByClassName(
-              "canvas-container"
-            )[0].style.cursor = `url(${cursor}) 8 8, default`;
-          }
-          setHovered(false);
-        }} // Set hovered to false on mouse out
+      <mesh position={midpoint} rotation={[0, 0, angle]} onClick={onClick}
+        onPointerOver={() => {if(activeRoomIndex!== -1){document.getElementsByClassName('canvas-container')[0].style.cursor = "pointer"} setHovered(true)}}  // Set hovered to true on mouse over
+        onPointerOut={() => {if(activeRoomIndex!==-1){document.getElementsByClassName('canvas-container')[0].style.cursor = `url(${cursor}) 8 8, default`} setHovered(false)}}  // Set hovered to false on mouse out
       >
         <boxGeometry args={[length, typeId === 4 ? width / 2 : width, 0.1]} />
-        <meshBasicMaterial map={getTexture()} transparent={true} opacity={1} />
+        <meshBasicMaterial
+          map={getTexture()}
+          transparent={true}
+          opacity={1}
+        />
       </mesh>
 
-      {/* <mesh position={start}>
+      <mesh position={start}>
         <sphereGeometry args={[4, 16, 16]} />
         <meshBasicMaterial
           color={
+            start === higlightPoint?
+              "green"
+            :
             typeId === 2
               ? "brown"
               : typeId === 3
@@ -391,6 +380,9 @@ const BoxGeometry = ({
         <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial
           color={
+            end === higlightPoint?
+              "green"
+            :
             typeId === 2
               ? "brown"
               : typeId === 3
@@ -404,9 +396,9 @@ const BoxGeometry = ({
           transparent={true}
           opacity={opacity}
         />
-      </mesh> */}
-      <mesh position={upperLeft}>
-      <sphereGeometry args={[4, 16, 16]} />
+      </mesh>
+      {/* <mesh position={upperLeft}>
+        <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial
           color={
             typeId === 2
@@ -424,7 +416,7 @@ const BoxGeometry = ({
         />
       </mesh>
       <mesh position={lowerLeft}>
-      <sphereGeometry args={[4, 16, 16]} />
+        <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial
           color={
             typeId === 2
@@ -442,7 +434,7 @@ const BoxGeometry = ({
         />
       </mesh>
       <mesh position={upperRight}>
-      <sphereGeometry args={[4, 16, 16]} />
+        <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial
           color={
             typeId === 2
@@ -460,7 +452,7 @@ const BoxGeometry = ({
         />
       </mesh>
       <mesh position={lowerRight}>
-      <sphereGeometry args={[4, 16, 16]} />
+        <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial
           color={
             typeId === 2
@@ -476,7 +468,7 @@ const BoxGeometry = ({
           transparent={true}
           opacity={opacity}
         />
-      </mesh>
+      </mesh> */}
     </>
   );
 };
