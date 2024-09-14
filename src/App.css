@@ -49,7 +49,7 @@ body, html {
   margin-top: 16px !important; /* Add some space between the text and buttons */
 }
 /* Confirm button style */
-.swal2-confirm-button-custom {
+.swal2-cancel-button-custom {
   background-color: #000; /* Match the second image's black button */
   color: #fff;
   border: none;
@@ -69,7 +69,7 @@ body, html {
 }
 
 /* Cancel button style */
-.swal2-cancel-button-custom {
+.swal2-confirm-button-custom {
   background-color: transparent;
   border: 1px solid #000; /* Add border for cancel button */
   color: #000;
