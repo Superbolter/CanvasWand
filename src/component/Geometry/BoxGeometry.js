@@ -18,6 +18,7 @@ import Wall from "../../assets/Walll.png";
 import HiddenWall from "../../assets/hiddenwall.png"
 import Opening from "../../assets/Opening.png"
 import newWall from "../../assets/newWall.png"
+import newWall2 from "../../assets/newWall2.png"
 import { setStoreBoxes } from "../../Actions/ApplicationStateAction";
 import cursor from "../../assets/Default.png"
 import usePoints from "../../hooks/usePoints";
@@ -119,7 +120,7 @@ const BoxGeometry = ({
     [textureLoader]
   );
   const wallTexture = useMemo(
-    () => textureLoader.load(newWall), // Replace with the path to your window image
+    () => textureLoader.load(newWall2), // Replace with the path to your window image
     [textureLoader]
   );
   const railingTexture = useMemo(
@@ -310,10 +311,10 @@ const BoxGeometry = ({
 
   // State to manage the current texture
   const getTexture = () => {
-    if (isSelected) return selectedTexture;
-    if (hovered && selectionMode && designStep === 2) return newTexture; 
-    if (hovered && selectionMode && designStep === 3 && activeRoomIndex !== -1) return newTexture;
-    if (typeId === 1) return wallTexture;
+    if (isSelected) return wallTexture;
+    if (hovered && selectionMode && designStep === 2) return selectedTexture; 
+    if (hovered && selectionMode && designStep === 3 && activeRoomIndex !== -1) return selectedTexture;
+    if (typeId === 1) return newTexture;
     if (typeId === 2) return doorTexture;
     if (typeId === 3) return windowTexture;
     if (typeId === 4) return railingTexture;
@@ -337,7 +338,7 @@ const BoxGeometry = ({
         <meshBasicMaterial
           map={getTexture()}
           transparent={true}
-          opacity={0.9}
+          opacity={1}
         />
       </mesh>
 

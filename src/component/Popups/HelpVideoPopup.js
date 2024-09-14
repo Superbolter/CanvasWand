@@ -1,9 +1,9 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./HelpVideoPopup.css";
 import { useSelector } from "react-redux";
 import { Typography } from "../../design_system/StyledComponents/components/Typography";
 import useResources from "../../hooks/useResources";
-import ReactPlayer from "react-player";
+import ReactPlayer from "react-player/lazy";
 
 const videoData = {
   addRoom: {
@@ -34,7 +34,15 @@ const HelpVideoPopup = () => {
   );
   const { getRomeCdnUrl } = useResources();
 
+  const [slideIn, setSlideIn] = useState(false);
+
+  useEffect(() => {
+    setSlideIn(!!helpVideo);
+  }, [helpVideo]);
+
   const videoPlayer = useMemo(() => {
+    if (!helpVideo || !helpVideoType) return null;
+
     return (
       <ReactPlayer
         playsinline
@@ -42,7 +50,6 @@ const HelpVideoPopup = () => {
         controls
         loop
         muted
-        volume={null}
         pip
         width="350px"
         height="200px"
@@ -50,13 +57,15 @@ const HelpVideoPopup = () => {
         url={getRomeCdnUrl() + videoData[helpVideoType].videoUrl}
       />
     );
-  }, [helpVideoType]);
+  }, [helpVideoType]); // Add all necessary dependencies here
+
+  if (!helpVideo || !helpVideoType) return null;
 
   return (
     <div>
       <div
         className={
-          helpVideo ? "help-popup-container" : "help-popup-container-hidden"
+          slideIn ? "help-popup-container" : "help-popup-container-hidden"
         }
       >
         {videoPlayer}

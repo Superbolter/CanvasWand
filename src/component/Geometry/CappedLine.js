@@ -5,12 +5,14 @@ import Door from "../../assets/Door.png";
 import Railing from "../../assets/Railing.png";
 import Wall from "../../assets/Walll.png";
 import newWall from "../../assets/newWall.png";
+import newWall2 from "../../assets/newWall2.png"
 import { useSelector } from 'react-redux';
+import New from "../../assets/New.png";
 
 function CappedLine({ lines }) {
   const textureLoader = useMemo(() => new THREE.TextureLoader(), []);
   const windowTexture = useMemo(() => textureLoader.load(Window), [textureLoader]);
-  const wallTexture = useMemo(() => textureLoader.load(newWall), [textureLoader]);
+  const wallTexture = useMemo(() => textureLoader.load(New), [textureLoader]);
   const railingTexture = useMemo(() => textureLoader.load(Railing), [textureLoader]);
   const doorTexture = useMemo(() => textureLoader.load(Door), [textureLoader]);
 
@@ -72,8 +74,10 @@ function CappedLine({ lines }) {
               // Handle cap for angles  
               if (occurrences > 1) {
                 const prevLine = lines[index - 1];
+                const nextLine = lines[index + 1];
 
                 if (prevLine) {
+                  if(prevLine.typeId !== 1 || line.typeId === 4 || (nextLine && nextLine?.typeId !== 1)) return null;
                   const angle = calculateAngleBetweenLines(
                     { start: prevLine.points[0], end: prevLine.points[1] },
                     { start: line.points[0], end: line.points[1] }

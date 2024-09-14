@@ -24,7 +24,7 @@ const initialState = {
     showSetScalePopup: false,
     firstLinePoints: [],
     helpVideo: false,
-    helpVideoType: "addRoom",
+    helpVideoType: "",
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {

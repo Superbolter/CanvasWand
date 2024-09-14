@@ -353,7 +353,7 @@ export const setFirstLinePoints = (val) => {
   }
 }
 
-export const setHelpVideo = (val, type = "addRoom") =>{
+export const setHelpVideo = (val, type = "") =>{
   return (dispatch) => {
     console.log("setScale")
     dispatch({
