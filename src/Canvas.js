@@ -277,17 +277,19 @@ export const CanvasComponent = () => {
   useEffect(()=>{
     const canvasContainer = document.querySelector(".canvas-container");
     const handlePointerMove = (event)=>{
-      const point = screenToNDC(event.clientX, event.clientY);
       if(draggingLine){
+        const point = screenToNDC(event.clientX, event.clientY);
         dispatch(setContextualMenuStatus(false));
         handleLineMove(point);
       }
     }
-    canvasContainer.addEventListener("pointermove", handlePointerMove);
+    if(draggingLine){
+      canvasContainer.addEventListener("pointermove", handlePointerMove);
+    }
     return () => {
       canvasContainer.removeEventListener("pointermove", handlePointerMove);
     };
-  })
+  },[draggingLine])
 
   useEffect(()=>{
     if(typeId === 0 && !selectionMode){
@@ -331,7 +333,6 @@ export const CanvasComponent = () => {
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        // onWheel={handleWheel}
         style={
           designStep === 1
             ? { cursor: "grab" }

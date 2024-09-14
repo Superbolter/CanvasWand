@@ -25,7 +25,7 @@ const TemporaryFiller = ({ polygon }) => {
   const material = new MeshBasicMaterial({
     color: "#4B73EC",
     transparent: true,
-    opacity: 0.1,
+    opacity: 0.5,
   });
   const handleDragPoint = (newPosition, point) => {
     const index = polygon.findIndex((p) => p.x === point.x && p.y === point.y);
