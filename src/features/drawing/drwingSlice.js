@@ -14,6 +14,7 @@ const initialState = {
   information: false,
   idSelection: [],
   widthChangeType: "between",
+  snapPoint:"middle",
   type:"wall",
   selectedButton: null,
   leftPos: new Vector3(-50, 0, 0),
@@ -38,6 +39,9 @@ export const drawingSlice = createSlice({
     },
     setLowerPoint: (state, action) => {
       state.lowerpoints = action.payload;
+    },
+    setSnapPoint:(state, action) => {
+      state.snapPoint = action.payload;
     },
     setSnapActive: (state, action) => {
       state.snapActive = action.payload;
@@ -108,6 +112,7 @@ export const {
   setMeasured,
   setInformation,
   setWidthChangeType,
+  snapPoint,setSnapPoint,
   roomSelect,
   roomSelectors,
   setRoomSelect,

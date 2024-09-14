@@ -17,7 +17,7 @@ import { useActions } from "./hooks/useActions.js";
 import CreateFiller from "./component/Geometry/filler.js";
 import RomeDataManager from "./app/RomeDataManager.js";
 import { cookies } from "./App";
-import { setLinePlacementMode } from "./features/drawing/drwingSlice.js";
+import { setLinePlacementMode ,setSnapPoint} from "./features/drawing/drwingSlice.js";
 import { DraggableDoor } from "./component/Geometry/DragDrop.js";
 import { Scale } from "./component/Geometry/Scale.js";
 import DrawtoolHeader from "./component/Overlays/DrawtoolHeader.js";
@@ -99,7 +99,8 @@ export const CanvasComponent = () => {
     roomSelectors,
     snapActive,
     userLength,
-    userWidth
+    userWidth,
+    snapPoint
   } = useSelector((state) => state.drawing);
   const {
     storeBoxes,
@@ -160,6 +161,14 @@ export const CanvasComponent = () => {
       (event.key === "c" || event.key === "C")
     ) {
       dispatch(setSnapActive(!snapActive));
+    }
+    if((event.ctrlKey || event.metaKey) &&
+    (event.key === "d" || event.key === "D")){
+      dispatch(setSnapPoint("lower"));
+    }
+    if((event.ctrlKey || event.metaKey) &&
+    (event.key === "w" || event.key === "W")){
+      dispatch(setSnapPoint("upper"));
     }
     if (
       (event.ctrlKey || event.metaKey) &&

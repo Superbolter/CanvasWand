@@ -20,6 +20,15 @@ export const findLineForPoint = (point, storeLines,snapActive) => {
         if (closestPointOnLine.distanceTo(point) < (snapActive ?SNAPPING_THRESHOLD:0)) {
           return {closestPointOnLine,line};
         }
+        /*if(snapPoint==="upper"){
+            
+          }else if(snapPoint==="lower"){
+
+          }else{
+            return {closestPointOnLine,line};
+          } */
+
+        
       }
   };
 
