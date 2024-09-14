@@ -8,7 +8,9 @@
     "@mui/icons-material": "^5.16.4",
     "@mui/material": "^5.16.4",
     "@mui/styled-engine-sc": "^6.0.0-alpha.18",
-    "@react-three/drei": "^9.107.0",
+    "@react-spring/three": "^9.7.4",
+    "@react-spring/web": "^9.7.4",
+    "@react-three/drei": "^9.111.2",
     "@react-three/fiber": "^8.16.8",
     "@reduxjs/toolkit": "^2.2.5",
     "@testing-library/dom": "^10.4.0",
@@ -59,5 +61,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7"
   }
 }

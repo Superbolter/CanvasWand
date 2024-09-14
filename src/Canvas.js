@@ -59,30 +59,30 @@ import TemporaryFiller from "./component/Geometry/temporaryFiller.js";
 import cursor from "./assets/Default.png"
 import SetScalePopup from "./component/Popups/SetScalePopup.js";
 import HelpVideoPopup from "./component/Popups/HelpVideoPopup.js";
+import useMouse from "./hooks/useMouse.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
   const {
     handleClick,
-    handleMouseMove,
     handleLineClick,
-    handleMouseDown,
-    handleMouseUp,
-    currentMousePosition,
-    currentLinePostion,
-    draggingLine,
-    currentStrightMousePosition,
-    distance,
     deleteSelectedLines,
     deleteSelectedRoom,
-    nearPoint,
-    nearVal,
+  } = useDrawing();
+  const { handleMouseMove, handleMouseDown, handleMouseUp, 
     isSelecting,
     startPoint,
     endPoint,
+    nearPoint,
+    nearVal,
     draggingLineIndex,
+    draggingLine,
+    currentLinePostion,
     setCurrentLinePostion,
-  } = useDrawing();
+    currentMousePosition,
+    currentStrightMousePosition,
+    distance,
+   } = useMouse();
   const { undo, redo } = useActions();
   const { toggleSelectionMode, perpendicularHandler } = useModes();
   const {screenToNDC, decimalToFeetInches} = usePoints();
@@ -116,7 +116,7 @@ export const CanvasComponent = () => {
     showSetScalePopup,
     img
   } = useSelector((state) => state.ApplicationState);
-  const { typeId, stop, showSnapLine, snappingPoint, temporaryPolygon, enablePolygonSelection } = useSelector(
+  const { typeId, stop, showSnapLine, snappingPoint, temporaryPolygon, enablePolygonSelection,} = useSelector(
     (state) => state.Drawing
   );
 
@@ -430,7 +430,7 @@ export const CanvasComponent = () => {
             // <BoxSegments lines={storeLines} />
             <CappedLine lines={storeLines} />
           )}
-
+          {console.log(showSnapLine, snappingPoint,designStep >1 && showSnapLine && snappingPoint.length > 0 && !lineBreak )}
           {designStep >1 && showSnapLine && snappingPoint.length > 0 && !lineBreak && (
             <Line
               points={[snappingPoint[1], snappingPoint[0]]}
