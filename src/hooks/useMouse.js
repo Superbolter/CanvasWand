@@ -11,7 +11,6 @@ import {
   setSelectedLinesState,
   setStoreLines,
 } from "../Actions/ApplicationStateAction.js";
-import _ from "lodash";
 
 const useMouse = () => {
   const dispatch = useDispatch();
@@ -80,7 +79,7 @@ const useMouse = () => {
     yMap.set(yKey, point);
   });
 
-  const handleMouseMove = _.debounce((event) => {
+  const handleMouseMove = (event) => {
     let point = screenToNDC(event.clientX, event.clientY);
     if (designStep === 3 && activeRoomButton === "divide") {
       setCurrentMousePosition(point);
@@ -200,7 +199,7 @@ const useMouse = () => {
     }
 
     setCurrentMousePosition(point);
-  }, 50);
+  };
 
   const handleMouseDown = (event) => {
     // if (designStep === 3 && expandRoomPopup) {
