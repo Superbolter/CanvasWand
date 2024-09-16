@@ -20,37 +20,21 @@ const useMouse = () => {
     measured,
     roomSelectors,
     lineBreak,
-    merge,
     snapActive,
-    userLength,
-    userWidth,
   } = useSelector((state) => state.drawing);
   const {
-    typeId,
-    actionHistory,
-    stop,
-    newLine,
-    showSnapLine,
-    snappingPoint,
     dragMode,
-    mergeLine,
-    shiftPressed,
-    temporaryPolygon,
     enablePolygonSelection,
   } = useSelector((state) => state.Drawing);
   const {
     storeLines,
     points,
     factor,
-    storeBoxes,
     selectionMode,
     selectedLines,
     expandRoomPopup,
-    roomEditingMode,
-    activeRoomIndex,
     designStep,
     activeRoomButton,
-    img,
   } = useSelector((state) => state.ApplicationState);
 
   const [isSelecting, setIsSelecting] = useState(false);
@@ -130,6 +114,9 @@ const useMouse = () => {
       const end = point;
       setEndPoint(end);
     }
+    if(selectionMode && designStep === 2){
+      setCurrentMousePosition(point);
+    }
     if (points.length === 0 || designStep === 1 || selectionMode) return;
 
     if (designStep === 3) return;
@@ -151,12 +138,12 @@ const useMouse = () => {
       }
     }
 
-    const highlightPoint = points.find((pt) => pt.distanceTo(point) < 5);
-    if(highlightPoint){
-        dispatch(setHiglightPoint(highlightPoint))
-    }else{
-        dispatch(setHiglightPoint(null))
-    }
+    // const highlightPoint = points.find((pt) => pt.distanceTo(point) < 5);
+    // if(highlightPoint){
+    //     dispatch(setHiglightPoint(highlightPoint))
+    // }else{
+    //     dispatch(setHiglightPoint(null))
+    // }
     let cuuPoint = point; // Copy the point
     const lastPoint = points[points.length - 1];
     if (cuuPoint.x !== lastPoint.x && cuuPoint.y !== lastPoint.y) {
@@ -217,15 +204,14 @@ const useMouse = () => {
         const beforeUpdation = points[pointIndex];
         let updatedDraggingLineIndex = [];
         storeLines.map((line, index) => {
-          let updatedLine = { ...line };
-          if (updatedLine.points[0].equals(beforeUpdation)) {
+          if (line.points[0].equals(beforeUpdation)) {
             const data = {
               index: index,
               type: "start",
             };
             updatedDraggingLineIndex.push(data);
           }
-          if (updatedLine.points[1].equals(beforeUpdation)) {
+          if (line.points[1].equals(beforeUpdation)) {
             const data = {
               index: index,
               type: "end",

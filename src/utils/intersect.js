@@ -14,7 +14,7 @@ export const getLineIntersection = (p1, p2, p3, p4,snapActive) => {
     p2,
     p4
   );
-  if (closestPointOnLine.distanceTo(p4) < (snapActive ?SNAPPING_THRESHOLD:0)) {
+  if (closestPointOnLine.distanceTo(p4) < (snapActive ?5:0)) {
     return closestPointOnLine;
   }
 

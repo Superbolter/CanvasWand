@@ -294,9 +294,6 @@ const BoxGeometry = ({
   }, [points]);
 
  
-
-  if (!start || !end) return null;
-
   // Calculate the text position slightly above the midpoint
   const textPosition = new Vector3(
     midpoint.x - 20 * Math.sin(angle),
@@ -326,8 +323,8 @@ const BoxGeometry = ({
     feetLength = decimalToFeetInches(length * factor[0]);
   }
 
-  //linePlacementMode === "midpoint" ? adjustedMidpoint : middlepoint
-  return (
+  const memoisedLine = useMemo(()=>{
+    return(
     <>
       <mesh position={midpoint} rotation={[0, 0, angle]} onClick={onClick}
         onPointerOver={() => {if(activeRoomIndex!== -1){document.getElementsByClassName('canvas-container')[0].style.cursor = "pointer"} setHovered(true)}}  // Set hovered to true on mouse over
@@ -469,6 +466,86 @@ const BoxGeometry = ({
           opacity={opacity}
         />
       </mesh> */}
+    </>)
+  }, [isSelected, typeId, start, end, hovered, activeRoomIndex])
+
+  if (!start || !end) return null;
+
+  return (
+    // isCustomised?
+    // <>
+    // <mesh position={midpoint} rotation={[0, 0, angle]} onClick={onClick}
+    //     onPointerOver={() => {if(activeRoomIndex!== -1){document.getElementsByClassName('canvas-container')[0].style.cursor = "pointer"} setHovered(true)}}  // Set hovered to true on mouse over
+    //     onPointerOut={() => {if(activeRoomIndex!==-1){document.getElementsByClassName('canvas-container')[0].style.cursor = `url(${cursor}) 8 8, default`} setHovered(false)}}  // Set hovered to false on mouse out
+    //   >
+    //     <boxGeometry args={[length, typeId === 4 ? width / 2 : width, 0.1]} />
+    //     <meshBasicMaterial
+    //       map={getTexture()}
+    //       transparent={true}
+    //       opacity={1}
+    //     />
+    //   </mesh>
+
+    //   <mesh position={start}>
+    //     <sphereGeometry args={[4, 16, 16]} />
+    //     <meshBasicMaterial
+    //       color={
+    //         start === higlightPoint?
+    //           "green"
+    //         :
+    //         typeId === 2
+    //           ? "brown"
+    //           : typeId === 3
+    //           ? "skyblue"
+    //           : typeId === 4
+    //           ? "violet"
+    //           : typeId === 4 
+    //           ? "#E6AB4A"
+    //           : "black"
+    //       }
+    //       transparent={true}
+    //       opacity={opacity}
+    //     />
+    //   </mesh>
+
+    //   {(seeDimensions || showDimension) && typeId !== 5 && (
+    //     <Text
+    //       position={textPosition}
+    //       rotation={[0, 0, textRotation]}
+    //       fontSize={9}
+    //       color="black"
+    //       anchorX="center"
+    //       anchorY="middle"
+    //     > 
+    //       { distance ? `${length.toFixed(2)}` : measured === "ft"? `${feetLength.feet}'${feetLength.inches} ${measured}`:`${(length * factor[0]).toFixed(2)} ${measured}`}
+    //     </Text>
+    //   )}
+
+    //   <mesh position={end}>
+    //     <sphereGeometry args={[3, 16, 16]} />
+    //     <meshBasicMaterial
+    //       color={
+    //         end === higlightPoint?
+    //           "green"
+    //         :
+    //         typeId === 2
+    //           ? "brown"
+    //           : typeId === 3
+    //           ? "skyblue"
+    //           : typeId === 4
+    //           ? "violet"
+    //           : typeId === 4 
+    //           ? "#E6AB4A"
+    //           : "black"
+    //       }
+    //       transparent={true}
+    //       opacity={opacity}
+    //     />
+    //   </mesh>
+    // </>
+    // :
+    <>
+    {memoisedLine}
     </>
   );
 };
