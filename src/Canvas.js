@@ -351,7 +351,7 @@ export const CanvasComponent = () => {
             ? designStep === 3? 
                 enablePolygonSelection
                 ? { cursor:`url(${newCursor}) 16 16, crosshair`}
-                : { cursor: `url(${cursor}) 8 8, default` }
+                : { cursor: `url(${cursor}) 4 4, default` }
               : { cursor: "grab" }
             : { cursor: `url(${newCursor}) 16 16, crosshair` }
         }
