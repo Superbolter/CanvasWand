@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import usePoints from "./usePoints";
 import { Vector3 } from "three";
-import { setHiglightPoint, setShowSnapLine, setSnappingPoint } from "../Actions/DrawingActions";
+import {
+  setHiglightPoint,
+  setShowSnapLine,
+  setSnappingPoint,
+} from "../Actions/DrawingActions";
 import { findLineForPoint } from "../utils/coolinear.js";
 import convert from "convert-units";
 import { calculateAlignedPoint } from "../utils/uniqueId";
@@ -15,17 +19,11 @@ import {
 const useMouse = () => {
   const dispatch = useDispatch();
   const { screenToNDC } = usePoints();
-  const {
-    perpendicularLine,
-    measured,
-    roomSelectors,
-    lineBreak,
-    snapActive,
-  } = useSelector((state) => state.drawing);
-  const {
-    dragMode,
-    enablePolygonSelection,
-  } = useSelector((state) => state.Drawing);
+  const { perpendicularLine, measured, roomSelectors, lineBreak, snapActive } =
+    useSelector((state) => state.drawing);
+  const { dragMode, enablePolygonSelection } = useSelector(
+    (state) => state.Drawing
+  );
   const {
     storeLines,
     points,
@@ -114,7 +112,7 @@ const useMouse = () => {
       const end = point;
       setEndPoint(end);
     }
-    if(selectionMode && designStep === 2){
+    if (selectionMode && designStep === 2) {
       setCurrentMousePosition(point);
     }
     if (points.length === 0 || designStep === 1 || selectionMode) return;
@@ -202,6 +200,7 @@ const useMouse = () => {
       if (pointIndex !== -1) {
         setDraggingPointIndex(pointIndex);
         const beforeUpdation = points[pointIndex];
+        dispatch(setHiglightPoint(beforeUpdation));
         let updatedDraggingLineIndex = [];
         storeLines.map((line, index) => {
           if (line.points[0].equals(beforeUpdation)) {
@@ -249,44 +248,10 @@ const useMouse = () => {
   };
 
   const handleMouseUp = (event) => {
-    if (draggingPointIndex !== null && designStep === 2) {
-      const point = screenToNDC(event.clientX, event.clientY);
-      let beforeUpdation = points[draggingPointIndex];
-      let updatedPoints = points.map((p) => {
-        if (p.equals(beforeUpdation)) {
-          return point;
-        }
-        return p;
-      });
-      dispatch(setPoints(updatedPoints));
-
-      const updatedLines = storeLines.map((line) => {
-        let updatedLine = { ...line }; // Shallow copy of the line object
-        if (updatedLine.points[0].equals(beforeUpdation)) {
-          updatedLine = {
-            ...updatedLine,
-            points: [point, updatedLine.points[1]],
-            length: convert(point.distanceTo(updatedLine.points[1]) * factor[0])
-              .from(measured)
-              .to("mm"),
-          };
-        }
-
-        if (updatedLine.points[1].equals(beforeUpdation)) {
-          updatedLine = {
-            ...updatedLine,
-            points: [updatedLine.points[0], point],
-            length: convert(updatedLine.points[0].distanceTo(point) * factor[0])
-              .from(measured)
-              .to("mm"),
-          };
-        }
-        return updatedLine;
-      });
-
-      dispatch(setStoreLines(updatedLines));
-    }
-    if (draggingLine !== null && designStep === 2 && currentLinePostion) {
+    if (
+      (draggingPointIndex !== null || draggingLine !== null) &&
+      designStep === 2
+    ) {
       let pts = [];
       storeLines.map((line) => {
         const startPoint = line.points[0];
@@ -312,40 +277,89 @@ const useMouse = () => {
           pts.push(endPoint);
         }
       });
-      var startPoint = currentLinePostion[0];
-      var endPoint = currentLinePostion[1];
-      pts.map((pt) => {
-        if (currentLinePostion[0].distanceTo(pt) < 15) {
-          startPoint = pt;
-        } else if (currentLinePostion[1].distanceTo(pt) < 15) {
-          endPoint = pt;
-        }
-      });
-      const updatedLines = storeLines.map((line, index) => {
-        let updatedLine = { ...line }; // Shallow copy of the line object
-        if (index === draggingLine) {
-          const beforeUpdation1 = line.points[0];
-          const beforeUpdation2 = line.points[1];
-          let updatedPoints = points.map((p) => {
-            if (p.equals(beforeUpdation1)) {
-              return startPoint;
-            } else if (p.equals(beforeUpdation2)) {
-              return endPoint;
-            }
-            return p;
-          });
-          dispatch(setPoints(updatedPoints));
-          updatedLine = {
-            ...updatedLine,
-            points: [startPoint, endPoint],
-            length: convert(startPoint.distanceTo(endPoint) * factor[0])
-              .from(measured)
-              .to("mm"),
-          };
-        }
-        return updatedLine;
-      });
-      dispatch(setStoreLines(updatedLines));
+
+      if (draggingPointIndex !== null && designStep === 2) {
+        let point = screenToNDC(event.clientX, event.clientY);
+        pts.map((pt) => {
+          if (point.distanceTo(pt) < 15) {
+            point = pt;
+          } 
+        });
+        let beforeUpdation = points[draggingPointIndex];
+        let updatedPoints = points.map((p) => {
+          if (p.equals(beforeUpdation)) {
+            return point;
+          }
+          return p;
+        });
+        dispatch(setPoints(updatedPoints));
+
+        const updatedLines = storeLines.map((line) => {
+          let updatedLine = { ...line }; // Shallow copy of the line object
+          if (updatedLine.points[0].equals(beforeUpdation)) {
+            updatedLine = {
+              ...updatedLine,
+              points: [point, updatedLine.points[1]],
+              length: convert(
+                point.distanceTo(updatedLine.points[1]) * factor[0]
+              )
+                .from(measured)
+                .to("mm"),
+            };
+          }
+
+          if (updatedLine.points[1].equals(beforeUpdation)) {
+            updatedLine = {
+              ...updatedLine,
+              points: [updatedLine.points[0], point],
+              length: convert(
+                updatedLine.points[0].distanceTo(point) * factor[0]
+              )
+                .from(measured)
+                .to("mm"),
+            };
+          }
+          return updatedLine;
+        });
+
+        dispatch(setStoreLines(updatedLines));
+      }
+      if (draggingLine !== null && designStep === 2 && currentLinePostion) {
+        var startPoint = currentLinePostion[0];
+        var endPoint = currentLinePostion[1];
+        pts.map((pt) => {
+          if (currentLinePostion[0].distanceTo(pt) < 15) {
+            startPoint = pt;
+          } else if (currentLinePostion[1].distanceTo(pt) < 15) {
+            endPoint = pt;
+          }
+        });
+        const updatedLines = storeLines.map((line, index) => {
+          let updatedLine = { ...line }; // Shallow copy of the line object
+          if (index === draggingLine) {
+            const beforeUpdation1 = line.points[0];
+            const beforeUpdation2 = line.points[1];
+            let updatedPoints = points.map((p) => {
+              if (p.equals(beforeUpdation1)) {
+                return startPoint;
+              } else if (p.equals(beforeUpdation2)) {
+                return endPoint;
+              }
+              return p;
+            });
+            dispatch(setPoints(updatedPoints));
+            updatedLine = {
+              ...updatedLine,
+              points: [startPoint, endPoint],
+              length: convert(startPoint.distanceTo(endPoint) * factor[0])
+                .from(measured)
+                .to("mm"),
+            };
+          }
+          return updatedLine;
+        });
+        dispatch(setStoreLines(updatedLines));
+      }
     }
     setDraggingPointIndex(null);
     setDraggingLineIndex([]);
