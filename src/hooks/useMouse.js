@@ -61,12 +61,6 @@ const useMouse = () => {
     yMap.set(yKey, point);
   });
 
-  const distanceTo = (p1, p2) => {
-    const dx = p1.x - p2.x;
-    const dy = p1.y - p2.y;
-    return Math.sqrt(dx * dx + dy * dy);
-  };
-
   const handleMouseMove = (event) => {
     let point = screenToNDC(event.clientX, event.clientY);
     if (designStep === 3 && activeRoomButton === "divide") {
@@ -162,22 +156,16 @@ const useMouse = () => {
       for (let x = xStart; x <= xEnd; x++) {
         const candidate = xMap.get(x);
         if (candidate) {
-          const dist = distanceTo(candidate, point);
-          if (dist <= threshold) {
-            snapX = candidate;
-            break; // Stop searching once we find a valid point
-          }
+          snapX = candidate;
+          break; // Stop searching once we find a valid point
         }
       }
 
       for (let y = yStart; y <= yEnd; y++) {
         const candidate = yMap.get(y);
         if (candidate) {
-          const dist = distanceTo(candidate, point);
-          if (dist <= threshold) {
-            snapY = candidate;
-            break; // Stop searching once we find a valid point
-          }
+          snapY = candidate;
+          break; // Stop searching once we find a valid point
         }
       }
 
@@ -187,7 +175,7 @@ const useMouse = () => {
 
       // Dispatch snapping actions
       if (snapX || snapY) {
-        // console.log(snapX, snapY);
+        console.log(snapX, snapY);
         dispatch(setSnappingPoint([cuuPoint, snapX || snapY]));
         dispatch(setShowSnapLine(true));
       } else {

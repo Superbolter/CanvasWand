@@ -345,19 +345,19 @@ const BoxGeometry = ({
         rotation={[0, 0, angle]}
         onClick={onClick}
         onPointerOver={() => {
-          if (activeRoomIndex !== -1) {
-            document.getElementsByClassName(
-              "canvas-container"
-            )[0].style.cursor = "pointer";
-          }
+          // if (activeRoomIndex !== -1) {
+          //   document.getElementsByClassName(
+          //     "canvas-container"
+          //   )[0].style.cursor = "pointer";
+          // }
           setHovered(true);
         }} // Set hovered to true on mouse over
         onPointerOut={() => {
-          if (activeRoomIndex !== -1) {
-            document.getElementsByClassName(
-              "canvas-container"
-            )[0].style.cursor = `url(${cursor}) 8 8, default`;
-          }
+          // if (activeRoomIndex !== -1) {
+          //   document.getElementsByClassName(
+          //     "canvas-container"
+          //   )[0].style.cursor = `url(${cursor}) 8 8, default`;
+          // }
           setHovered(false);
         }} // Set hovered to false on mouse out
       >
