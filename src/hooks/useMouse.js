@@ -61,6 +61,12 @@ const useMouse = () => {
     yMap.set(yKey, point);
   });
 
+  const distanceTo = (p1, p2) => {
+    const dx = p1.x - p2.x;
+    const dy = p1.y - p2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
   const handleMouseMove = (event) => {
     let point = screenToNDC(event.clientX, event.clientY);
     if (designStep === 3 && activeRoomButton === "divide") {
@@ -142,11 +148,38 @@ const useMouse = () => {
     // }else{
     //     dispatch(setHiglightPoint(null))
     // }
+    const threshold = 5;
+    const xStart = point.x - threshold;
+    const xEnd = point.x + threshold;
+    const yStart = point.y - threshold;
+    const yEnd = point.y + threshold;
+
     let cuuPoint = point; // Copy the point
     const lastPoint = points[points.length - 1];
     if (cuuPoint.x !== lastPoint.x && cuuPoint.y !== lastPoint.y) {
-      const snapX = xMap.get(cuuPoint.x);
-      const snapY = yMap.get(cuuPoint.y);
+      let snapX = xMap.get(cuuPoint.x);
+      let snapY = yMap.get(cuuPoint.y);
+      for (let x = xStart; x <= xEnd; x++) {
+        const candidate = xMap.get(x);
+        if (candidate) {
+          const dist = distanceTo(candidate, point);
+          if (dist <= threshold) {
+            snapX = candidate;
+            break; // Stop searching once we find a valid point
+          }
+        }
+      }
+
+      for (let y = yStart; y <= yEnd; y++) {
+        const candidate = yMap.get(y);
+        if (candidate) {
+          const dist = distanceTo(candidate, point);
+          if (dist <= threshold) {
+            snapY = candidate;
+            break; // Stop searching once we find a valid point
+          }
+        }
+      }
 
       // Snap to the found x or y if they exist
       if (snapX) cuuPoint.x = snapX.x;
