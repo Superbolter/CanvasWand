@@ -10,6 +10,7 @@ import { setShowPopup, setTypeId } from '../../Actions/DrawingActions.js';
 import { setSelectedButton } from '../../features/drawing/drwingSlice.js';
 import useModes from '../../hooks/useModes.js';
 import HowTo from './HowTo.js';
+import divide from "../../assets/divide.svg";
 
 const ButtonComponent = () => {
   const {lineBreak,merge} = useSelector((state) => state.drawing);
@@ -38,8 +39,12 @@ const ButtonComponent = () => {
       dispatch(setTypeId(2))
     }else if(buttonName === "Window"){
       dispatch(setTypeId(3))
-    }else{
+    }else if(buttonName === "Railing"){
       dispatch(setTypeId(4))
+    }else if(buttonName === "Divide"){
+      dispatch(setTypeId(5))
+    }else{
+      dispatch(setTypeId(0))
     }
     
   };
@@ -59,6 +64,13 @@ const ButtonComponent = () => {
               <Typography className='btn-text' style={{color:selectedButton==="Walls"&&"#4B73EC" }}>Walls</Typography>
             </div>
             <HowTo type="addWall" />
+            </div>
+            <div
+              className={`drawtool-btn ${selectedButton === 'Divide' ? 'selected' : ''}`}
+              onClick={() => handleButtonClick('Divide')}
+            >
+              <img src={divide} alt="" style={{ width: "24px", height: "24px",}} />
+              <Typography className='btn-text' style={{color:selectedButton==="Divide"&&"#4B73EC" }}>Open Wall</Typography>
             </div>
             {/* <div
               className={`drawtool-btn ${selectedButton === 'Room' ? 'selected' : ''}`}

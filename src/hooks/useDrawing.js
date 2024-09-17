@@ -507,7 +507,8 @@ export const useDrawing = () => {
       dispatch(updateTemoraryPolygon(polygon));
       const newLine = [...selectedLines]
       storeLines.map((line) => {
-        if(isPointInsidePolygon(polygon, line.points[0]) || isPointInsidePolygon(polygon, line.points[1])){
+        const midpoint = new Vector3().addVectors(line.points[0], line.points[1]).multiplyScalar(0.5);
+        if(isPointInsidePolygon(polygon, midpoint)){
           newLine.push(line.id)
         }
       })

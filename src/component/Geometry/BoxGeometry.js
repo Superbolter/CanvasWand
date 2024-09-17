@@ -306,8 +306,7 @@ const BoxGeometry = ({
     }
   }, [points]);
 
-  if (!start || !end) return null;
-
+ 
   // Calculate the text position slightly above the midpoint
   const textPosition = new Vector3(
     midpoint.x - 20 * Math.sin(angle),
@@ -338,9 +337,9 @@ const BoxGeometry = ({
     feetLength = decimalToFeetInches(length * factor[0]);
   }
 
-  //linePlacementMode === "midpoint" ? adjustedMidpoint : middlepoint
-  return (
-    <>
+  const memoisedLine = useMemo(()=>{
+    return(
+      <>
       <mesh
         position={midpoint}
         rotation={[0, 0, angle]}
@@ -357,7 +356,7 @@ const BoxGeometry = ({
           if (activeRoomIndex !== -1) {
             document.getElementsByClassName(
               "canvas-container"
-            )[0].style.cursor = `url(${cursor}) 8 8, default`;
+            )[0].style.cursor = `url(${cursor}) 4 4, default`;
           }
           setHovered(false);
         }} // Set hovered to false on mouse out
@@ -505,7 +504,16 @@ const BoxGeometry = ({
         </mesh>
       )} */}
     </>
-  );
+    )
+  },[start, end, isSelected, hovered, activeRoomIndex, typeId])
+
+  if (!start || !end) return null;
+
+  return (
+    <>
+      {memoisedLine}
+    </>
+  )
 };
 
 export default BoxGeometry;

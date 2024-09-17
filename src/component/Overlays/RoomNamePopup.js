@@ -178,8 +178,9 @@ const RoomNamePopup = () => {
     if (roomName.length > 0 && selectedRoomType?.length > 0) {
       addRoom(roomName, selectedRoomType);
       setName("");
-      dispatch(setRoomDetails(""));
-      dispatch(setRoomName(""));
+      dispatch(setActiveRoomButton(""));
+      dispatch(setEnablePolygonSelection(false))
+      handleReset(false);
     } else {
       if (roomName.length === 0) {
         setError("Please enter room name");

@@ -16,6 +16,7 @@ import Delete from "../../assets/Delete.png";
 import { setLineBreakState, setMergeState } from "../../features/drawing/drwingSlice.js";
 import useModes from "../../hooks/useModes.js";
 import { useDrawing } from "../../hooks/useDrawing.js";
+import divide from "../../assets/divide.svg";
 
 const ContextualMenu = () => {
   const dispatch = useDispatch();
@@ -49,6 +50,13 @@ const ContextualMenu = () => {
     e.stopPropagation();
     dispatch(updateLineTypeId(4));
     dispatch(setTypeId(4));
+    dispatch(setSelectedLinesState([]));
+  };
+
+  const handleDivideClick = (e) => {
+    e.stopPropagation()
+    dispatch(updateLineTypeId(5));
+    dispatch(setTypeId(5));
     dispatch(setSelectedLinesState([]));
   };
 
@@ -107,6 +115,10 @@ const ContextualMenu = () => {
         <div className="contextual-menu-element" onClick={handleRailingClick}>
           <img src={RailingIcon} alt="" />
           <Typography className="contextual-menu-text">Railing</Typography>
+        </div>
+        <div className="contextual-menu-element" onClick={handleDivideClick}>
+          <div style={{height:"34px", width:"34px", backgroundColor:"#E6AB4A80", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:"50%"}}><img src={divide} alt="" /></div>
+          <Typography className="contextual-menu-text">Opening</Typography>
         </div>
         </div>
           {positionType !== "neutral" && (

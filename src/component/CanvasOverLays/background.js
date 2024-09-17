@@ -21,13 +21,21 @@ const BackgroundImage = () => {
       return [texture.image.width, texture.image.height]
     }
   },[screenHeight,screenWidth,aspectRatio])
-
-  return (
-    image? 
-    <mesh position={[0, 0, -3]}>
+  
+  const memoImage = useMemo(()=>{
+    return(
+      <mesh position={[0, 0, -3]}>
       <planeGeometry args={[fixedWidth, fixedHeight]}  />
       <meshBasicMaterial map={texture}  transparent = {imageOpacity === 1 ? false: true} opacity={imageOpacity}/>
     </mesh>
+    )
+  },[image])
+
+  return (
+    image? 
+    <>
+      {memoImage}
+    </>
     : 
     null
   );
