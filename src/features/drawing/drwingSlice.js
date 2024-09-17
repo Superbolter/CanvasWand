@@ -14,7 +14,7 @@ const initialState = {
   information: false,
   idSelection: [],
   widthChangeType: "between",
-  snapPoint:"middle",
+  snapPoint:"normal",
   type:"wall",
   selectedButton: null,
   leftPos: new Vector3(-50, 0, 0),
