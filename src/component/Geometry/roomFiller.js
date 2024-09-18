@@ -143,6 +143,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
   // Adjust font size based on bounding box dimensions
   const fontSize = Math.min(boxSize.x, boxSize.y) * 0.1;
   return (
+    activeRoomButton === "divide" && activeRoomIndex !== index ? null:
     <>
       <mesh>
         <shapeGeometry attach="geometry" args={[shape]} />

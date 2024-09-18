@@ -114,6 +114,7 @@ const BoxGeometry = ({
     designStep,
     selectionMode,
     activeRoomIndex,
+    activeRoomButton
   } = useSelector((state) => state.ApplicationState);
   const { seeDimensions, higlightPoint } = useSelector(
     (state) => state.Drawing
@@ -323,7 +324,7 @@ const BoxGeometry = ({
   const getTexture = () => {
     if (isSelected) return wallTexture;
     if (hovered && selectionMode && designStep === 2) return selectedTexture;
-    if (hovered && selectionMode && designStep === 3 && activeRoomIndex !== -1)
+    if (hovered && selectionMode && designStep === 3 && activeRoomIndex !== -1 && activeRoomButton !== "divide")
       return selectedTexture;
     if (typeId === 1) return newTexture;
     if (typeId === 2) return doorTexture;
