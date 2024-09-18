@@ -571,7 +571,6 @@ export const useDrawing = () => {
         dispatch(setContextualMenuStatus(true, pointToSend, "neutral"));
       }
       dispatch(setNewLine(false));
-      console.log("HII:",snapPoint,linePlacementMode);
 
       point = snapToPoint(point, points, storeLines, snapActive,factor,measured,snapPoint,linePlacementMode);
       // let result = findLineForPoint(point, storeLines, snapActive);
@@ -591,7 +590,6 @@ export const useDrawing = () => {
     if (perpendicularLine && points.length > 0) {
       point = calculateAlignedPoint(points[points.length - 1], point);
     }
-    console.log("HII:",snapPoint,linePlacementMode);// undefined Value
 
     point = snapToPoint(point, points, storeLines, snapActive,factor,measured,snapPoint,linePlacementMode); //snapping
     // let result = findLineForPoint(point, storeLines, snapActive);
