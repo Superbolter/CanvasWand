@@ -34,6 +34,7 @@ import { Check } from "@mui/icons-material";
 import useModes from "../../hooks/useModes.js";
 import { useDrawing } from "../../hooks/useDrawing.js";
 import HowTo from "./HowTo.js";
+import toast from "react-hot-toast";
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   "label + &": {
@@ -125,21 +126,36 @@ const RoomNamePopup = () => {
   };
 
   const divideRoomClick = () => {
+    if(activeRoomIndex === -1){
+      toast.error("Please select a room to divide",
+        {
+          style: {
+            color: "#000",
+            boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.25)",
+            borderRadius: "8px",
+            fontFamily: "'DM Sans', sans-serif",
+          },
+        }
+      )
+      return;
+    } 
     if (activeRoomButton === "divide") {
       dispatch(setActiveRoomButton(""));
       dispatch(setTypeId(0));
       if (!selectionMode) {
         toggleSelectionMode();
       }
+      dispatch(updateTemoraryPolygon([]))
       return;
     }
-    dispatch(setEnablePolygonSelection(false))
+    dispatch(setEnablePolygonSelection(true))
     dispatch(setActiveRoomButton("divide"));
-    dispatch(setTypeId(5));
-    if (selectionMode) {
-      toggleSelectionMode();
-    }
-    handleReset(false);
+    dispatch(setRoomDetails(""));
+    dispatch(setRoomName(""));
+    dispatch(setRoomEditingMode(false));
+    dispatch(setSelectedLinesState([]));
+    dispatch(setExpandRoomNamePopup(false));
+    dispatch(updateTemoraryPolygon([]))
   };
 
   const handleChange = (event) => {

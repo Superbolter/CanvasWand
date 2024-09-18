@@ -42,6 +42,7 @@ import {
   setCurrentStrightMousePosition,
   setDistance,
   setDragMode,
+  setEnablePolygonSelection,
   setMergeLine,
   setNewLine,
   setRedoStack,
@@ -60,6 +61,7 @@ import withReactContent from "sweetalert2-react-content";
 import { toast } from "react-hot-toast";
 import useModes from "./useModes.js";
 import usePoints from "./usePoints.js";
+import { dividePolygon } from "../utils/polygon.js";
 
 const MySwal = withReactContent(Swal);
 
@@ -483,7 +485,7 @@ export const useDrawing = () => {
 
   const handleClick = (event) => {
     dispatch(setHelpVideo(false))
-    if (selectionMode && !lineClick && !expandRoomPopup) {
+    if (selectionMode && !lineClick && !enablePolygonSelection && activeRoomButton !== "divide") {
       setSelectedLines([]);
       dispatch(setContextualMenuStatus(false));
       dispatch(setShowPopup(false));
@@ -500,7 +502,7 @@ export const useDrawing = () => {
 
     let point = screenToNDC(event.clientX, event.clientY);
 
-    if(designStep ===3 && enablePolygonSelection){
+    if(designStep ===3 && enablePolygonSelection && activeRoomButton !== "divide"){
       const polygon = [...temporaryPolygon];
       const history = [...roomActionHistory];
       if(showSnapLine){
@@ -540,6 +542,65 @@ export const useDrawing = () => {
         }
       })
       dispatch(setSelectedLinesState(newLine));
+      return
+    }
+    if(designStep === 3 && activeRoomButton === "divide"){
+      const line = [...temporaryPolygon];
+      line.push(point);
+      if(line.length === 1){
+        dispatch(updateTemoraryPolygon(line));
+      }
+      if(line.length === 2){
+        const history = [...roomActionHistory];
+        const polygon = roomSelectors[activeRoomIndex].polygon;
+        const newPolygon = dividePolygon(polygon, line);
+        if (newPolygon.length > 1) {
+          const newRooms = roomSelectors.filter(
+            (room, index) => index !== activeRoomIndex
+          );
+          newPolygon.forEach((polygon, index) => {
+            const newLine = [];
+            storeLines.map((line) => {
+              const midpoint = new Vector3()
+                .addVectors(line.points[0], line.points[1])
+                .multiplyScalar(0.5);
+              if (isPointInsidePolygon(polygon, midpoint)) {
+                newLine.push(line.id);
+              }
+            });
+            const newRoom = {
+              roomId: uniqueId(),
+              polygon: polygon,
+              roomName: `New Room ${roomSelectors.length + index + 1}`,
+              roomType: "",
+              wallIds: [...newLine],
+            };
+            newRooms.push(newRoom);
+          });
+          history.push({
+            type: "updateRoom",
+            oldRooms: [...roomSelectors],
+            newRooms: [...newRooms],
+          });
+          dispatch(setRoomUndoStack(history));
+          dispatch(setRoomRedoStack([]));
+          dispatch(setRoomSelectors(newRooms));
+          dispatch(setEnablePolygonSelection(false));
+          dispatch(setActiveRoomButton(""));
+          dispatch(setActiveRoomIndex(-1));
+        } else {
+          toast.error("Invalid Division, kindly draw to divide the room", {
+            style: {
+              color: "#000",
+              boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.25)",
+              borderRadius: "8px",
+              fontFamily: "'DM Sans', sans-serif",
+            },
+          });
+        }
+        dispatch(updateTemoraryPolygon([]));
+        
+      }
       return
     }
     if (selectionMode || merge || designStep === 1) return; // Prevent drawing new lines in selection mode

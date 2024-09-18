@@ -525,7 +525,7 @@ export const CanvasComponent = () => {
               />
             ))}
           
-          {designStep===3 && activeRoomButton === "add" && temporaryPolygon.length> 0 && (
+          {designStep===3 && (activeRoomButton === "add" || activeRoomButton === "divide") && temporaryPolygon.length> 0 && (
             <TemporaryFiller polygon={temporaryPolygon} />
           )}
           {designStep === 3 && enablePolygonSelection && currentMousePosition && temporaryPolygon.length> 0 && (
