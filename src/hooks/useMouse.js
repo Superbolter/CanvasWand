@@ -222,7 +222,7 @@ const useMouse = () => {
       if (pointIndex !== -1) {
         setDraggingPointIndex(pointIndex);
         const beforeUpdation = points[pointIndex];
-        dispatch(setHiglightPoint(beforeUpdation));
+        // dispatch(setHiglightPoint(beforeUpdation));
         let updatedDraggingLineIndex = [];
         storeLines.map((line, index) => {
           if (line.points[0].equals(beforeUpdation)) {
