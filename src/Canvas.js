@@ -162,13 +162,16 @@ export const CanvasComponent = () => {
     ) {
       dispatch(setSnapActive(!snapActive));
     }
-    if((event.ctrlKey || event.metaKey) &&
-    (event.key === "d" || event.key === "D")){
-      dispatch(setSnapPoint("lower"));
-    }
-    if((event.ctrlKey || event.metaKey) &&
-    (event.key === "w" || event.key === "W")){
-      dispatch(setSnapPoint("upper"));
+   
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      (event.key === "Q" || event.key === "q")
+    ) {
+      if (snapPoint === "normal") {
+        dispatch(setSnapPoint("upper"));
+      } else {
+        dispatch(setSnapPoint("normal"));
+      }
     }
     if (
       (event.ctrlKey || event.metaKey) &&
