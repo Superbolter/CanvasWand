@@ -29,7 +29,7 @@ const BackgroundImage = () => {
       <meshBasicMaterial map={texture}  transparent = {imageOpacity === 1 ? false: true} opacity={imageOpacity}/>
     </mesh>
     )
-  },[image])
+  },[image, imageOpacity])
 
   return (
     image? 
