@@ -4,8 +4,10 @@ import usePoints from "./usePoints";
 import { Vector3 } from "three";
 import {
   setHiglightPoint,
+  setRedoStack,
   setShowSnapLine,
   setSnappingPoint,
+  setUndoStack,
 } from "../Actions/DrawingActions";
 import { findLineForPoint } from "../utils/coolinear.js";
 import convert from "convert-units";
@@ -21,7 +23,7 @@ const useMouse = () => {
   const { screenToNDC } = usePoints();
   const { perpendicularLine, measured, roomSelectors, lineBreak, snapActive } =
     useSelector((state) => state.drawing);
-  const { dragMode, enablePolygonSelection } = useSelector(
+  const { dragMode, enablePolygonSelection, actionHistory } = useSelector(
     (state) => state.Drawing
   );
   const {
@@ -175,7 +177,6 @@ const useMouse = () => {
 
       // Dispatch snapping actions
       if (snapX || snapY) {
-        console.log(snapX, snapY);
         dispatch(setSnappingPoint([cuuPoint, snapX || snapY]));
         dispatch(setShowSnapLine(true));
       } else {
@@ -273,6 +274,7 @@ const useMouse = () => {
       (draggingPointIndex !== null || draggingLine !== null) &&
       designStep === 2
     ) {
+      const history = [...actionHistory];
       let pts = [];
       storeLines.map((line) => {
         const startPoint = line.points[0];
@@ -344,6 +346,15 @@ const useMouse = () => {
         });
 
         dispatch(setStoreLines(updatedLines));
+        history.push({
+          type: "pointLineDrag",
+          prevPoints: points,
+          prevLines: storeLines,
+          updatedPoints,
+          updatedLines
+        });
+        dispatch(setUndoStack(history))
+        dispatch(setRedoStack([]))
       }
       if (draggingLine !== null && designStep === 2 && currentLinePostion) {
         var startPoint = currentLinePostion[0];
@@ -355,12 +366,13 @@ const useMouse = () => {
             endPoint = pt;
           }
         });
+        let updatedPoints = [];
         const updatedLines = storeLines.map((line, index) => {
           let updatedLine = { ...line }; // Shallow copy of the line object
           if (index === draggingLine) {
             const beforeUpdation1 = line.points[0];
             const beforeUpdation2 = line.points[1];
-            let updatedPoints = points.map((p) => {
+            updatedPoints = points.map((p) => {
               if (p.equals(beforeUpdation1)) {
                 return startPoint;
               } else if (p.equals(beforeUpdation2)) {
@@ -380,6 +392,15 @@ const useMouse = () => {
           return updatedLine;
         });
         dispatch(setStoreLines(updatedLines));
+        history.push({
+          type: "pointLineDrag",
+          prevPoints: points,
+          prevLines: storeLines,
+          updatedPoints,
+          updatedLines
+        });
+        dispatch(setUndoStack(history))
+        dispatch(setRedoStack([]))
       }
     }
     setDraggingPointIndex(null);

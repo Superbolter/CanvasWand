@@ -91,6 +91,16 @@ export const setRedoStack = (undoStack) => ({
   payload: undoStack,
 });
 
+export const setRoomUndoStack = (undoStack) => ({
+  type: "UPDATE_ROOM_UNDO_DATA",
+  payload: undoStack,
+});
+
+export const setRoomRedoStack = (undoStack) => ({
+  type: "UPDATE_ROOM_REDO_DATA",
+  payload: undoStack,
+})
+
 export const setSeeDimensions = (val) => ({
   type: "SET_SEE_DIMENSIONS",
   payload: val,

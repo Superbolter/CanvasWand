@@ -43,6 +43,8 @@ import {
   setMergeLine,
   setNewLine,
   setRedoStack,
+  setRoomRedoStack,
+  setRoomUndoStack,
   setShowPopup,
   setShowSnapLine,
   setSnappingPoint,
@@ -74,6 +76,7 @@ export const useDrawing = () => {
   const {
     typeId,
     actionHistory,
+    roomActionHistory,
     stop,
     newLine,
     showSnapLine,
@@ -327,14 +330,14 @@ export const useDrawing = () => {
       rooms.splice(activeRoomIndex, 1);
       dispatch(setRoomSelectors(rooms));
       setSelectedLines([]);
-      const history = [...actionHistory];
+      const history = [...roomActionHistory];
       history.push({
-        type: "deleteRoom",
+        type: "updateRoom",
         oldRooms: [...roomSelectors],
         newRooms: rooms,
       });
-      dispatch(setUndoStack(history));
-      dispatch(setRedoStack([]));
+      dispatch(setRoomUndoStack(history));
+      dispatch(setRoomRedoStack([]));
       dispatch(setExpandRoomNamePopup(false));
       dispatch(setRoomDetails(""));
       dispatch(setRoomName(""));
@@ -458,6 +461,17 @@ export const useDrawing = () => {
       roomType: roomType,
       wallIds: [...selectedLines],
     };
+    let history = [...roomActionHistory];
+    history = history.filter(
+      (action) => action.type !== "addPoint"
+    ); // clearing temporary polygon's points from undo stack
+    history.push({
+      type: "updateRoom",
+      oldRooms: [...roomSelectors],
+      newRooms: [...roomSelectors, room],
+    });
+    dispatch(setRoomUndoStack(history));
+    dispatch(setRoomRedoStack([]));
     dispatch(setRoomSelectors([...roomSelectors, room]));
     setSelectedLines([]);
     dispatch(updateTemoraryPolygon([]))
@@ -484,8 +498,14 @@ export const useDrawing = () => {
 
     if(designStep ===3 && enablePolygonSelection){
       const polygon = [...temporaryPolygon];
+      const history = [...roomActionHistory];
       if(showSnapLine){
-        polygon.push(snappingPoint[0])
+        polygon.push(snappingPoint[0]);
+        history.push({
+          type: "addPoint",
+          oldPolygon: [...temporaryPolygon],
+          newPolygon: [...polygon],
+        });
       }else{
         let cuuPoint = point;
         roomSelectors.forEach((room) => {
@@ -499,7 +519,14 @@ export const useDrawing = () => {
           }
         });
         polygon.push(cuuPoint);
+        history.push({
+          type: "addPoint",
+          oldPolygon: [...temporaryPolygon],
+          newPolygon: [...polygon],
+        });
       }
+      dispatch(setRoomUndoStack(history));
+      dispatch(setRoomRedoStack([]));
       dispatch(updateTemoraryPolygon(polygon));
       const newLine = [...selectedLines]
       storeLines.map((line) => {

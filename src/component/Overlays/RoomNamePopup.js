@@ -86,7 +86,7 @@ const RoomNamePopup = () => {
   const dispatch = useDispatch();
   const { roomSelectors } = useSelector((state) => state.drawing);
   const { toggleSelectionMode } = useModes();
-  const { addRoom } = useDrawing();
+  const { addRoom,deleteSelectedRoom } = useDrawing();
 
   useEffect(() => {
     if (selectedRoomName) {
@@ -191,12 +191,8 @@ const RoomNamePopup = () => {
   };
 
   const handleDeleteClick = () => {
-    const newRooms = [...roomSelectors];
-    newRooms.splice(activeRoomIndex, 1);
+    deleteSelectedRoom();
     setName("");
-    dispatch(setRoomSelectors(newRooms));
-    dispatch(setActiveRoomButton(""));
-    handleReset(false);
     dispatch(setEnablePolygonSelection(false))
   };
 

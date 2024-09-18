@@ -238,7 +238,8 @@ export const CanvasComponent = () => {
     snapActive,
     linePlacementMode,
     roomSelectors,
-    enablePolygonSelection
+    enablePolygonSelection,
+    temporaryPolygon
   ]);
 
   useEffect(() => {

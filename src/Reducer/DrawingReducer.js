@@ -8,6 +8,8 @@ const initialState = {
     positionType: "neutral",
     actionHistory: [],
     redoStack: [],
+    roomActionHistory: [],
+    roomRedoStack: [],
     seeDimensions: false,
     cameraContext: {},
     stop: false,
@@ -60,6 +62,16 @@ const initialState = {
         return {
           ...state,
           redoStack: action.payload
+        }
+      case "UPDATE_ROOM_UNDO_DATA":
+        return {
+          ...state,
+          roomActionHistory: action.payload
+        }
+      case "UPDATE_ROOM_REDO_DATA":
+        return {
+          ...state,
+          roomRedoStack: action.payload
         }
       case "SET_SEE_DIMENSIONS":
         return {

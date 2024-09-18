@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import newCursor from "../../assets/linedraw.png";
 import cursor from "../../assets/Default.png"
 
-const DraggablePoint = ({ point, onDrag, index }) => {
+const DraggablePoint = ({ point, onDrag, index, onDragEnd = () => {} }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [draggingPoint, setDraggingPoint] = useState(null);
   const [currentPosition, setCurrentPosition] = useState(new Vector3(point.x, point.y, point.z));
@@ -15,9 +15,9 @@ const DraggablePoint = ({ point, onDrag, index }) => {
 
   const handlePointerDown = (e) => {
     e.stopPropagation();
-    setIsDragging(true);
     const pt = screenToNDC(e.clientX, e.clientY);
     if(pt.distanceTo(point) < 10){
+        setIsDragging(true);
         setDraggingPoint(index);
         document.getElementsByClassName('canvas-container')[0].style.cursor = "move"
     }
@@ -25,6 +25,10 @@ const DraggablePoint = ({ point, onDrag, index }) => {
 
   const handlePointerUp = (e) => {
     e.stopPropagation();
+    if(isDragging){
+      const intersect = screenToNDC(e.clientX, e.clientY);
+      onDragEnd(intersect);
+    }
     setIsDragging(false);
     setDraggingPoint(null);
     if(enablePolygonSelection){

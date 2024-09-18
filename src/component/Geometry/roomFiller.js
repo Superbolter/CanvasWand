@@ -17,6 +17,7 @@ import DraggablePoint from "./DraggablePoints";
 import { setRoomSelectors } from "../../features/drawing/drwingSlice";
 import usePoints from "../../hooks/usePoints";
 import {colors} from "../../utils/colors"
+import { setRoomRedoStack, setRoomUndoStack } from "../../Actions/DrawingActions";
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -63,10 +64,15 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
   const { selectedRoomName, activeRoomButton, storeLines, points, activeRoomIndex } =
     useSelector((state) => state.ApplicationState);
   const { roomSelectors } = useSelector((state) => state.drawing);
+  const { roomActionHistory } = useSelector((state) => state.Drawing);
   const { isPointInsidePolygon} = usePoints();
   const dispatch = useDispatch();
+  const [initialRoomState, setInitialRoomState] = useState(null);
 
   const handleDragPoint = (newPosition, draggedPoint) => {
+    if (!initialRoomState) {
+      setInitialRoomState([...roomSelectors]);
+    }
     // Update the shared points in all rooms
     const updatedRooms = updateSharedPoints(
       roomSelectors,
@@ -81,6 +87,24 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
     //     }
     //   })
     //   dispatch(setSelectedLinesState(newLine));
+  };
+
+  const handleDragUndo = (newPosition, draggedPoint) => {
+    // Update the shared points in all rooms
+    const updatedRooms = updateSharedPoints(
+      roomSelectors,
+      draggedPoint,
+      newPosition
+    );
+    const history = [...roomActionHistory];
+    history.push({
+      type: "updateRoom",
+      oldRooms: initialRoomState,
+      newRooms: updatedRooms,
+    });
+    setInitialRoomState(null);
+    dispatch(setRoomUndoStack(history));
+    dispatch(setRoomRedoStack([]));
   };
 
   const handleRoomClick = (e) => {
@@ -186,6 +210,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
             index={i}
             point={new Vector3(point.x, point.y, 5)}
             onDrag={(newPosition) => handleDragPoint(newPosition, point)}
+            onDragEnd={(newPosition) => handleDragUndo(newPosition, point)}
           />:
           <mesh key={i} position={[point.x, point.y, 0]}>
             <sphereGeometry args={[6, 6, 32]} />
