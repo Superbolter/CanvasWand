@@ -534,13 +534,25 @@ export const useDrawing = () => {
       dispatch(setRoomUndoStack(history));
       dispatch(setRoomRedoStack([]));
       dispatch(updateTemoraryPolygon(polygon));
-      const newLine = [...selectedLines]
+      const newLine = [...selectedLines];
       storeLines.map((line) => {
-        const midpoint = new Vector3().addVectors(line.points[0], line.points[1]).multiplyScalar(0.5);
-        if(isPointInsidePolygon(polygon, midpoint)){
-          newLine.push(line.id)
+        const midpoint = new Vector3()
+          .addVectors(line.points[0], line.points[1])
+          .multiplyScalar(0.5);
+        const tolerance = 10;
+        const maxX = midpoint.x + tolerance;
+        const minX = midpoint.x - tolerance;
+        const maxY = midpoint.y + tolerance;
+        const minY = midpoint.y - tolerance;
+        if (
+          isPointInsidePolygon(polygon, { x: maxX, y: midpoint.y }) ||
+          isPointInsidePolygon(polygon, { x: minX, y: midpoint.y }) ||
+          isPointInsidePolygon(polygon, { x: midpoint.x, y: maxY }) ||
+          isPointInsidePolygon(polygon, { x: midpoint.x, y: minY })
+        ) {
+          newLine.push(line.id);
         }
-      })
+      });
       dispatch(setSelectedLinesState(newLine));
       return
     }
@@ -564,7 +576,12 @@ export const useDrawing = () => {
               const midpoint = new Vector3()
                 .addVectors(line.points[0], line.points[1])
                 .multiplyScalar(0.5);
-              if (isPointInsidePolygon(polygon, midpoint)) {
+              const tolerance = 10;
+              const maxX = midpoint.x + tolerance;
+              const minX = midpoint.x - tolerance;
+              const maxY = midpoint.y + tolerance;
+              const minY = midpoint.y - tolerance;
+              if (isPointInsidePolygon(polygon, {x: maxX, y: midpoint.y}) || isPointInsidePolygon(polygon, {x: minX, y: midpoint.y}) || isPointInsidePolygon(polygon, {x: midpoint.x, y: maxY}) || isPointInsidePolygon(polygon, {x: midpoint.x, y: minY})) {
                 newLine.push(line.id);
               }
             });
