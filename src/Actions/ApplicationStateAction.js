@@ -12,6 +12,7 @@ import {
   setUserWidth,
 } from "../features/drawing/drwingSlice";
 import { setContextualMenuStatus, setUndoStack } from "./DrawingActions";
+import { setEnableFirstTimePopup, setShowFirstTimePopup } from "./PopupAction";
 
 export const drawToolData = (floorplan_id) => {
   return (dispatch, getState) => {
@@ -125,6 +126,8 @@ export const drawToolData = (floorplan_id) => {
         if(!response.data.image_uri && response.data.scale === null){
           dispatch(setDesignStep(2));
         }
+        dispatch(setEnableFirstTimePopup(true))
+        dispatch(setShowFirstTimePopup(true,"UI","selectWallPopup"))
       })
       .catch((error) => {
         console.error("Error", error);

@@ -1,4 +1,9 @@
-const initialState = {};
+const initialState = {
+    enableFirstTimePopup: false,
+    showFirstTimePopup: false,
+    firstTimePopupType: "",
+    firstTimePopupName: null,
+};
 
 const PopupReducer = (state = initialState, action) => {
   switch (action.type) {

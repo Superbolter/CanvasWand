@@ -1,0 +1,98 @@
+.timer-container {
+    position: absolute;
+    left: 0;
+    top:0;
+    width: 100%;
+    height: 4px;
+    background-color: #4B73EC;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+}
+
+.timer-progress {
+    border-radius: 8px 8px 0 0;
+    height: 100%;
+    background-color: #EDF1FD;
+    width: 0;
+    transition: width 1s linear;
+}
+
+.first-time-popup{
+    position: absolute;
+    right: 100%;
+    bottom: 100%;
+}
+
+.first-time-popup-container{
+    background-color: #4B73EC;
+    padding: 24px;
+    border-radius: 8px;
+    width: 300px;
+    color: white;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    border: 1px solid white;
+    box-shadow: -4px 5px 14px 0px #1C1C1C1A;
+}
+
+.first-time-popup::before{
+    content: "";
+    position: absolute;
+    top: calc(100%);
+    left: 90%;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid white;
+    transform: translateX(-50%);
+}
+
+.first-time-popup:after{
+    content: "";
+    position: absolute;
+    top: calc(100% - 1.5px);
+    left: 90%;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #4B73EC;
+    transform: translateX(-50%);
+}
+
+.first-time-popup-ui{
+    position: absolute;
+    right: 100%;
+    transform: translate(50%, 50%);
+    width: 100vw;
+    height: 100vh;
+    bottom: 100%;
+}
+
+.selectWallPopup{
+    position: absolute;
+    top: 275px;
+    right: 275px;
+}
+
+.selectWallPopup::before{
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid white;
+    transform: translateY(-50%);
+}
+
+.selectWallPopup::after{
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: calc(100% - 1.5px);
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid #4B73EC;
+    transform: translateY(-50%);
+}

@@ -60,6 +60,7 @@ import cursor from "./assets/Default.png"
 import SetScalePopup from "./component/Popups/SetScalePopup.js";
 import HelpVideoPopup from "./component/Popups/HelpVideoPopup.js";
 import useMouse from "./hooks/useMouse.js";
+import FirstTimePopup from "./component/Popups/FirstTimePopup.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -119,6 +120,8 @@ export const CanvasComponent = () => {
   const { typeId, stop, showSnapLine, snappingPoint, temporaryPolygon, enablePolygonSelection,} = useSelector(
     (state) => state.Drawing
   );
+
+  const {enableFirstTimePopup, showFirstTimePopup} = useSelector((state) => state.PopupState);
 
   const getUrlParameter = (name) => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -512,6 +515,9 @@ export const CanvasComponent = () => {
             ))}
 
           {designStep > 1 && <ContextualMenu />}
+          {showFirstTimePopup && enableFirstTimePopup && (
+            <FirstTimePopup />
+          )}
 
           {designStep === 3 &&
             roomSelectors.map((room, index) => (

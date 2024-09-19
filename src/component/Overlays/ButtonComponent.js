@@ -127,11 +127,11 @@ const ButtonComponent = () => {
               <Typography className='btn-text'style={{color:selectedButton==="Window"&&"#4B73EC" }}>Window</Typography>
             </div>
             <div
-              className={`drawtool-btn ${selectedButton === 'Balcony railing' ? 'selected' : ''}`}
-              onClick={() => handleButtonClick('Balcony railing')}
+              className={`drawtool-btn ${selectedButton === 'Railing' ? 'selected' : ''}`}
+              onClick={() => handleButtonClick('Railing')}
             >
               <img src={RailingIcon} alt="" style={{ width: "24px", height: "24px",}} />
-              <Typography className='btn-text'style={{color:selectedButton==="Balcony railing"&&"#4B73EC" }}>Balcony</Typography>
+              <Typography className='btn-text'style={{color:selectedButton==="Railing"&&"#4B73EC" }}>Balcony</Typography>
             </div>
           </div>
         </div>
