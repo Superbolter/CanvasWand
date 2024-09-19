@@ -22,6 +22,7 @@ import newWall2 from "../../assets/newWall2.png";
 import { setStoreBoxes } from "../../Actions/ApplicationStateAction";
 import cursor from "../../assets/Default.png";
 import usePoints from "../../hooks/usePoints";
+import { setHiglightPoint } from "../../Actions/DrawingActions";
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
 
@@ -114,7 +115,7 @@ const BoxGeometry = ({
     designStep,
     selectionMode,
     activeRoomIndex,
-    activeRoomButton
+    activeRoomButton,
   } = useSelector((state) => state.ApplicationState);
   const { seeDimensions, higlightPoint } = useSelector(
     (state) => state.Drawing
@@ -307,7 +308,6 @@ const BoxGeometry = ({
     }
   }, [points]);
 
- 
   // Calculate the text position slightly above the midpoint
   const textPosition = new Vector3(
     midpoint.x - 20 * Math.sin(angle),
@@ -324,7 +324,13 @@ const BoxGeometry = ({
   const getTexture = () => {
     if (isSelected) return wallTexture;
     if (hovered && selectionMode && designStep === 2) return selectedTexture;
-    if (hovered && selectionMode && designStep === 3 && activeRoomIndex !== -1 && activeRoomButton !== "divide")
+    if (
+      hovered &&
+      selectionMode &&
+      designStep === 3 &&
+      activeRoomIndex !== -1 &&
+      activeRoomButton !== "divide"
+    )
       return selectedTexture;
     if (typeId === 1) return newTexture;
     if (typeId === 2) return doorTexture;
@@ -338,98 +344,55 @@ const BoxGeometry = ({
     feetLength = decimalToFeetInches(length * factor[0]);
   }
 
-  const memoisedLine = useMemo(()=>{
-    return(
+  const memoisedLine = useMemo(() => {
+    return (
       <>
-      <mesh
-        position={midpoint}
-        rotation={[0, 0, angle]}
-        onClick={onClick}
-        onPointerOver={() => {
-          // if (activeRoomIndex !== -1) {
-          //   document.getElementsByClassName(
-          //     "canvas-container"
-          //   )[0].style.cursor = "pointer";
-          // }
-          setHovered(true);
-        }} // Set hovered to true on mouse over
-        onPointerOut={() => {
-          // if (activeRoomIndex !== -1) {
-          //   document.getElementsByClassName(
-          //     "canvas-container"
-          //   )[0].style.cursor = `url(${cursor}) 4 4, default`;
-          // }
-          setHovered(false);
-        }} // Set hovered to false on mouse out
-      >
-        <boxGeometry args={[length, typeId === 4 ? width / 2 : width, 0.1]} />
-        <meshBasicMaterial map={getTexture()} transparent={true} opacity={1} />
-      </mesh>
-
-      <mesh position={start}>
-        <sphereGeometry args={[4, 16, 16]} />
-        <meshBasicMaterial
-          color={
-            start === higlightPoint
-              ? "green"
-              : typeId === 2
-              ? "brown"
-              : typeId === 3
-              ? "skyblue"
-              : typeId === 4
-              ? "violet"
-              : typeId === 4
-              ? "#E6AB4A"
-              : "black"
-          }
-          transparent={true}
-          opacity={opacity}
-        />
-      </mesh>
-
-      {(seeDimensions || showDimension) && typeId !== 5 && (
-        <Text
-          position={textPosition}
-          rotation={[0, 0, textRotation]}
-          fontSize={9}
-          color="black"
-          anchorX="center"
-          anchorY="middle"
+        <mesh
+          position={midpoint}
+          rotation={[0, 0, angle]}
+          onClick={onClick}
+          onPointerOver={() => {
+            // if (activeRoomIndex !== -1) {
+            //   document.getElementsByClassName(
+            //     "canvas-container"
+            //   )[0].style.cursor = "pointer";
+            // }
+            setHovered(true);
+          }} // Set hovered to true on mouse over
+          onPointerOut={() => {
+            // if (activeRoomIndex !== -1) {
+            //   document.getElementsByClassName(
+            //     "canvas-container"
+            //   )[0].style.cursor = `url(${cursor}) 4 4, default`;
+            // }
+            setHovered(false);
+          }} // Set hovered to false on mouse out
         >
-          {distance
-            ? `${length.toFixed(2)}`
-            : measured === "ft"
-            ? `${feetLength.feet}'${feetLength.inches} ${measured}`
-            : `${(length * factor[0]).toFixed(2)} ${measured}`}
-        </Text>
-      )}
+          <boxGeometry args={[length, typeId === 4 ? width / 2 : width, 0.1]} />
+          <meshBasicMaterial
+            map={getTexture()}
+            transparent={true}
+            opacity={1}
+          />
+        </mesh>
 
-      <mesh position={end}>
-        <sphereGeometry args={[4, 16, 16]} />
-        <meshBasicMaterial
-          color={
-            end === higlightPoint
-              ? "green"
-              : typeId === 2
-              ? "brown"
-              : typeId === 3
-              ? "skyblue"
-              : typeId === 4
-              ? "violet"
-              : typeId === 4
-              ? "#E6AB4A"
-              : "black"
-          }
-          transparent={true}
-          opacity={opacity}
-        />
-      </mesh>
-      {linePlacementMode !== "midpoint" && (
-        <mesh position={upperLeft}>
-          <sphereGeometry args={[4, 16, 16]} />
+        <mesh
+          position={start}
+          onPointerOver={() => {
+            if (designStep === 2) {
+              dispatch(setHiglightPoint(start));
+            }
+          }}
+          onPointerOut={() => {
+            dispatch(setHiglightPoint(null));
+          }}
+        >
+          <sphereGeometry args={[start === higlightPoint ? 10 : 4, 16, 16]} />
           <meshBasicMaterial
             color={
-              typeId === 2
+              start === higlightPoint
+                ? "green"
+                : typeId === 2
                 ? "brown"
                 : typeId === 3
                 ? "skyblue"
@@ -443,8 +406,75 @@ const BoxGeometry = ({
             opacity={opacity}
           />
         </mesh>
-      )}
-      {/* {(linePlacementMode !== "below" )&& (
+
+        {(seeDimensions || showDimension) && typeId !== 5 && (
+          <Text
+            position={textPosition}
+            rotation={[0, 0, textRotation]}
+            fontSize={9}
+            color="black"
+            anchorX="center"
+            anchorY="middle"
+          >
+            {distance
+              ? `${length.toFixed(2)}`
+              : measured === "ft"
+              ? `${feetLength.feet}'${feetLength.inches} ${measured}`
+              : `${(length * factor[0]).toFixed(2)} ${measured}`}
+          </Text>
+        )}
+
+        <mesh
+          position={end}
+          onPointerOver={() => {
+            if (designStep === 2) {
+              dispatch(setHiglightPoint(end));
+            }
+          }}
+          onPointerOut={() => {
+            dispatch(setHiglightPoint(null));
+          }}
+        >
+          <sphereGeometry args={[end === higlightPoint ? 10 : 4, 16, 16]} />
+          <meshBasicMaterial
+            color={
+              end === higlightPoint
+                ? "green"
+                : typeId === 2
+                ? "brown"
+                : typeId === 3
+                ? "skyblue"
+                : typeId === 4
+                ? "violet"
+                : typeId === 4
+                ? "#E6AB4A"
+                : "black"
+            }
+            transparent={true}
+            opacity={opacity}
+          />
+        </mesh>
+        {linePlacementMode !== "midpoint" && (
+          <mesh position={upperLeft}>
+            <sphereGeometry args={[4, 16, 16]} />
+            <meshBasicMaterial
+              color={
+                typeId === 2
+                  ? "brown"
+                  : typeId === 3
+                  ? "skyblue"
+                  : typeId === 4
+                  ? "violet"
+                  : typeId === 4
+                  ? "#E6AB4A"
+                  : "black"
+              }
+              transparent={true}
+              opacity={opacity}
+            />
+          </mesh>
+        )}
+        {/* {(linePlacementMode !== "below" )&& (
         <mesh position={lowerLeft}>
           <sphereGeometry args={[3, 16, 16]} />
           <meshBasicMaterial
@@ -464,27 +494,27 @@ const BoxGeometry = ({
           />
         </mesh>
       )} */}
-      {linePlacementMode !== "midpoint" && (
-        <mesh position={upperRight}>
-          <sphereGeometry args={[4, 16, 16]} />
-          <meshBasicMaterial
-            color={
-              typeId === 2
-                ? "brown"
-                : typeId === 3
-                ? "skyblue"
-                : typeId === 4
-                ? "violet"
-                : typeId === 4
-                ? "#E6AB4A"
-                : "black"
-            }
-            transparent={true}
-            opacity={opacity}
-          />
-        </mesh>
-      )}
-      {/* {linePlacementMode !== "below" && (
+        {linePlacementMode !== "midpoint" && (
+          <mesh position={upperRight}>
+            <sphereGeometry args={[4, 16, 16]} />
+            <meshBasicMaterial
+              color={
+                typeId === 2
+                  ? "brown"
+                  : typeId === 3
+                  ? "skyblue"
+                  : typeId === 4
+                  ? "violet"
+                  : typeId === 4
+                  ? "#E6AB4A"
+                  : "black"
+              }
+              transparent={true}
+              opacity={opacity}
+            />
+          </mesh>
+        )}
+        {/* {linePlacementMode !== "below" && (
         <mesh position={lowerRight}>
           <sphereGeometry args={[4, 16, 16]} />
           <meshBasicMaterial
@@ -504,17 +534,13 @@ const BoxGeometry = ({
           />
         </mesh>
       )} */}
-    </>
-    )
-  },[start, end, isSelected, hovered, activeRoomIndex, typeId])
+      </>
+    );
+  }, [start, end, isSelected, hovered, activeRoomIndex, typeId, higlightPoint]);
 
   if (!start || !end) return null;
 
-  return (
-    <>
-      {memoisedLine}
-    </>
-  )
+  return <>{memoisedLine}</>;
 };
 
 export default BoxGeometry;
