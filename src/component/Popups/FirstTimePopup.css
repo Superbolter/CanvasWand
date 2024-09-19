@@ -67,6 +67,7 @@
     width: 100vw;
     height: 100vh;
     bottom: 100%;
+    pointer-events: none;
 }
 
 .selectWallPopup{
