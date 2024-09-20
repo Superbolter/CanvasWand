@@ -132,7 +132,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
   const material = new MeshBasicMaterial({
     color: activeRoomIndex === index ? "#4B73EC" :  colors[index % colors.length],
     transparent: true,
-    opacity: 0.3,
+    opacity: activeRoomIndex !== index && activeRoomIndex!==-1 ?0.1: 0.3,
   });
 
   const centroid = getCentroid(sortedPoints);

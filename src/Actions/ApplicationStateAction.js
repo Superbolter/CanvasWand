@@ -127,7 +127,7 @@ export const drawToolData = (floorplan_id) => {
           dispatch(setDesignStep(2));
         }
         dispatch(setEnableFirstTimePopup(true))
-        dispatch(setShowFirstTimePopup(true,"UI","selectWallPopup"))
+        // dispatch(setShowFirstTimePopup(true,"UI","selectWallPopup"))
       })
       .catch((error) => {
         console.error("Error", error);
