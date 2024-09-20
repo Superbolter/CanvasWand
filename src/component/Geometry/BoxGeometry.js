@@ -258,10 +258,10 @@ const BoxGeometry = ({
 
     if (mid1 && mid2 && !newline) {
       if (mid1 !== mid2 && p1 !== p2) {
-        //console.log("intersection point found between mid1 and mid2")
+        
         p3 = calculateIntersection(p1, prevAngle, p2, angle);
 
-        //console.log("hii",p3);
+        
       }
     }
 
@@ -474,26 +474,7 @@ const BoxGeometry = ({
             />
           </mesh>
         )}
-        {/* {(linePlacementMode !== "below" )&& (
-        <mesh position={lowerLeft}>
-          <sphereGeometry args={[3, 16, 16]} />
-          <meshBasicMaterial
-            color={
-              typeId === 2
-                ? "brown"
-                : typeId === 3
-                ? "skyblue"
-                : typeId === 4
-                ? "violet"
-                : typeId === 4
-                ? "#E6AB4A"
-                : "black"
-            }
-            transparent={true}
-            opacity={opacity}
-          />
-        </mesh>
-      )} */}
+        
         {linePlacementMode !== "midpoint" && (
           <mesh position={upperRight}>
             <sphereGeometry args={[4, 16, 16]} />
@@ -514,26 +495,7 @@ const BoxGeometry = ({
             />
           </mesh>
         )}
-        {/* {linePlacementMode !== "below" && (
-        <mesh position={lowerRight}>
-          <sphereGeometry args={[4, 16, 16]} />
-          <meshBasicMaterial
-            color={
-              typeId === 2
-                ? "brown"
-                : typeId === 3
-                ? "skyblue"
-                : typeId === 4
-                ? "violet"
-                : typeId === 4
-                ? "#E6AB4A"
-                : "black"
-            }
-            transparent={true}
-            opacity={opacity}
-          />
-        </mesh>
-      )} */}
+        
       </>
     );
   }, [start, end, isSelected, hovered, activeRoomIndex, typeId, higlightPoint, seeDimensions, showDimension, linePlacementMode, distance, measured, factor, opacity, designStep]);
