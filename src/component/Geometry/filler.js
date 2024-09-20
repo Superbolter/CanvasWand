@@ -71,7 +71,7 @@ const CreateFiller = ({ p1, p2, p3, p4 }) => {
     // console.error("One or more points are undefined", { p1, p2, p3, p4 });
     return null;
   }
-
+  
   
   //console.log("Hello create filler", p1, p2, p3, p4);
   const shape = createQuadrilateral(p1, p2, p3, p4);
