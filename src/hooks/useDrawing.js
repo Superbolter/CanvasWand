@@ -316,19 +316,19 @@ export const useDrawing = () => {
     );
   }
 
-  useEffect(() => {
-    const { pointUpper, pointLower } = calculateUpperAndLowerPoints(
-      storeLines,
-      factor,
-      measured
-    );
-    // console.log("hello this is working");
-    // console.log(pointUpper);
+  // useEffect(() => {
+  //   const { pointUpper, pointLower } = calculateUpperAndLowerPoints(
+  //     storeLines,
+  //     factor,
+  //     measured
+  //   );
+  //   // console.log("hello this is working");
+  //   // console.log(pointUpper);
 
-    // Dispatch the calculated points to the store
-    dispatch(setUpperPoint(pointUpper));
-    dispatch(setLowerPoint(pointLower));
-  }, [storeLines, factor, measured, dispatch]);
+  //   // Dispatch the calculated points to the store
+  //   dispatch(setUpperPoint(pointUpper));
+  //   dispatch(setLowerPoint(pointLower));
+  // }, [storeLines, factor, measured, dispatch]);
 
   const deleteSelectedRoom = () => {
     if (activeRoomIndex !== -1) {
@@ -667,6 +667,17 @@ export const useDrawing = () => {
 
     if (perpendicularLine && points.length > 0) {
       point = calculateAlignedPoint(points[points.length - 1], point);
+    }
+    if (!perpendicularLine && points.length > 0) {
+      const lastPoint = points[points.length - 1];
+      const position = calculateAlignedPoint(lastPoint, point);
+      const V1 = new Vector3().subVectors(position, lastPoint); 
+      const V2 = new Vector3().subVectors(point, lastPoint); 
+      const angleInRadians = V1.angleTo(V2);
+      const angleInDegrees = angleInRadians * (180 / Math.PI);
+      if(angleInDegrees < 3){
+        point = position;
+      }
     }
 
     point = snapToPoint(point, points, storeLines, snapActive,factor,measured,snapPoint,linePlacementMode); //snapping

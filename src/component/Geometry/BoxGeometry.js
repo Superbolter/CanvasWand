@@ -536,7 +536,7 @@ const BoxGeometry = ({
       )} */}
       </>
     );
-  }, [start, end, isSelected, hovered, activeRoomIndex, typeId, higlightPoint]);
+  }, [start, end, isSelected, hovered, activeRoomIndex, typeId, higlightPoint, seeDimensions, showDimension, linePlacementMode, distance, measured, factor, opacity, designStep]);
 
   if (!start || !end) return null;
 

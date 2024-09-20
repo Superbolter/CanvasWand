@@ -259,6 +259,7 @@ export const CanvasComponent = () => {
     }
 
     dispatch(drawToolData(floorplanId));
+    window.cameraContext = {}
   }, []);
 
   const createQuadrilateral = (p1, p2, p3, p4) => {

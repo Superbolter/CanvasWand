@@ -172,8 +172,8 @@ const useMouse = () => {
       }
 
       // Snap to the found x or y if they exist
-      if (snapX) cuuPoint.x = snapX.x;
-      if (snapY) cuuPoint.y = snapY.y;
+      if (snapX && snapX.x !== lastPoint.x) cuuPoint.x = snapX.x;
+      if (snapY && snapY.y !== lastPoint.y) cuuPoint.y = snapY.y;
 
       // Dispatch snapping actions
       if (snapX || snapY) {
@@ -198,11 +198,18 @@ const useMouse = () => {
       draggingPointIndex === null &&
       points.length > 0
     ) {
-      const position = calculateAlignedPoint(points[points.length - 1], point);
-      dispatch(setCurrentStrightMousePosition(position));
       const lastPoint = points[points.length - 1];
+      const position = calculateAlignedPoint(lastPoint, point);
+      const V1 = new Vector3().subVectors(position, lastPoint); 
+      const V2 = new Vector3().subVectors(point, lastPoint); 
+      const angleInRadians = V1.angleTo(V2);
+      const angleInDegrees = angleInRadians * (180 / Math.PI);
+      if(angleInDegrees < 3){
+        point = position;
+      }
+      setCurrentStrightMousePosition(position);
       const currentDistance = lastPoint.distanceTo(position);
-      dispatch(setDistance(currentDistance * factor[0]));
+      setDistance(currentDistance * factor[0]);
     }
 
     setCurrentMousePosition(point);

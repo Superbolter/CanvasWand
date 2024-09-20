@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import * as THREE from "three";
 
 const usePoints = () => {
-  const { cameraContext } = useSelector((state) => state.Drawing);
   const raycaster = useRef(new THREE.Raycaster());
   const mouse = useRef(new THREE.Vector2());
 
@@ -12,7 +11,7 @@ const usePoints = () => {
     mouse.current.y = -(clientY / window.innerHeight) * 2 + 1;
 
     // Update the raycaster with the camera and mouse position
-    raycaster.current.setFromCamera(mouse.current, cameraContext);
+    raycaster.current.setFromCamera(mouse.current, window.cameraContext);
 
     // Define a plane at z = 0 and find the intersection point
     const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);

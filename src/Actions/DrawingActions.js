@@ -106,57 +106,52 @@ export const setSeeDimensions = (val) => ({
   payload: val,
 });
 
-export const setCameraContext = (val) => ({
-  type: "SET_CAMERA_CONTEXT",
-  payload: val,
-});
-
 export const setStop = (val) => ({
-  type: "UPDATE_DRAWING_STATE",
+  type: "UPDATE_DRAWING_REDUCER_STATE",
   stop: val
 })
 
 export const setNewLine = (val) => ({
-  type: "UPDATE_DRAWING_STATE",
+  type: "UPDATE_DRAWING_REDUCER_STATE",
   newLine: val
 })
 
 export const setShowSnapLine = (val) => ({
-  type: "UPDATE_DRAWING_STATE",
+  type: "UPDATE_DRAWING_REDUCER_STATE",
   showSnapLine: val
 })
 
 export const setSnappingPoint = (val) => ({
-  type: "UPDATE_DRAWING_STATE",
+  type: "UPDATE_DRAWING_REDUCER_STATE",
   snappingPoint: val
 })
 
 export const setDragMode = (val) => ({
-  type: "UPDATE_DRAWING_STATE",
+  type: "UPDATE_DRAWING_REDUCER_STATE",
   dragMode: val
 })
 
 export const setMergeLine = (val) => ({
-  type: "UPDATE_DRAWING_STATE",
+  type: "UPDATE_DRAWING_REDUCER_STATE",
   mergeLine: val
 })
 
 export const setShiftPressed = (val) => ({
-  type: "UPDATE_DRAWING_STATE",
+  type: "UPDATE_DRAWING_REDUCER_STATE",
   shiftPressed: val
 })
 
 export const updateTemoraryPolygon = (val) => ({
-  type: "UPDATE_DRAWING_STATE",
+  type: "UPDATE_DRAWING_REDUCER_STATE",
   temporaryPolygon: val
 })
 
 export const setEnablePolygonSelection = (val) => ({
-  type: "UPDATE_DRAWING_STATE",
+  type: "UPDATE_DRAWING_REDUCER_STATE",
   enablePolygonSelection: val
 })
 
 export const setHiglightPoint = (val) => ({
-  type: "UPDATE_DRAWING_STATE",
+  type: "UPDATE_DRAWING_REDUCER_STATE",
   higlightPoint: val
 })

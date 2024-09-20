@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import { setCameraContext } from "../../Actions/DrawingActions";
 
 const CameraController = ({
   zoom,
@@ -12,21 +11,20 @@ const CameraController = ({
 }) => {
   const { camera } = useThree();
   const dispatch = useDispatch();
-  const { cameraContext } = useSelector((state) => state.Drawing);
   const controlsRef = useRef();
 
   useEffect(() => {
-    if (Object.keys(cameraContext).length === 0) {
-      dispatch(setCameraContext(camera));
+    if (Object.keys(window.cameraContext).length === 0) {
+      window.cameraContext = camera;
     }
-  }, [camera, cameraContext, dispatch]);
+  }, [camera, dispatch]);
 
   useEffect(() => {
     if (controlsRef.current) {
       const controls = controlsRef.current;
       controls.addEventListener("change", () => {
         const newContext = camera.clone();
-        dispatch(setCameraContext(newContext));
+        window.cameraContext = newContext;
       });
 
       return () => {
@@ -41,7 +39,7 @@ const CameraController = ({
       camera.updateProjectionMatrix();
     }
     const newContext = camera.clone();
-    dispatch(setCameraContext(newContext));
+    window.cameraContext = newContext;
   }, [zoom, camera, dispatch]);
 
   const handleControlsChange = () => {

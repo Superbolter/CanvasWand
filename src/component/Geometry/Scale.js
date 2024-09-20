@@ -29,7 +29,6 @@ export const Scale = () => {
   const [isPointerMoving, setIsPointerMoving] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
   const { leftPos, rightPos } = useSelector((state) => state.drawing);
-  const { cameraContext  } = useSelector((state) => state.Drawing);
   const [leftJawActivated, setLeftJawActivated] = useState(false);
   const [rightJawActivated, setRightJawActivated] = useState(false);
   const tolerance = 1e-3;
@@ -51,7 +50,7 @@ export const Scale = () => {
 
     if (firstLoad) {
       setFirstLoad(false);
-      updateMesh(leftPos, rightPos);
+      updateMesh(new Vector3(leftPos.x, leftPos.y, 0), new Vector3(rightPos.x, rightPos.y, 0));
       const l =
         Math.abs(rightPos.x - leftPos.x) < 15
           ? Math.abs(rightPos.y - leftPos.y)
@@ -101,7 +100,7 @@ export const Scale = () => {
           }
 
           leftJaw.current.position.set(adjustedX, adjustedY, 0);
-          dispatch(setLeftPosState(new Vector3(adjustedX, adjustedY, 0)));
+          dispatch(setLeftPosState({x:adjustedX, y:adjustedY, z:0}));
 
           const length = rightJaw.current.position.distanceTo(
             leftJaw.current.position
@@ -125,7 +124,7 @@ export const Scale = () => {
           }
 
           rightJaw.current.position.set(adjustedX, adjustedY, 0);
-          dispatch(setRightPosState(new Vector3(adjustedX, adjustedY, 0)));
+          dispatch(setRightPosState({x:adjustedX, y:adjustedY, z:0}));
           const length = rightJaw.current.position.distanceTo(
             leftJaw.current.position
           );
@@ -159,8 +158,8 @@ export const Scale = () => {
       const rotatedLeft = boxCenter.clone().sub(rotatedOffset);
       const rotatedRight = boxCenter.clone().add(rotatedOffset);
 
-      dispatch(setLeftPosState(rotatedLeft));
-      dispatch(setRightPosState(rotatedRight));
+      dispatch(setLeftPosState({x:rotatedLeft.x, y:rotatedLeft.y, z:0}));
+      dispatch(setRightPosState({x:rotatedRight.x, y:rotatedRight.y, z:0}));
       leftJaw.current.position.set(rotatedLeft.x, rotatedLeft.y, 0);
       rightJaw.current.position.set(rotatedRight.x, rotatedRight.y, 0);
     };

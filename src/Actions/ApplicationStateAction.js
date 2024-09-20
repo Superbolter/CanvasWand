@@ -103,16 +103,16 @@ export const drawToolData = (floorplan_id) => {
           dispatch(setUserLength(userLength));
           dispatch(setUserWidth(userWidth));
           dispatch(setUserHeight(userHeight));
-          const left = new THREE.Vector3(
-            scaleData.leftPos.x,
-            scaleData.leftPos.y,
-            scaleData.leftPos.z
-          );
-          const right = new THREE.Vector3(
-            scaleData.rightPos.x,
-            scaleData.rightPos.y,
-            scaleData.rightPos.z
-          );
+          const left = {
+            x: scaleData.leftPos.x,
+            y: scaleData.leftPos.y,
+            z: scaleData.leftPos.z
+          };
+          const right = {
+            x: scaleData.rightPos.x,
+            y: scaleData.rightPos.y,
+            z: scaleData.rightPos.z
+          };
           dispatch(setLeftPosState(left));
           dispatch(setRightPosState(right));
           const lfactor = userLength / scaleData.distance;

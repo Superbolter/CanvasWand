@@ -11,7 +11,6 @@ const initialState = {
     roomActionHistory: [],
     roomRedoStack: [],
     seeDimensions: false,
-    cameraContext: {},
     stop: false,
     newLine: false,
     showSnapLine: false,
@@ -78,12 +77,7 @@ const initialState = {
           ...state,
           seeDimensions: action.payload
         }
-      case "SET_CAMERA_CONTEXT":
-        return {
-          ...state,
-          cameraContext: action.payload
-        }
-      case 'UPDATE_DRAWING_STATE':
+      case 'UPDATE_DRAWING_REDUCER_STATE':
         return Object.assign({}, state, {
           ...state,
           ...action
