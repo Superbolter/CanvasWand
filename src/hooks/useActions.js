@@ -42,6 +42,7 @@ import { INITIAL_BREADTH, INITIAL_HEIGHT } from "../constant/constant.js";
 import { toast } from "react-hot-toast";
 import convert from "convert-units";
 import { useDrawing } from "./useDrawing.js";
+import { Vector3 } from "three";
 
 export const useActions = () => {
   const { actionHistory, roomActionHistory, redoStack, roomRedoStack } =
@@ -319,8 +320,8 @@ export const useActions = () => {
       unit = "in";
     }
     const scaleData = {
-      leftPos,
-      rightPos,
+      left,
+      right,
       distance: distance,
       unitLength: newLength,
       userWidth: newWidth,
@@ -400,8 +401,8 @@ export const useActions = () => {
       dispatch(setUserLength(length));
       dispatch(setUserWidth(width));
     }
-    let left = leftPos;
-    let right = rightPos;
+    let left = new Vector3(leftPos.x, leftPos.y,0);
+    let right = new Vector3 (rightPos.x, rightPos.y,0);
     if (showSetScalePopup) {
       left = firstLinePoints[0];
       right = firstLinePoints[1];
