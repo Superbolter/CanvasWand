@@ -32,10 +32,61 @@
       href="https://fonts.googleapis.com/css?family=DM Sans"
       rel="stylesheet"
     />
-    <title>SuperBolter:Draw Tool</title>
+    <title>SuperBolter: Draw Tool</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <script>
+      function GAEvent(eventCategory, eventAction, eventLabel, eventValue, extraparams="" ) {
+      // ga('send', 'event', {
+      //   eventCategory: eventCategory,
+      //   eventAction: eventAction,
+      //   eventLabel: eventLabel,
+      //   eventValue: eventValue
+      // });
+      window.FBPixel(eventCategory, eventAction, eventLabel, eventValue)
+      window.GTMEVENT(eventCategory, eventAction, eventLabel, eventValue,  extraparams)
+
+
+    }
+
+    function FBPixel(eventCategory, eventAction, eventLabel, eventValue) {
+      if (typeof fbq === "function") {
+        fbq('trackCustom', eventCategory, {
+          "eventAction": eventAction,
+          "eventLabel": eventLabel,
+          "eventValue": eventValue
+
+        });
+      }
+
+    }
+
+    function GTMEVENT(eventCategory, eventAction, eventLabel, eventValue, extraparams="" ) {
+        window.dataLayer = window.dataLayer || [];
+        const user_id = window?.curentUserSession?.user_id? window?.curentUserSession?.user_id : "";
+        dataLayer.push({
+          'event': 'customEvent',
+          'eventCategory': eventCategory,
+          'eventAction': eventAction,
+          'eventLabel': eventLabel,
+          'eventValue': eventValue,
+          "extraParams":extraparams ,
+          "user_id":user_id,
+          "source":"DrawTool",
+        });
+    }
+
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+          new Date().getTime(), event: 'gtm.js'
+      }); var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', '%REACT_APP_GTM_ID%')
+
+    </script>
   </body>
 </html>
