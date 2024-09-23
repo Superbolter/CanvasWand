@@ -409,7 +409,7 @@ export const useActions = () => {
     }
     dispatch(setUserHeight(height));
     const lfactor = length / left.distanceTo(right);
-    const wfactor = INITIAL_BREADTH / width;
+    const wfactor = INITIAL_BREADTH;
     const hfactor = INITIAL_HEIGHT / height;
     dispatch(setFactor([lfactor, wfactor, hfactor]));
     dispatch(setDesignStep(2));

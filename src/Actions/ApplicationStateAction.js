@@ -116,7 +116,7 @@ export const drawToolData = (floorplan_id) => {
           dispatch(setLeftPosState(left));
           dispatch(setRightPosState(right));
           const lfactor = userLength / scaleData.distance;
-          const wfactor = INITIAL_BREADTH / userWidth;
+          const wfactor = INITIAL_BREADTH;
           const hfactor = INITIAL_HEIGHT / userHeight;
           dispatch(setFactor([lfactor, wfactor, hfactor]));
           if(designStep === 1){

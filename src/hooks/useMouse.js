@@ -69,22 +69,21 @@ const useMouse = () => {
   const controlPoint = (point1, point2, angle = 0) => {
     let x = (point1?.x + point2?.x) / 2;
     let y= (point1?.y + point2?.y) / 2;
-    setCurveAngle(angle);
     if(Math.abs(point1?.x - point2?.x) < Math.abs(point1?.y - point2?.y)){
       if(points[points.length-1].x > point2?.x){
         x = x - (angle * 0.67);
-        setCurveAnglePosition(new Vector3(x - 10,y,0));
+        setCurveAnglePosition(new Vector3(x - 20,y,0));
       } else {
         x = x + (angle * 0.67);
-        setCurveAnglePosition(new Vector3(x + 10,y,0));
+        setCurveAnglePosition(new Vector3(x + 20,y,0));
       }
     } else {
       if(points[points.length-1].y > point2?.y){
         y = y - (angle * 0.67);
-        setCurveAnglePosition(new Vector3(x,y - 10,0));
+        setCurveAnglePosition(new Vector3(x,y - 20,0));
       } else {
         y = y + (angle * 0.67);
-        setCurveAnglePosition(new Vector3(x,y + 10,0));
+        setCurveAnglePosition(new Vector3(x,y + 20,0));
       }
     }
     return new Vector3(x,y,0);
@@ -233,6 +232,9 @@ const useMouse = () => {
       const angleInDegrees = angleInRadians * (180 / Math.PI);
       if(angleInDegrees < 3){
         point = position;
+        setCurveAngle(0);
+      }else{
+        setCurveAngle(angleInDegrees);
       }
       const curve = new QuadraticBezierCurve3(
         new Vector3(currentStrightMousePosition?.x, currentStrightMousePosition?.y, 0), // Start point (last point) 

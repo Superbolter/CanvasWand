@@ -150,7 +150,7 @@ const Properties = () => {
           </Select>
         </Paper>
       </div>
-      <div className="thickness-input-container">
+      {/* <div className="thickness-input-container">
         <Typography className="thickness-text">Thickness</Typography>
         <Paper
           label={measured}
@@ -243,7 +243,7 @@ const Properties = () => {
             ))}
           </Select>
         </Paper>
-      </div>
+      </div> */}
     </>
   );
 };

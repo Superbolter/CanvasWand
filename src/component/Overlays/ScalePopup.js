@@ -30,7 +30,9 @@ const ScalePopup = () => {
 
   const handleContinueClick = () => {
     if(measured === "ft"){
-      if(lengthFoot === 0 || (widthFoot === 0 && widthInch === 0)) {
+      if(lengthFoot === 0
+        //  || (widthFoot === 0 && widthInch === 0)
+        ) {
         setError(true);
         return;
       }
@@ -40,11 +42,11 @@ const ScalePopup = () => {
     }else{
       if (
         userLength === 0 ||
-        userWidth === 0 ||
+        // userWidth === 0 ||
         userLength === undefined ||
-        userWidth === undefined ||
-        userLength === "" ||
-        userWidth === ""
+        // userWidth === undefined ||
+        userLength === "" 
+        // || userWidth === ""
       ) {
         setError(true);
         return;
@@ -77,8 +79,9 @@ const ScalePopup = () => {
     <div>
       <div
         className={
-          showSetScalePopup ? "scale-popup-overlay":
-          designStep === 1
+          showSetScalePopup
+            ? "scale-popup-overlay"
+            : designStep === 1
             ? "scale-popup-container"
             : "scale-popup-container-hidden"
         }
@@ -93,6 +96,7 @@ const ScalePopup = () => {
         </div>
         <HowTo type="setScale" />
         <div className="input-container">
+          <LengthConverter />
           <div className="height-input-container">
             <Typography className="height-text">Length</Typography>
             {measured === "ft" ? (
@@ -106,7 +110,9 @@ const ScalePopup = () => {
                   size="small"
                   required={true}
                   value={lengthFoot !== "" ? lengthFoot : ""}
-                  onChange={(e) => setLengthFoot(e.target.value? parseInt(e.target.value) : 0 )}
+                  onChange={(e) =>
+                    setLengthFoot(e.target.value ? parseInt(e.target.value) : 0)
+                  }
                   InputProps={{
                     style: {
                       fontSize: "16px",
@@ -126,7 +132,12 @@ const ScalePopup = () => {
                   size="small"
                   required={true}
                   value={lengthInch !== "" ? lengthInch : ""}
-                  onChange={(e) => {if(e.target.value.length <= 11) setLengthInch(e.target.value? parseInt(e.target.value) : 0)}}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 11)
+                      setLengthInch(
+                        e.target.value ? parseInt(e.target.value) : 0
+                      );
+                  }}
                   InputProps={{
                     style: {
                       fontSize: "16px",
@@ -161,7 +172,7 @@ const ScalePopup = () => {
               />
             )}
           </div>
-          <div className="thickness-input-container">
+          {/* <div className="thickness-input-container">
             <Typography className="thickness-text">Thickness</Typography>
             {measured === "ft" ? (
               <div className="feet-input-container">
@@ -228,22 +239,21 @@ const ScalePopup = () => {
                 }}
               />
             )}
-          </div>
-          <LengthConverter />
-          {error && (
-            <Typography modifiers={["warning300", "helpText"]}>
-              Don't leave the feilds empty
-            </Typography>
-          )}
-          <div className="btn-container" style={{ marginTop: "10px" }}>
-            <Button
-              onClick={handleContinueClick}
-              className="save-btn"
-              modifiers={["blue", "block"]}
-            >
-              Save & continue
-            </Button>
-          </div>
+          </div> */}
+        </div>
+        {error && (
+          <Typography style={{marginBottom:"-10px"}} modifiers={["warning300", "helpText"]}>
+            Please enter a valid value for length
+          </Typography>
+        )}
+        <div className="btn-container" style={{ marginTop: "6px" }}>
+          <Button
+            onClick={handleContinueClick}
+            className="save-btn"
+            modifiers={["blue", "block"]}
+          >
+            Save & continue
+          </Button>
         </div>
       </div>
     </div>

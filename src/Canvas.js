@@ -499,7 +499,7 @@ export const CanvasComponent = () => {
                       color="blue"
                       lineWidth={5}
                     />
-                    <Line points={curvePoints} color="black" lineWidth={1} />
+                    <Line points={curvePoints} color="black" lineWidth={1} transparent={true} opacity={0.5}/>
                     <Text
                       position={[
                         (points[points.length - 1].x +
