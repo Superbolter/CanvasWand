@@ -91,6 +91,10 @@ export const drawToolData = (floorplan_id) => {
         if (drawData?.storeBoxes && drawData?.storeBoxes?.length > 0) {
           dispatch(setStoreBoxes(drawData.storeBoxes));
         }
+        if(drawData?.firstTimePopupStatus){
+          firstTimePopupNumber = drawData.firstTimePopupStatus;
+          dispatch(setShowFirstTimePopup({firstTimePopupNumber: firstTimePopupNumber}));
+        }
         if (response.data.scale !== null) {
           const scaleData = JSON.parse(response.data.scale);
           const measured = scaleData?.userUnit || "mm";
@@ -121,8 +125,10 @@ export const drawToolData = (floorplan_id) => {
           const wfactor = INITIAL_BREADTH;
           const hfactor = INITIAL_HEIGHT / userHeight;
           dispatch(setFactor([lfactor, wfactor, hfactor]));
-          if((designStep === 1 || designStep === 2) && enableFirstTimePopup && firstTimePopupNumber < 2){
+          if(designStep === 1){
             dispatch(setDesignStep(2));
+          }
+          if((designStep === 1 || designStep === 2) && enableFirstTimePopup && firstTimePopupNumber < 2){
             dispatch(setShowFirstTimePopup({
               showFirstTimePopup: true,
               firstTimePopupType: "ui",

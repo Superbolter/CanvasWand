@@ -72,6 +72,7 @@ export const useActions = () => {
   const dispatch = useDispatch();
   const { toggleSelectionMode } = useModes();
   const { addPoint } = useDrawing();
+  const {firstTimePopupNumber} = useSelector((state) => state.PopupState);
 
   const undo = () => {
     if (designStep === 2) {
@@ -329,7 +330,7 @@ export const useActions = () => {
       unitType: unit,
       userUnit: measured,
     };
-    const data = handleDownload(lines, points, rooms, storeBoxes);
+    const data = handleDownload(lines, points, rooms, storeBoxes, firstTimePopupNumber);
     const finalData = {
       floorplan_uuid: floorplanId,
       draw_data: data,

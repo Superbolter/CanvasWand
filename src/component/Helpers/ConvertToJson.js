@@ -1,6 +1,6 @@
 import React from 'react';
 
-const convertToJSON = (lines, points,roomSelectors,storeBoxes) => {
+const convertToJSON = (lines, points,roomSelectors,storeBoxes,firstTimePopupNumber) => {
     const jsonData = {
         points: points.map(point => ({ id:point.id,x: point.x, y: point.y,  z: point.z})),
         lines: lines.map(line => ({
@@ -17,7 +17,8 @@ const convertToJSON = (lines, points,roomSelectors,storeBoxes) => {
             typeId: line.typeId
         })),
         rooms: roomSelectors,
-        storeBoxes
+        storeBoxes,
+        firstTimePopupStatus: firstTimePopupNumber
     };
     return JSON.stringify(jsonData);
 };
@@ -45,8 +46,8 @@ const DownloadJSONButton = ({ lines, points,roomSelectors }) => {
 
 export default DownloadJSONButton;
 
-export const handleDownload = (lines, points, roomSelectors,storeBoxes) => {
-    const data = convertToJSON(lines, points, roomSelectors,storeBoxes);
+export const handleDownload = (lines, points, roomSelectors,storeBoxes, firstTimePopupNumber) => {
+    const data = convertToJSON(lines, points, roomSelectors,storeBoxes,firstTimePopupNumber);
     return data;
 };
 
