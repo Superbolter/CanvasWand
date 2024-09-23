@@ -1,8 +1,10 @@
 const initialState = {
-    enableFirstTimePopup: false,
+    enableFirstTimePopup: true,
     showFirstTimePopup: false,
     firstTimePopupType: "",
-    firstTimePopupName: null,
+    firstTimePopupNumber: null,
+    customisedPosition: null,
+    popupDismissable: false
 };
 
 const PopupReducer = (state = initialState, action) => {

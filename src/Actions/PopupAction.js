@@ -1,15 +1,17 @@
-export const setShowFirstTimePopup = (showFirstTimePopup, firstTimePopupType = "", firstTimePopupName =  null) => {
+export const setShowFirstTimePopup = (data) => {
   return {
     type: "UPDATE_POPUP_REDUCER",
-    showFirstTimePopup,
-    firstTimePopupType,
-    firstTimePopupName,
+    ...data,
   };
 };
 
-export const setEnableFirstTimePopup = (enableFirstTimePopup) => {
+export const resetShowFirstTimePopup = () => {
   return {
     type: "UPDATE_POPUP_REDUCER",
-    enableFirstTimePopup,
+    showFirstTimePopup: false,
+    firstTimePopupType: "",
+    firstTimePopupNumber: null,
+    customisedPosition: null,
+    popupDismissable: false
   };
 };

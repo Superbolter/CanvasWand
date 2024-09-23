@@ -427,3 +427,10 @@ body, html {
   -moz-appearance: none;
   height: 4px;
 } */
+
+
+.logo{
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+}

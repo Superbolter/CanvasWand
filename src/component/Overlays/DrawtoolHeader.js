@@ -17,6 +17,7 @@ import { ArrowBack, Check } from "@mui/icons-material";
 import { Switch } from "@mui/material";
 import { setSeeDimensions } from "../../Actions/DrawingActions.js";
 import { useActions } from "../../hooks/useActions.js";
+import { resetShowFirstTimePopup } from "../../Actions/PopupAction.js";
 
 const MySwal = withReactContent(Swal);
 
@@ -24,9 +25,10 @@ const DrawtoolHeader = ({ }) => {
   const dispatch = useDispatch();
   const { designStep, img } = useSelector((state) => state.ApplicationState);
   const { seeDimensions } = useSelector((state) => state.Drawing);
-  const { undo, redo, handleReset, handleResetRooms, handleSaveClick} = useActions();
+  const { handleReset, handleResetRooms, handleSaveClick} = useActions();
 
   const handleBackToScale = () => {
+    dispatch(resetShowFirstTimePopup());
     dispatch(setDesignStep(1));
     handleReset();
   };
@@ -56,6 +58,7 @@ const DrawtoolHeader = ({ }) => {
         dispatch(setDesignStep(2));
         dispatch(showRoomNamePopup(false));
         handleResetRooms();
+        dispatch(resetShowFirstTimePopup());
       }
     });
   };
@@ -137,7 +140,7 @@ const DrawtoolHeader = ({ }) => {
             </div>
             <Typography modifiers={designStep > 2? ["medium", "subtitle", "black600"]: ["grey","medium", "subtitle"]}>Define Rooms</Typography>
           </div>
-          <div className={`header-step-indicator-line ${designStep > 3 ? "blackLine" : "grayLine"}`}></div>
+          {/* <div className={`header-step-indicator-line ${designStep > 3 ? "blackLine" : "grayLine"}`}></div>
           <div className="header-step-indicator-step">
             <div className={`header-step-indicator-step-box ${designStep< 4? "grayBorder" : ""}`}>
               {
@@ -148,40 +151,16 @@ const DrawtoolHeader = ({ }) => {
               }
             </div>
             <Typography modifiers={designStep > 3? ["medium", "subtitle", "black600"]: ["grey","medium", "subtitle"]}>Open 3D</Typography>
-          </div>
+          </div> */}
         </div>
         {designStep === 1 ? null : (
           <div style={{ display: "flex", gap: "8px" }}>
-            <Button
-              modifiers={["outlineBlack", "sm"]}
-              className="undo-redo-btn"
-              onClick={undo}
-            >
-              <img
-                style={{ width: "24px", height: "24px" }}
-                src={Undo}
-                alt=""
-              />
-              <Typography>Undo</Typography>
-            </Button>
-            <Button
-              modifiers={["outlineBlack", "sm"]}
-              className="undo-redo-btn"
-              onClick={redo}
-            >
-              <img
-                style={{ width: "24px", height: "24px" }}
-                src={Redo}
-                alt=""
-              />
-              <Typography>Redo</Typography>
-            </Button>
             <Button
               className="save-btn"
               modifiers={["blue"]}
               onClick={handleSaveClick}
             >
-              {designStep < 3? "Save & next": "Open 3D" }
+              {designStep < 3? "Save & next": "Finish & generate 3D" }
             </Button>
           </div>
         )}

@@ -12,12 +12,13 @@ import {
   setUserWidth,
 } from "../features/drawing/drwingSlice";
 import { setContextualMenuStatus, setUndoStack } from "./DrawingActions";
-import { setEnableFirstTimePopup, setShowFirstTimePopup } from "./PopupAction";
+import { setShowFirstTimePopup } from "./PopupAction";
 
 export const drawToolData = (floorplan_id) => {
   return (dispatch, getState) => {
     const state = getState();
     const designStep = state.ApplicationState.designStep;
+    let enableFirstTimePopup = state.PopupState.enableFirstTimePopup
     const formData = new FormData();
     formData.append("floorplan_uuid", floorplan_id); // Assuming 'token' is the expected field name
 
@@ -119,15 +120,35 @@ export const drawToolData = (floorplan_id) => {
           const wfactor = INITIAL_BREADTH;
           const hfactor = INITIAL_HEIGHT / userHeight;
           dispatch(setFactor([lfactor, wfactor, hfactor]));
-          if(designStep === 1){
+          if((designStep === 1 || designStep === 2) && enableFirstTimePopup){
             dispatch(setDesignStep(2));
+            dispatch(setShowFirstTimePopup({
+              showFirstTimePopup: true,
+              firstTimePopupType: "ui",
+              firstTimePopupNumber: 3,
+              popupDismissable: false
+            }))
+          }else if(designStep === 3 && enableFirstTimePopup){
+            dispatch(setShowFirstTimePopup({
+              showFirstTimePopup: true,
+              firstTimePopupType: "canvas",
+              firstTimePopupNumber: 6,
+              popupDismissable: false
+            }))
+          }
+        }else{
+          if(designStep === 1 && enableFirstTimePopup){
+            dispatch(setShowFirstTimePopup({
+              showFirstTimePopup: true,
+              firstTimePopupType: "canvas",
+              firstTimePopupNumber: 1,
+              popupDismissable: true
+            }))
           }
         }
         if(!response.data.image_uri && response.data.scale === null){
           dispatch(setDesignStep(2));
         }
-        dispatch(setEnableFirstTimePopup(true))
-        // dispatch(setShowFirstTimePopup(true,"UI","selectWallPopup"))
       })
       .catch((error) => {
         console.error("Error", error);

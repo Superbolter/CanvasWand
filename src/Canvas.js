@@ -60,7 +60,10 @@ import cursor from "./assets/Default.png"
 import SetScalePopup from "./component/Popups/SetScalePopup.js";
 import HelpVideoPopup from "./component/Popups/HelpVideoPopup.js";
 import useMouse from "./hooks/useMouse.js";
-import FirstTimePopup from "./component/Popups/FirstTimePopup.js";
+import FirstTimePopupCanvas from "./component/Popups/FirstTimePopupCanvas.js";
+import FirstTimePopupUI from "./component/Popups/FirstTimePopupUI.js";
+import UndoRedoButton from "./component/Overlays/UndoRedoButton.js";
+import Logo from "./component/Overlays/Logo.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -124,7 +127,7 @@ export const CanvasComponent = () => {
     (state) => state.Drawing
   );
 
-  const {enableFirstTimePopup, showFirstTimePopup} = useSelector((state) => state.PopupState);
+  const {enableFirstTimePopup, showFirstTimePopup, firstTimePopupType} = useSelector((state) => state.PopupState);
 
   const getUrlParameter = (name) => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -547,7 +550,7 @@ export const CanvasComponent = () => {
             ))}
 
           {designStep > 1 && <ContextualMenu />}
-          {showFirstTimePopup && enableFirstTimePopup && <FirstTimePopup />}
+          {showFirstTimePopup && enableFirstTimePopup && firstTimePopupType==="canvas" && <FirstTimePopupCanvas />}
 
           {designStep === 3 &&
             roomSelectors.map((room, index) => (
@@ -604,6 +607,8 @@ export const CanvasComponent = () => {
           /> */}
         </Canvas>
         <DrawtoolHeader />
+        <UndoRedoButton/>
+        <Logo/>
         <BottomComponent zoom={zoom} setZoom={setZoom} />
       </div>
       {designStep > 1 ? (
@@ -685,12 +690,14 @@ export const CanvasComponent = () => {
             <ButtonComponent />
             <HelpVideoPopup />
             {showSetScalePopup && <SetScalePopup />}
+            {showFirstTimePopup && enableFirstTimePopup && firstTimePopupType==="ui" && <FirstTimePopupUI />}
           </div>
         </div>
       ) : (
         <div className="button-container">
           <ScalePopup />
           <HelpVideoPopup />
+          {showFirstTimePopup && enableFirstTimePopup && firstTimePopupType==="ui" && <FirstTimePopupUI />}
         </div>
       )}
     </div>
