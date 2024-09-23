@@ -1,0 +1,37 @@
+.escape-helper-container{
+    position: absolute;
+    top: 90px;
+    left: 40%;
+    transform: translateX(-40%);
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px 0 #00000026;
+    align-items: center;
+    z-index: 1300;
+}
+
+.escape-helper-content{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    padding: 8px 12px;
+    border-right: 1px solid #DADDDE;
+}
+
+.escape-helper-right{
+    padding: 8px 12px;
+    cursor: pointer;
+    &:hover{
+        text-decoration: underline;
+        color: cornflowerblue;
+    }
+}
+
+.escape-helper-escape{
+    background-color: #F4F4F4;
+    padding: 5px 11px;
+    border-radius: 8px;
+}

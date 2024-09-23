@@ -64,6 +64,7 @@ import FirstTimePopupCanvas from "./component/Popups/FirstTimePopupCanvas.js";
 import FirstTimePopupUI from "./component/Popups/FirstTimePopupUI.js";
 import UndoRedoButton from "./component/Overlays/UndoRedoButton.js";
 import Logo from "./component/Overlays/Logo.js";
+import EscapeHelper from "./component/Overlays/EscapeHelper.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -121,7 +122,8 @@ export const CanvasComponent = () => {
     expandRoomPopup,
     activeRoomButton,
     showSetScalePopup,
-    img
+    img,
+    escapeMessageShow
   } = useSelector((state) => state.ApplicationState);
   const { typeId, stop, showSnapLine, snappingPoint, temporaryPolygon, enablePolygonSelection,} = useSelector(
     (state) => state.Drawing
@@ -609,6 +611,7 @@ export const CanvasComponent = () => {
         <DrawtoolHeader />
         <UndoRedoButton/>
         <Logo/>
+        {designStep === 2 && !selectionMode && escapeMessageShow && <EscapeHelper/>}
         <BottomComponent zoom={zoom} setZoom={setZoom} />
       </div>
       {designStep > 1 ? (

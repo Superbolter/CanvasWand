@@ -57,6 +57,7 @@ export const useActions = () => {
     showSetScalePopup,
     img,
     firstLinePoints,
+    escapeMessageShow
   } = useSelector((state) => state.ApplicationState);
   const {
     lineBreak,
@@ -330,7 +331,7 @@ export const useActions = () => {
       unitType: unit,
       userUnit: measured,
     };
-    const data = handleDownload(lines, points, rooms, storeBoxes, firstTimePopupNumber);
+    const data = handleDownload(lines, points, rooms, storeBoxes, firstTimePopupNumber, escapeMessageShow);
     const finalData = {
       floorplan_uuid: floorplanId,
       draw_data: data,

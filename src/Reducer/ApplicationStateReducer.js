@@ -25,6 +25,7 @@ const initialState = {
     firstLinePoints: [],
     helpVideo: false,
     helpVideoType: "",
+    escapeMessageShow: true,
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {

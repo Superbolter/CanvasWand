@@ -95,6 +95,9 @@ export const drawToolData = (floorplan_id) => {
           firstTimePopupNumber = drawData.firstTimePopupStatus;
           dispatch(setShowFirstTimePopup({firstTimePopupNumber: firstTimePopupNumber}));
         }
+        if(drawData?.escapeMessageShow === false){
+          dispatch(setEscapeMessageShow(drawData.escapeMessageShow));
+        }
         if (response.data.scale !== null) {
           const scaleData = JSON.parse(response.data.scale);
           const measured = scaleData?.userUnit || "mm";
@@ -390,6 +393,15 @@ export const setHelpVideo = (val, type = "") =>{
       type: "UPDATE_APPLICATION_STATE",
       helpVideo: val,
       helpVideoType: type
+    })
+  }
+}
+
+export const setEscapeMessageShow = (val) => {
+  return (dispatch) => {
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      escapeMessageShow: val
     })
   }
 }
