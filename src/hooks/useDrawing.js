@@ -62,6 +62,7 @@ import { toast } from "react-hot-toast";
 import useModes from "./useModes.js";
 import usePoints from "./usePoints.js";
 import { dividePolygon } from "../utils/polygon.js";
+import { resetShowFirstTimePopup, setShowFirstTimePopup } from "../Actions/PopupAction.js";
 
 const MySwal = withReactContent(Swal);
 
@@ -107,6 +108,7 @@ export const useDrawing = () => {
     activeRoomButton,
     img
   } = useSelector((state) => state.ApplicationState);
+  const { showFirstTimePopup, firstTimePopupNumber, enableFirstTimePopup } = useSelector((state) => state.PopupState);
 
   const { toggleSelectionSplitMode } = useModes();
   const { screenToNDC, isPointInsidePolygon, arePointsSimilar } = usePoints();
@@ -478,6 +480,9 @@ export const useDrawing = () => {
   };
 
   const handleClick = (event) => {
+    if(showFirstTimePopup && firstTimePopupNumber === 4 || firstTimePopupNumber === 5) {
+      dispatch(resetShowFirstTimePopup());
+    }
     dispatch(setHelpVideo(false))
     if (selectionMode && !lineClick && !enablePolygonSelection && activeRoomButton !== "divide") {
       setSelectedLines([]);
@@ -641,6 +646,15 @@ export const useDrawing = () => {
       if (designStep === 2) {
         const pointToSend = [point?.x + 40, point?.y + 100, point?.z];
         dispatch(setContextualMenuStatus(true, pointToSend, "neutral"));
+        if(!showFirstTimePopup && firstTimePopupNumber < 5 && enableFirstTimePopup && storeLines.length === 0){
+          dispatch(setShowFirstTimePopup({
+            showFirstTimePopup: true,
+            firstTimePopupNumber: 5,
+            popupDismissable: true,
+            firstTimePopupType: "canvas",
+            customisedPosition: [pointToSend[0] + 60, pointToSend[1] + 10, pointToSend[2]],
+          }))
+        }
       }
       dispatch(setNewLine(false));
 
@@ -683,6 +697,15 @@ export const useDrawing = () => {
       if (designStep === 2) {
         const pointToSend = [point?.x + 40, point?.y + 100, point?.z];
         dispatch(setContextualMenuStatus(true, pointToSend, "neutral"));
+        if(!showFirstTimePopup && firstTimePopupNumber < 5 && enableFirstTimePopup && storeLines.length === 0){
+          dispatch(setShowFirstTimePopup({
+            showFirstTimePopup: true,
+            firstTimePopupNumber: 5,
+            popupDismissable: true,
+            firstTimePopupType: "canvas",
+            customisedPosition: [pointToSend[0] + 60, pointToSend[1] +10, pointToSend[2]],
+          }))
+        }
       }
       addPoint(point, newPoints[newPoints.length - 2]);
     }

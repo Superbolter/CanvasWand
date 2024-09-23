@@ -18,6 +18,7 @@ import { setRoomSelectors } from "../../features/drawing/drwingSlice";
 import usePoints from "../../hooks/usePoints";
 import {colors} from "../../utils/colors"
 import { setRoomRedoStack, setRoomUndoStack } from "../../Actions/DrawingActions";
+import { resetShowFirstTimePopup, setShowFirstTimePopup } from "../../Actions/PopupAction";
 
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
@@ -68,6 +69,20 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
   const { isPointInsidePolygon} = usePoints();
   const dispatch = useDispatch();
   const [initialRoomState, setInitialRoomState] = useState(null);
+  const { showFirstTimePopup, firstTimePopupNumber, enableFirstTimePopup } = useSelector((state) => state.PopupState);
+  
+  useEffect (()=>{
+    if(index === 0 && !showFirstTimePopup && firstTimePopupNumber < 11 && enableFirstTimePopup && polygon){
+      const centroid = getCentroid(polygon);
+      dispatch(setShowFirstTimePopup({
+        showFirstTimePopup: true,
+        firstTimePopupNumber: 11,
+        firstTimePopupType: "canvas",
+        popupDismissable: true,
+        customisedPosition: new Vector3(centroid.x + 50, centroid.y, 0),
+      }))
+    }
+  },[roomSelectors, showFirstTimePopup, firstTimePopupNumber])
 
   const handleDragPoint = (newPosition, draggedPoint) => {
     if (!initialRoomState) {
@@ -117,7 +132,26 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
       dispatch(setRoomName(""));
       dispatch(setRoomDetails(""));
       dispatch(setActiveRoomIndex(-1));
+      dispatch(resetShowFirstTimePopup())
       return;
+    }
+    if(firstTimePopupNumber < 12 && enableFirstTimePopup){
+      const centroid = getCentroid(polygon);
+      dispatch(setShowFirstTimePopup({
+        showFirstTimePopup: true,
+        firstTimePopupNumber: 12,
+        firstTimePopupType: "canvas",
+        popupDismissable: true,
+        customisedPosition: new Vector3(centroid.x + 50, centroid.y, 0),
+      }))
+    }else if(firstTimePopupNumber < 13 && enableFirstTimePopup){
+      dispatch(setShowFirstTimePopup({
+        showFirstTimePopup: true,
+        firstTimePopupNumber: 13,
+        firstTimePopupType: "ui",
+        popupDismissable: true,
+        customisedPosition: null,
+      }))
     }
     dispatch(setSelectedLinesState(wallIds));
     dispatch(setExpandRoomNamePopup(true));

@@ -2,7 +2,7 @@ const initialState = {
     enableFirstTimePopup: true,
     showFirstTimePopup: false,
     firstTimePopupType: "",
-    firstTimePopupNumber: null,
+    firstTimePopupNumber: 1,
     customisedPosition: null,
     popupDismissable: false
 };

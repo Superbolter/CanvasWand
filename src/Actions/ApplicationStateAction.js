@@ -19,6 +19,7 @@ export const drawToolData = (floorplan_id) => {
     const state = getState();
     const designStep = state.ApplicationState.designStep;
     let enableFirstTimePopup = state.PopupState.enableFirstTimePopup
+    let firstTimePopupNumber = state.PopupState.firstTimePopupNumber
     const formData = new FormData();
     formData.append("floorplan_uuid", floorplan_id); // Assuming 'token' is the expected field name
 
@@ -120,7 +121,7 @@ export const drawToolData = (floorplan_id) => {
           const wfactor = INITIAL_BREADTH;
           const hfactor = INITIAL_HEIGHT / userHeight;
           dispatch(setFactor([lfactor, wfactor, hfactor]));
-          if((designStep === 1 || designStep === 2) && enableFirstTimePopup){
+          if((designStep === 1 || designStep === 2) && enableFirstTimePopup && firstTimePopupNumber < 2){
             dispatch(setDesignStep(2));
             dispatch(setShowFirstTimePopup({
               showFirstTimePopup: true,
@@ -128,7 +129,7 @@ export const drawToolData = (floorplan_id) => {
               firstTimePopupNumber: 3,
               popupDismissable: false
             }))
-          }else if(designStep === 3 && enableFirstTimePopup){
+          }else if(designStep === 3 && enableFirstTimePopup && firstTimePopupNumber < 6 && drawData.rooms.length > 0){
             dispatch(setShowFirstTimePopup({
               showFirstTimePopup: true,
               firstTimePopupType: "canvas",
@@ -137,7 +138,7 @@ export const drawToolData = (floorplan_id) => {
             }))
           }
         }else{
-          if(designStep === 1 && enableFirstTimePopup){
+          if(designStep === 1 && enableFirstTimePopup && firstTimePopupNumber <= 1){
             dispatch(setShowFirstTimePopup({
               showFirstTimePopup: true,
               firstTimePopupType: "canvas",

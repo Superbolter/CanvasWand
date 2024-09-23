@@ -53,7 +53,7 @@
 .first-time-popup:after{
     content: "";
     position: absolute;
-    top: calc(100% - 1.5px);
+    top: calc(100% - 2px);
     left: 90%;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
@@ -93,6 +93,12 @@
     position: absolute;
     top: 230px;
     right: 145px;
+}
+
+.renameRoomPopup{
+    position: absolute;
+    top: 400px;
+    right: 275px;
 }
 
 .first-time-popup-close{

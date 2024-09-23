@@ -15,6 +15,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useDrawing } from "../../hooks/useDrawing.js";
 import usePoints from "../../hooks/usePoints.js";
+import { resetShowFirstTimePopup, setShowFirstTimePopup } from "../../Actions/PopupAction.js";
 
 export const Scale = () => {
   const dispatch = useDispatch();
@@ -28,11 +29,12 @@ export const Scale = () => {
   const [lineAngle, setLineAngle] = useState(0);
   const [isPointerMoving, setIsPointerMoving] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
-  const { leftPos, rightPos } = useSelector((state) => state.drawing);
+  const { leftPos, rightPos, userLength } = useSelector((state) => state.drawing);
   const [leftJawActivated, setLeftJawActivated] = useState(false);
   const [rightJawActivated, setRightJawActivated] = useState(false);
   const tolerance = 1e-3;
   const { screenToNDC} = usePoints();
+  const { showFirstTimePopup, firstTimePopupNumber, enableFirstTimePopup } =useSelector((state) => state.PopupState);
 
   useEffect(() => {
     const updateMesh = (pointA, pointB) => {
@@ -184,6 +186,9 @@ export const Scale = () => {
   };
 
   const handlePointerDownBox = (event) => {
+    if(showFirstTimePopup){
+      dispatch(resetShowFirstTimePopup());
+    }
     setDragging(mesh.current);
     setIsDraggingBox(true);
     event.stopPropagation();
@@ -213,12 +218,30 @@ export const Scale = () => {
 
   const handlePointerUp = (event) => {
     document.getElementsByClassName('canvas-container')[0].style.cursor = "grab"
+    if(dragging === leftJaw || dragging === rightJaw){
+      showPopup();
+    }else{
+      setTimeout(()=>{
+        showPopup();
+      },5000)
+    }
     setDragging(null);
     setIsDraggingBox(false);
     setLeftJawActivated(false);
     setRightJawActivated(false);
     event.stopPropagation();
   };
+
+  const showPopup = () =>{
+    if(userLength === 0 && !showFirstTimePopup && firstTimePopupNumber === 1 && enableFirstTimePopup){
+      dispatch(setShowFirstTimePopup({
+        showFirstTimePopup: true,
+        firstTimePopupNumber: 2,
+        popupDismissable: true,
+        firstTimePopupType: "ui"
+      }));
+    }
+  }
 
   // Create line segments for jaws with increased length
   const createJawLine = (start, end, lengthMultiplier = 2) => {

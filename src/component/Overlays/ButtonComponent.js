@@ -11,6 +11,7 @@ import { setSelectedButton } from '../../features/drawing/drwingSlice.js';
 import useModes from '../../hooks/useModes.js';
 import HowTo from './HowTo.js';
 import divide from "../../assets/divide.svg";
+import { setShowFirstTimePopup } from '../../Actions/PopupAction.js';
 
 const ButtonComponent = () => {
   const {lineBreak,merge} = useSelector((state) => state.drawing);
@@ -19,8 +20,17 @@ const ButtonComponent = () => {
   const {designStep, selectionMode} = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch()
   const {toggleSelectionMode} = useModes();
+  const { showFirstTimePopup, firstTimePopupNumber, enableFirstTimePopup } =useSelector((state) => state.PopupState);
 
   const handleButtonClick = (buttonName) => {
+    if(showFirstTimePopup && enableFirstTimePopup && firstTimePopupNumber === 3){
+      dispatch(setShowFirstTimePopup({
+        showFirstTimePopup: true,
+        firstTimePopupType: "canvas",
+        popupDismissable: false,
+        firstTimePopupNumber: 4
+      }))
+    }
     if(selectionMode){
       toggleSelectionMode();
     }

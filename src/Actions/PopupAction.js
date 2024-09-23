@@ -10,8 +10,7 @@ export const resetShowFirstTimePopup = () => {
     type: "UPDATE_POPUP_REDUCER",
     showFirstTimePopup: false,
     firstTimePopupType: "",
-    firstTimePopupNumber: null,
     customisedPosition: null,
-    popupDismissable: false
+    popupDismissable: false,
   };
 };

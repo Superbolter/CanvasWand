@@ -23,6 +23,14 @@ const FirstTimePopupCanvas = () => {
     }
   }, [showFirstTimePopup, firstTimePopupNumber]);
 
+  useEffect(()=>{
+    if(fadeIn){
+      setTimeLeft(11);
+      setProgress(0);
+      setSetShowClose(false);
+    }
+  },[firstTimePopupNumber])
+
   useEffect(() => {
     if (timeLeft === 0 && fadeIn && popupDismissable) {
       setSetShowClose(true);
@@ -40,7 +48,6 @@ const FirstTimePopupCanvas = () => {
     dispatch(setShowFirstTimePopup({
       showFirstTimePopup: false,
       firstTimePopupType: "",
-      firstTimePopupNumber: null,
       customisedPosition: null,
       popupDismissable: false
     }))
