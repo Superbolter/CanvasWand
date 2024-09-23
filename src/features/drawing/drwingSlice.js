@@ -8,7 +8,7 @@ const initialState = {
   upperpoints: [],
   lowerpoints: [],
   roomSelectors: [],
-  perpendicularLine: true,
+  perpendicularLine: false,
   measured: "in",
   linePlacementMode: "midpoint",
   information: false,

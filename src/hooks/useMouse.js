@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import usePoints from "./usePoints";
-import { Vector3 } from "three";
+import { Vector3, QuadraticBezierCurve3 } from "three";
 import {
   setHiglightPoint,
   setRedoStack,
@@ -50,6 +50,9 @@ const useMouse = () => {
   const [currentStrightMousePosition, setCurrentStrightMousePosition] =
     useState(null);
   const [distance, setDistance] = useState(null);
+  const [curvePoints, setCurvePoints] = useState(null);
+  const [curveAngle, setCurveAngle] = useState(0);
+  const [curveAnglePosition, setCurveAnglePosition] = useState(null);
 
   const xMap = new Map();
   const yMap = new Map();
@@ -62,6 +65,30 @@ const useMouse = () => {
     xMap.set(xKey, point);
     yMap.set(yKey, point);
   });
+
+  const controlPoint = (point1, point2, angle = 0) => {
+    let x = (point1?.x + point2?.x) / 2;
+    let y= (point1?.y + point2?.y) / 2;
+    setCurveAngle(angle);
+    if(Math.abs(point1?.x - point2?.x) < Math.abs(point1?.y - point2?.y)){
+      if(points[points.length-1].x > point2?.x){
+        x = x - (angle * 0.67);
+        setCurveAnglePosition(new Vector3(x - 10,y,0));
+      } else {
+        x = x + (angle * 0.67);
+        setCurveAnglePosition(new Vector3(x + 10,y,0));
+      }
+    } else {
+      if(points[points.length-1].y > point2?.y){
+        y = y - (angle * 0.67);
+        setCurveAnglePosition(new Vector3(x,y - 10,0));
+      } else {
+        y = y + (angle * 0.67);
+        setCurveAnglePosition(new Vector3(x,y + 10,0));
+      }
+    }
+    return new Vector3(x,y,0);
+  }
 
   const handleMouseMove = (event) => {
     let point = screenToNDC(event.clientX, event.clientY);
@@ -207,6 +234,13 @@ const useMouse = () => {
       if(angleInDegrees < 3){
         point = position;
       }
+      const curve = new QuadraticBezierCurve3(
+        new Vector3(currentStrightMousePosition?.x, currentStrightMousePosition?.y, 0), // Start point (last point) 
+        controlPoint(position, point, angleInDegrees),                            // Control point
+        new Vector3(currentMousePosition?.x, currentMousePosition?.y, 0) // End point (mouse position)
+      );
+      const curvePoints = curve.getPoints(100);
+      setCurvePoints(curvePoints);
       setCurrentStrightMousePosition(position);
       const currentDistance = lastPoint.distanceTo(position);
       setDistance(currentDistance * factor[0]);
@@ -467,6 +501,9 @@ const useMouse = () => {
     currentMousePosition,
     currentStrightMousePosition,
     distance,
+    curvePoints,
+    curveAngle,
+    curveAnglePosition
   };
 };
 

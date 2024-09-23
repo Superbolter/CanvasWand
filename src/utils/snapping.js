@@ -108,6 +108,7 @@ export const snapToPoint = (
           factor,
           measured
         );
+
       }
 
       return closestPointOnLine;

@@ -163,7 +163,6 @@ export const useDrawing = () => {
       locked: false,
       isCustomised: null,
     };
-    console.log(newLine)
 
     let updatedStoreLines = [...storeLines];
     let intersections = [];
@@ -183,16 +182,12 @@ export const useDrawing = () => {
       }
     });
 
-    console.log("intersect: ", intersections);
-
     // Sort intersections based on their distance from startPoint along the new line
     intersections.sort(
       (a, b) =>
         startPoint.distanceTo(a.intersection) -
         startPoint.distanceTo(b.intersection)
     );
-
-    console.log("intersections: ", intersections);
 
     let currentStartPoint = startPoint;
 
@@ -218,7 +213,6 @@ export const useDrawing = () => {
 
     // Add the final segment of the new line
     if (!arePointsSimilar(currentStartPoint, newPoint)) {
-      console.log("hello", currentStartPoint, newPoint);
       const finalNewLineSegment = {
         ...newLine,
         id: uniqueId(),

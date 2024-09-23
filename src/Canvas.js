@@ -83,6 +83,9 @@ export const CanvasComponent = () => {
     currentMousePosition,
     currentStrightMousePosition,
     distance,
+    curvePoints,
+    curveAngle,
+    curveAnglePosition
    } = useMouse();
   const { undo, redo } = useActions();
   const { toggleSelectionMode, perpendicularHandler } = useModes();
@@ -356,9 +359,9 @@ export const CanvasComponent = () => {
             : lineBreak
             ? { cursor: `url(${blade}) 8 8, crosshair` }
             : selectionMode
-            ? designStep === 3? 
-                enablePolygonSelection
-                ? { cursor:`url(${newCursor}) 16 16, crosshair`}
+            ? designStep === 3
+              ? enablePolygonSelection
+                ? { cursor: `url(${newCursor}) 16 16, crosshair` }
                 : { cursor: `url(${cursor}) 4 4, default` }
               : { cursor: "grab" }
             : { cursor: `url(${newCursor}) 16 16, crosshair` }
@@ -376,11 +379,7 @@ export const CanvasComponent = () => {
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
         >
-          <CameraController
-            zoom={zoom}
-            setZoom={setZoom}
-            isNeeded={isNeeded}
-          />
+          <CameraController zoom={zoom} setZoom={setZoom} isNeeded={isNeeded} />
 
           {/* {isSelecting && startPoint && endPoint && (
             <mesh>
@@ -418,12 +417,16 @@ export const CanvasComponent = () => {
                   start={
                     lineIndex !== undefined && lineIndex.type === "start"
                       ? currentMousePosition
-                      : test && draggingLine === index ? test[0] :line.points[0]
+                      : test && draggingLine === index
+                      ? test[0]
+                      : line.points[0]
                   }
                   end={
                     lineIndex !== undefined && lineIndex.type === "end"
                       ? currentMousePosition
-                      : test && draggingLine === index ? test[1]:line.points[1]
+                      : test && draggingLine === index
+                      ? test[1]
+                      : line.points[1]
                   }
                   dimension={{ width: line.width, height: line.height }}
                   typeId={line.typeId}
@@ -433,77 +436,105 @@ export const CanvasComponent = () => {
                 />
               );
             })}
-          {designStep === 2 && draggingLineIndex.length === 0 && !currentLinePostion &&(
-            // <LineSegments lines={storeLines} />
-            // <BoxSegments lines={storeLines} />
-            <CappedLine lines={storeLines} />
-          )}
-          {designStep >1 && showSnapLine && snappingPoint.length > 0 && !lineBreak && (
-            <Line
-              points={[snappingPoint[1], snappingPoint[0]]}
-              color="green"
-              lineWidth={5}
-            />
-          )}
-
-          {designStep > 1 && currentMousePosition && points.length > 0 && !stop && (
-            <>
+          {designStep === 2 &&
+            draggingLineIndex.length === 0 &&
+            !currentLinePostion && (
+              // <LineSegments lines={storeLines} />
+              // <BoxSegments lines={storeLines} />
+              <CappedLine lines={storeLines} />
+            )}
+          {designStep > 1 &&
+            showSnapLine &&
+            snappingPoint.length > 0 &&
+            !lineBreak && (
               <Line
-                points={[points[points.length - 1], currentMousePosition]}
-                color="black"
-                lineWidth={2}
+                points={[snappingPoint[1], snappingPoint[0]]}
+                color="green"
+                lineWidth={5}
               />
-              <BoxGeometry
-                start={points[points.length - 1]}
-                end={currentMousePosition}
-                dimension={{
-                  width: convert(INITIAL_BREADTH / factor[1])
-                    .from(measured)
-                    .to("mm"),
-                  height: convert(INITIAL_HEIGHT / factor[2])
-                    .from(measured)
-                    .to("mm"),
-                }}
-                typeId={typeId}
-                isSelected={false}
-                showDimension={true}
-                isCustomised={null}
-                distance={storeLines.length===0 && userLength === 0 && userWidth === 0 && !img ? true: null}
-                onClick={() => {}}
-              />
-              {currentStrightMousePosition && !perpendicularLine && (
-                <>
-                  <Line
-                    points={[points[points.length - 1], currentStrightMousePosition]}
-                    color="blue"
-                    lineWidth={5}
-                  />
-                  <Line
-                    points={[currentMousePosition, currentStrightMousePosition]}
-                    color="black"
-                    lineWidth={1}
-                  />
-                  <Text
-                    position={[
-                      (points[points.length - 1].x + currentStrightMousePosition.x) /
-                        2,
-                      (points[points.length - 1].y + currentStrightMousePosition.y) /
-                        2 +
-                        10,
-                      0,
-                    ]}
-                    color="black"
-                    anchorX="center"
-                    anchorY="middle"
-                    fontSize={8}
-                    fontWeight="bold"
-                  >
-                    { measured === "ft"? `${feetLength.feet}'${feetLength.inches} ${measured}`:`${distance.toFixed(2)} ${measured}`}
-                  </Text>
-                </>
-              )}
-            </>
-          )}
+            )}
+
+          {designStep > 1 &&
+            currentMousePosition &&
+            points.length > 0 &&
+            !stop && (
+              <>
+                <Line
+                  points={[points[points.length - 1], currentMousePosition]}
+                  color="black"
+                  lineWidth={2}
+                />
+                <BoxGeometry
+                  start={points[points.length - 1]}
+                  end={currentMousePosition}
+                  dimension={{
+                    width: convert(INITIAL_BREADTH / factor[1])
+                      .from(measured)
+                      .to("mm"),
+                    height: convert(INITIAL_HEIGHT / factor[2])
+                      .from(measured)
+                      .to("mm"),
+                  }}
+                  typeId={typeId}
+                  isSelected={false}
+                  showDimension={true}
+                  isCustomised={null}
+                  distance={
+                    storeLines.length === 0 &&
+                    userLength === 0 &&
+                    userWidth === 0 &&
+                    !img
+                      ? true
+                      : null
+                  }
+                  onClick={() => {}}
+                />
+                {currentStrightMousePosition && !perpendicularLine && (
+                  <>
+                    <Line
+                      points={[
+                        points[points.length - 1],
+                        currentStrightMousePosition,
+                      ]}
+                      color="blue"
+                      lineWidth={5}
+                    />
+                    <Line points={curvePoints} color="black" lineWidth={1} />
+                    <Text
+                      position={[
+                        (points[points.length - 1].x +
+                          currentStrightMousePosition.x) /
+                          2,
+                        (points[points.length - 1].y +
+                          currentStrightMousePosition.y) /
+                          2 +
+                          10,
+                        0,
+                      ]}
+                      color="black"
+                      anchorX="center"
+                      anchorY="middle"
+                      fontSize={8}
+                      fontWeight="bold"
+                    >
+                      {measured === "ft"
+                        ? `${feetLength.feet}'${feetLength.inches} ${measured}`
+                        : `${distance.toFixed(2)} ${measured}`}
+                    </Text>
+                    <Text
+                      position={curveAnglePosition}
+                      color="black"
+                      anchorX="center"
+                      anchorY="middle"
+                      fontSize={8}
+                      fontWeight="bold"
+                    >
+                      {curveAngle.toFixed(2)}°
+                    </Text>
+                  </>
+                )}
+              </>
+            )}
           {designStep === 2 &&
             storeBoxes.map((box, index) => (
               <CreateFiller
@@ -516,9 +547,7 @@ export const CanvasComponent = () => {
             ))}
 
           {designStep > 1 && <ContextualMenu />}
-          {showFirstTimePopup && enableFirstTimePopup && (
-            <FirstTimePopup />
-          )}
+          {showFirstTimePopup && enableFirstTimePopup && <FirstTimePopup />}
 
           {designStep === 3 &&
             roomSelectors.map((room, index) => (
@@ -531,19 +560,27 @@ export const CanvasComponent = () => {
                 index={index}
               />
             ))}
-          
-          {designStep===3 && (activeRoomButton === "add" || activeRoomButton === "divide") && temporaryPolygon.length> 0 && (
-            <TemporaryFiller polygon={temporaryPolygon} />
-          )}
-          {designStep === 3 && enablePolygonSelection && currentMousePosition && temporaryPolygon.length> 0 && (
-            <>
-              <Line
-                points={[temporaryPolygon[temporaryPolygon.length - 1], currentMousePosition]}
-                color="blue"
-                lineWidth={2}
-              /> 
-            </>
-          )}
+
+          {designStep === 3 &&
+            (activeRoomButton === "add" || activeRoomButton === "divide") &&
+            temporaryPolygon.length > 0 && (
+              <TemporaryFiller polygon={temporaryPolygon} />
+            )}
+          {designStep === 3 &&
+            enablePolygonSelection &&
+            currentMousePosition &&
+            temporaryPolygon.length > 0 && (
+              <>
+                <Line
+                  points={[
+                    temporaryPolygon[temporaryPolygon.length - 1],
+                    currentMousePosition,
+                  ]}
+                  color="blue"
+                  lineWidth={2}
+                />
+              </>
+            )}
 
           {/* 2D grid */}
           {/* <Grid
@@ -567,7 +604,7 @@ export const CanvasComponent = () => {
           /> */}
         </Canvas>
         <DrawtoolHeader />
-        <BottomComponent zoom={zoom} setZoom={setZoom} />        
+        <BottomComponent zoom={zoom} setZoom={setZoom} />
       </div>
       {designStep > 1 ? (
         <div className="button-container">
@@ -647,7 +684,7 @@ export const CanvasComponent = () => {
             <RoomNamePopup />
             <ButtonComponent />
             <HelpVideoPopup />
-            {showSetScalePopup && <SetScalePopup/>}
+            {showSetScalePopup && <SetScalePopup />}
           </div>
         </div>
       ) : (
