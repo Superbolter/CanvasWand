@@ -651,11 +651,7 @@ export const useDrawing = () => {
       dispatch(setNewLine(false));
 
       point = snapToPoint(point, points, storeLines, snapActive,factor,measured,snapPoint,linePlacementMode);
-      // let result = findLineForPoint(point, storeLines, snapActive);
-      // if(result){
-      //   let {closestPointOnLine} = result;
-      //   point = closestPointOnLine;
-      // }
+      
       
 
       const newPoint = [...points, point];
@@ -681,11 +677,7 @@ export const useDrawing = () => {
     }
 
     point = snapToPoint(point, points, storeLines, snapActive,factor,measured,snapPoint,linePlacementMode); //snapping
-    // let result = findLineForPoint(point, storeLines, snapActive);
-    //   if(result){
-    //     let {closestPointOnLine} = result;
-    //     point = closestPointOnLine;
-    //   }
+    
     const newPoints = [...points, point];
     dispatch(setPoints(newPoints));
 

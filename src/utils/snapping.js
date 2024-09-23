@@ -28,11 +28,11 @@ export const snapToPoint = (
   snapPoint,
   linePlacementMode
 ) => {
-  console.log("upperPoints called with: ", {
-    snapPoint,
-    snapActive,
-    linePlacementMode,
-  });
+  // console.log("upperPoints called with: ", {
+  //   snapPoint,
+  //   snapActive,
+  //   linePlacementMode,
+  // });
   if (!snapActive) {
     return point;
   }
@@ -62,12 +62,34 @@ export const snapToPoint = (
     if (
       line.points[0].distanceTo(point) < (snapActive ? SNAPPING_THRESHOLD : 0)
     ) {
-      return line.points[0];
+      let closestPoint = line.points[0];
+      if(snapPoint === "upper" && linePlacementMode === "below"){
+          closestPoint = upperPoints(
+            line.points[0],
+            line.points[1],
+            line.width,
+            line.points[0],
+            factor,
+            measured
+          );
+      }
+      return closestPoint;
     }
     if (
       line.points[1].distanceTo(point) < (snapActive ? SNAPPING_THRESHOLD : 0)
     ) {
-      return line.points[1];
+      let closestPoint = line.points[1];
+      if(snapPoint === "upper" && linePlacementMode === "below"){
+          closestPoint = upperPoints(
+            line.points[0],
+            line.points[1],
+            line.width,
+            line.points[1],
+            factor,
+            measured
+          );
+      }
+      return closestPoint;
     }
 
     // Check for snapping to the line segment itself
@@ -77,7 +99,7 @@ export const snapToPoint = (
       point
     );
     if (closestPointOnLine.distanceTo(point) < SNAPPING_THRESHOLD) {
-      if (snapPoint === "upper" && linePlacementMode ==="below") {
+      if (snapPoint === "upper" && linePlacementMode === "below") {
         closestPointOnLine = upperPoints(
           line.points[0],
           line.points[1],
@@ -86,7 +108,6 @@ export const snapToPoint = (
           factor,
           measured
         );
-
       }
 
       return closestPointOnLine;

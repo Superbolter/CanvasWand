@@ -1,17 +1,17 @@
 import { SNAPPING_THRESHOLD } from "../constant/constant";
 import { Vector3 } from "three";
 
-// const upperPoints = (start, end, width, point) => {
-//   const angle = Math.atan2(end.y - start.y, end.x - start.x);
-//   let direction = new Vector3().subVectors(end, start).normalize();
+const upperPoints = (start, end, width, point) => {
+  const angle = Math.atan2(end.y - start.y, end.x - start.x);
+  let direction = new Vector3().subVectors(end, start).normalize();
 
-//   // Calculate the perpendicular vector
-//   let perpVector = new Vector3(-direction.y, direction.x, 0).multiplyScalar(
-//     width
-//   );
-//   const upperLeft = new Vector3().addVectors(point, perpVector);
-//   return upperLeft;
-// };
+  // Calculate the perpendicular vector
+  let perpVector = new Vector3(-direction.y, direction.x, 0).multiplyScalar(
+    width
+  );
+  const upperLeft = new Vector3().addVectors(point, perpVector);
+  return upperLeft;
+};
 
 export const findLineForPoint = (point, storeLines, snapActive) => {
   for (let line of storeLines) {
@@ -40,44 +40,6 @@ export const findLineForPoint = (point, storeLines, snapActive) => {
     }
   }
 };
-
-// export const findLineForPoint = (point, storeLines, snapActive) => {
-//   for (let line of storeLines) {
-//     if (
-//       line.points[0].distanceTo(point) < (snapActive ? SNAPPING_THRESHOLD : 0)
-//     ) {
-//       return line.points[0];
-//     }
-//     if (
-//       line.points[1].distanceTo(point) < (snapActive ? SNAPPING_THRESHOLD : 0)
-//     ) {
-//       return line.points[1];
-//     }
-
-//     // Check for snapping to the line segment itself
-//     let closestPointOnLine = closestPointOnSegment(
-//       line.points[0],
-//       line.points[1],
-//       point
-//     );
-//     if (
-//       closestPointOnLine.distanceTo(point) <
-//       (snapActive ? SNAPPING_THRESHOLD : 0)
-//     ) {
-//       if (snapPoint === "upper") {
-//         closestPointOnLine = upperPoints(
-//           line.points[0],
-//           line.points[1],
-//           line.width,
-//           closestPointOnLine
-//         );
-//         return { closestPointOnLine, line };
-//       } else {
-//         return { closestPointOnLine, line };
-//       }
-//     }
-//   }
-// };
 
 const closestPointOnSegment = (A, B, P) => {
   const AP = P.clone().sub(A);
