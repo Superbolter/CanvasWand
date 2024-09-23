@@ -320,8 +320,8 @@ export const useActions = () => {
       unit = "in";
     }
     const scaleData = {
-      left,
-      right,
+      leftPos: left,
+      rightPos: right,
       distance: distance,
       unitLength: newLength,
       userWidth: newWidth,
