@@ -10,7 +10,7 @@ import { setShowPopup, setTypeId } from '../../Actions/DrawingActions.js';
 import { setSelectedButton } from '../../features/drawing/drwingSlice.js';
 import useModes from '../../hooks/useModes.js';
 import HowTo from './HowTo.js';
-import divide from "../../assets/divide.svg";
+import divide from "../../assets/WallOpening.png"
 import { setShowFirstTimePopup } from '../../Actions/PopupAction.js';
 
 const ButtonComponent = () => {
@@ -80,7 +80,7 @@ const ButtonComponent = () => {
               onClick={() => handleButtonClick('Divide')}
             >
               <img src={divide} alt="" style={{ width: "24px", height: "24px",}} />
-              <Typography className='btn-text' style={{color:selectedButton==="Divide"&&"#4B73EC" }}>Open Wall</Typography>
+              <Typography className='btn-text' style={{color:selectedButton==="Divide"&&"#4B73EC" }}>Wall Opening</Typography>
             </div>
             {/* <div
               className={`drawtool-btn ${selectedButton === 'Room' ? 'selected' : ''}`}

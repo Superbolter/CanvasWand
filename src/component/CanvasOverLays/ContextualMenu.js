@@ -16,7 +16,7 @@ import Delete from "../../assets/Delete.png";
 import { setLineBreakState, setMergeState } from "../../features/drawing/drwingSlice.js";
 import useModes from "../../hooks/useModes.js";
 import { useDrawing } from "../../hooks/useDrawing.js";
-import divide from "../../assets/divide.svg";
+import divide from "../../assets/WallOpening.png";
 
 const ContextualMenu = () => {
   const dispatch = useDispatch();
@@ -117,7 +117,7 @@ const ContextualMenu = () => {
           <Typography className="contextual-menu-text">Railing</Typography>
         </div>
         <div className="contextual-menu-element" onClick={handleDivideClick}>
-          <div style={{height:"34px", width:"34px", backgroundColor:"#E6AB4A80", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:"50%"}}><img src={divide} alt="" /></div>
+          <img style={{height:"34px", width:"34px",borderRadius:"50%"}} src={divide} alt="" />
           <Typography className="contextual-menu-text">Opening</Typography>
         </div>
         </div>
