@@ -646,10 +646,10 @@ export const useDrawing = () => {
 
     if (newLine) {
       dispatch(setStop(!stop));
-      if (designStep === 2) {
-        const pointToSend = [point?.x + 40, point?.y + 100, point?.z];
-        dispatch(setContextualMenuStatus(true, pointToSend, "neutral"));
-      }
+      // if (designStep === 2) {
+      //   const pointToSend = [point?.x + 40, point?.y + 100, point?.z];
+      //   dispatch(setContextualMenuStatus(true, pointToSend, "neutral"));
+      // }
       dispatch(setNewLine(false));
 
       point = snapToPoint(point, points, storeLines, snapActive,factor,measured,snapPoint,linePlacementMode);
