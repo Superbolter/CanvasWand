@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import {
   Plane,
   Vector3,
@@ -6,6 +6,8 @@ import {
   BufferGeometry,
   LineBasicMaterial,
   LineSegments,
+  TextureLoader,
+  RepeatWrapping,
 } from "three";
 
 import {
@@ -16,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useDrawing } from "../../hooks/useDrawing.js";
 import usePoints from "../../hooks/usePoints.js";
 import { resetShowFirstTimePopup, setShowFirstTimePopup } from "../../Actions/PopupAction.js";
+import scale from "../../assets/scale.png"
 
 export const Scale = () => {
   const dispatch = useDispatch();
@@ -35,6 +38,23 @@ export const Scale = () => {
   const tolerance = 1e-3;
   const { screenToNDC} = usePoints();
   const { showFirstTimePopup, firstTimePopupNumber, enableFirstTimePopup } =useSelector((state) => state.PopupState);
+
+  const textureLoader = useMemo(() => new TextureLoader(), []);
+  const texture = useMemo(
+    () => textureLoader.load(scale), 
+    [textureLoader]
+  );
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+
+
+  useEffect(() => {
+    if (mesh.current) {
+      const factor = dimensions.l / 24;
+      texture.repeat.set(factor, 1);
+    }
+  }, [dimensions.l]);
+  
 
   useEffect(() => {
     const updateMesh = (pointA, pointB) => {
@@ -271,7 +291,8 @@ export const Scale = () => {
         onPointerUp={handlePointerUp}
       >
         <boxGeometry args={[dimensions.l, dimensions.w, dimensions.h]} />
-        <meshBasicMaterial color={"#6360FB"} transparent={true} opacity={0.8} />
+        {/* <meshBasicMaterial color={"#6360FB"} transparent={true} opacity={0.8} /> */}
+        <meshBasicMaterial attach="material" map={texture} />
       </mesh>
       {createJawLine(leftJaw.current?.position || new Vector3(), position)}
       {createJawLine(rightJaw.current?.position || new Vector3(), position)}

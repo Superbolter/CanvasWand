@@ -31,32 +31,32 @@ const ContextualMenu = () => {
   const handleWallClick = (e) => {
     e.stopPropagation();
     dispatch(updateLineTypeId(1));
-    dispatch(setTypeId(1));
+    // dispatch(setTypeId(1));
     dispatch(setSelectedLinesState([]));
   };
   const handleDoorClick = (e) => {
     e.stopPropagation();
     dispatch(updateLineTypeId(2));
-    dispatch(setTypeId(2));
+    // dispatch(setTypeId(2));
     dispatch(setSelectedLinesState([]));
   };
   const handleWindowClick = (e) => {
     e.stopPropagation();
     dispatch(updateLineTypeId(3));
-    dispatch(setTypeId(3));
+    // dispatch(setTypeId(3));
     dispatch(setSelectedLinesState([]));
   };
   const handleRailingClick = (e) => {
     e.stopPropagation();
     dispatch(updateLineTypeId(4));
-    dispatch(setTypeId(4));
+    // dispatch(setTypeId(4));
     dispatch(setSelectedLinesState([]));
   };
 
   const handleDivideClick = (e) => {
     e.stopPropagation()
     dispatch(updateLineTypeId(5));
-    dispatch(setTypeId(5));
+    // dispatch(setTypeId(5));
     dispatch(setSelectedLinesState([]));
   };
 
