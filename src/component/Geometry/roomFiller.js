@@ -11,6 +11,7 @@ import {
   setRoomEditingMode,
   setRoomName,
   setSelectedLinesState,
+  setUserStatus,
 } from "../../Actions/ApplicationStateAction";
 import { Check } from "@mui/icons-material";
 import DraggablePoint from "./DraggablePoints";
@@ -152,6 +153,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
         popupDismissable: true,
         customisedPosition: null,
       }))
+      dispatch(setUserStatus())
     }
     dispatch(setSelectedLinesState(wallIds));
     dispatch(setExpandRoomNamePopup(true));

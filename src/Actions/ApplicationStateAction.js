@@ -40,6 +40,10 @@ export const drawToolData = (floorplan_id) => {
           type:"UPDATE_APPLICATION_STATE",
           floorplanId: floorplan_id,
         })
+        if(response.data?.draw_tool_guidance === "0"){
+          enableFirstTimePopup = false;
+          dispatch(setShowFirstTimePopup({enableFirstTimePopup: enableFirstTimePopup}));
+        }
         const drawData = JSON.parse(response.data.draw_data);
         let lines = [];
         let point = [];
@@ -403,5 +407,14 @@ export const setEscapeMessageShow = (val) => {
       type: "UPDATE_APPLICATION_STATE",
       escapeMessageShow: val
     })
+  }
+}
+
+export const setUserStatus = () =>{
+  return (dispatch) => {
+    const formData = new FormData();
+    formData.append('status', "0")
+    fetchWrapper.post('/user_preferences/data_tool_guidance', formData)
+    dispatch(setShowFirstTimePopup({enableFirstTimePopup: false}))
   }
 }

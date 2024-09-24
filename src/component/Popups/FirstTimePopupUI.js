@@ -85,7 +85,7 @@ const FirstTimePopupUI = () => {
     if(firstTimePopupNumber === 7){
       dispatch(setShowFirstTimePopup({
         showFirstTimePopup: true,
-        firstTimePopupType: "canvas",
+        firstTimePopupType: "ui",
         firstTimePopupNumber: firstTimePopupNumber + 2,
         popupDismissable: true
       }))
