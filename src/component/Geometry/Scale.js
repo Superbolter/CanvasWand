@@ -187,10 +187,12 @@ export const Scale = () => {
     };
 
     canvasContainer.addEventListener("pointermove", handlePointerMove);
+    canvasContainer.addEventListener("pointerup", handlePointerUp);
 
     return () => {
       cancelAnimationFrame(frameId);
       canvasContainer.removeEventListener("pointermove", handlePointerMove);
+      canvasContainer.removeEventListener("pointerup", handlePointerUp);
     };
   }, [
     isDraggingBox,
@@ -309,11 +311,11 @@ export const Scale = () => {
             Math.abs(
               rightJaw.current?.position.y - leftJaw.current?.position.y
             ) < tolerance
-              ? [3, 30, dimensions.h] // Vertical
-              : [30, 3, dimensions.h]
+              ? [3, 30, 5] // Vertical
+              : [30, 3, 5]
           } // Horizontal
         />
-        <meshBasicMaterial color={leftJawActivated ? "red" : "black"} />
+        <meshBasicMaterial color={leftJawActivated ? "red" : "#9E61FF"} transparent={true} opacity={0} />
       </mesh>
       <mesh
         ref={rightJaw}
@@ -328,11 +330,41 @@ export const Scale = () => {
             Math.abs(
               rightJaw.current?.position.y - leftJaw.current?.position.y
             ) < tolerance
-              ? [3, 30, dimensions.h] // Vertical
-              : [30, 3, dimensions.h]
+              ? [3, 30, 5] // Vertical
+              : [30, 3, 5]
           } // Horizontal
         />
-        <meshBasicMaterial color={rightJawActivated ? "red" : "black"} />
+        <meshBasicMaterial color={rightJawActivated ? "red" : "#9E61FF"} transparent={true} opacity={0} />
+      </mesh>
+      <mesh
+        ref={leftJaw}
+        position={[leftPos.x, leftPos.y, 3]}
+      >
+        <boxGeometry
+          args={
+            Math.abs(
+              rightJaw.current?.position.y - leftJaw.current?.position.y
+            ) < tolerance
+              ? [2, 30, 0] // Vertical
+              : [30, 2, 0]
+          } // Horizontal
+        />
+        <meshBasicMaterial color={leftJawActivated ? "red" : "#9E61FF"} />
+      </mesh>
+      <mesh
+        ref={rightJaw}
+        position={[rightPos.x, rightPos.y, 3]}
+      >
+        <boxGeometry
+          args={
+            Math.abs(
+              rightJaw.current?.position.y - leftJaw.current?.position.y
+            ) < tolerance
+              ? [2, 30, 0] // Vertical
+              : [30, 2, 0]
+          } // Horizontal
+        />
+        <meshBasicMaterial color={rightJawActivated ? "red" : "#9E61FF"} />
       </mesh>
     </>
   );
