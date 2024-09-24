@@ -101,6 +101,13 @@
     right: 275px;
 }
 
+.roomGeneratedPopup{
+    position: absolute;
+    top: 100px;
+    right: 50vh;
+    transform: translateX(-50%);
+}
+
 .first-time-popup-close{
     position: absolute;
     top: 10px;
@@ -131,6 +138,28 @@
     border-bottom: 10px solid transparent;
     border-left: 10px solid #4B73EC;
     transform: translateY(-50%);
+}
+
+.roomGeneratedPopup::before{
+    content: "";
+    position: absolute;
+    top: calc(100%);
+    left: 90%;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid white;
+    transform: translateX(-50%);
+}
+
+.roomGeneratedPopup::after{
+    content: "";
+    position: absolute;
+    top: calc(100% - 2px);
+    left: 90%;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #4B73EC;
+    transform: translateX(-50%);
 }
 
 .first-time-popup-footer{

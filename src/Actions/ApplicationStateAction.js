@@ -131,17 +131,17 @@ export const drawToolData = (floorplan_id) => {
           if(designStep === 1){
             dispatch(setDesignStep(2));
           }
-          if((designStep === 1 || designStep === 2) && enableFirstTimePopup && firstTimePopupNumber < 2){
+          if((designStep === 1 || designStep === 2) && enableFirstTimePopup && firstTimePopupNumber <= 2){
             dispatch(setShowFirstTimePopup({
               showFirstTimePopup: true,
               firstTimePopupType: "ui",
               firstTimePopupNumber: 3,
               popupDismissable: false
             }))
-          }else if(designStep === 3 && enableFirstTimePopup && firstTimePopupNumber < 6 && drawData.rooms.length > 0){
+          }else if(designStep === 3 && enableFirstTimePopup && firstTimePopupNumber <= 6 && drawData.rooms.length > 0){
             dispatch(setShowFirstTimePopup({
               showFirstTimePopup: true,
-              firstTimePopupType: "canvas",
+              firstTimePopupType: "ui",
               firstTimePopupNumber: 6,
               popupDismissable: false
             }))
@@ -249,20 +249,20 @@ export const updateLineTypeId = (typeId) => {
           ...storeLines[lineIndex], // Create a copy of the line object
           typeId, // Update the typeId
         };
-        dispatch({
-          type: "SET_PROPERTY_POPUP",
-          payload: true,
-        });
-        const length = convert(storeLines[lineIndex].length).from('mm').to(measured)
-        const width = convert(storeLines[lineIndex].width).from('mm').to(measured)
-        dispatch({
-          type: "SET_LENGTH",
-          payload: length,
-        });
-        dispatch({
-          type: "SET_WIDTH",
-          payload: width,
-        });
+        // dispatch({
+        //   type: "SET_PROPERTY_POPUP",
+        //   payload: true,
+        // });
+        // const length = convert(storeLines[lineIndex].length).from('mm').to(measured)
+        // const width = convert(storeLines[lineIndex].width).from('mm').to(measured)
+        // dispatch({
+        //   type: "SET_LENGTH",
+        //   payload: length,
+        // });
+        // dispatch({
+        //   type: "SET_WIDTH",
+        //   payload: width,
+        // });
         // Dispatch an action to update the state in the Redux store
         dispatch(setStoreLines(storeLines));
       }

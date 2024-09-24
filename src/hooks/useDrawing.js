@@ -495,6 +495,9 @@ export const useDrawing = () => {
         dispatch(setRoomEditingMode(false));
         dispatch(setActiveRoomButton(""));
         dispatch(setActiveRoomIndex(-1));
+        if(showFirstTimePopup){
+          dispatch(resetShowFirstTimePopup());
+        }
       }
       return;
     }
@@ -646,15 +649,6 @@ export const useDrawing = () => {
       if (designStep === 2) {
         const pointToSend = [point?.x + 40, point?.y + 100, point?.z];
         dispatch(setContextualMenuStatus(true, pointToSend, "neutral"));
-        if(!showFirstTimePopup && firstTimePopupNumber < 5 && enableFirstTimePopup && storeLines.length === 0){
-          dispatch(setShowFirstTimePopup({
-            showFirstTimePopup: true,
-            firstTimePopupNumber: 5,
-            popupDismissable: true,
-            firstTimePopupType: "canvas",
-            customisedPosition: [pointToSend[0] + 60, pointToSend[1] + 10, pointToSend[2]],
-          }))
-        }
       }
       dispatch(setNewLine(false));
 
@@ -695,9 +689,9 @@ export const useDrawing = () => {
 
     if (points.length >= 1) {
       if (designStep === 2) {
-        const pointToSend = [point?.x + 40, point?.y + 100, point?.z];
-        dispatch(setContextualMenuStatus(true, pointToSend, "neutral"));
-        if(!showFirstTimePopup && firstTimePopupNumber < 5 && enableFirstTimePopup && storeLines.length === 0 && points.length >=2){
+        let pointToSend = [point?.x + 40, point?.y + 100, point?.z];
+        if(!showFirstTimePopup && firstTimePopupNumber < 5 && enableFirstTimePopup && storeLines.length === 0){
+          pointToSend = [0, 0, 0]
           dispatch(setShowFirstTimePopup({
             showFirstTimePopup: true,
             firstTimePopupNumber: 5,
@@ -706,6 +700,7 @@ export const useDrawing = () => {
             customisedPosition: [pointToSend[0] + 60, pointToSend[1] +10, pointToSend[2]],
           }))
         }
+        dispatch(setContextualMenuStatus(true, pointToSend, "neutral"));
       }
       addPoint(point, newPoints[newPoints.length - 2]);
     }

@@ -59,7 +59,7 @@ const FirstTimePopupUI = () => {
       case "Move":
         dispatch(setShowFirstTimePopup({
           showFirstTimePopup: true,
-          firstTimePopupType: "canvas",
+          firstTimePopupType: "ui",
           firstTimePopupNumber: firstTimePopupNumber + 1,
           popupDismissable: true
         }))

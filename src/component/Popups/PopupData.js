@@ -36,14 +36,14 @@ export const popupData = {
             "You can change the wall you just drew to a window, door, or balcony railing from here",
     },
     6: {
-        position: new Vector3(0, 225, 0),
+        className: "roomGeneratedPopup",
         title: "Bolt AI has automatically identified some of your rooms 🎉",
         buttonText1: "Next",
         buttonType: "Move",
         order: "1/3",
     },
     7: {
-        position: new Vector3(0, 225, 0),
+        className: "roomGeneratedPopup",
         title:
             "Sometimes two or more rooms are clubbed together, do you see a clubbed room?",
         buttonText1: "Yes",
@@ -59,7 +59,7 @@ export const popupData = {
         buttonType: "Move",
     },
     9: {
-        position: new Vector3(0, 225, 0),
+        className: "roomGeneratedPopup",
         title: "Did our AI miss identifying a room?",
         buttonText1: "Yes",
         buttonText2: "No",

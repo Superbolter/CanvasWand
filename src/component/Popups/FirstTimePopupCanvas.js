@@ -57,10 +57,7 @@ const FirstTimePopupCanvas = () => {
     setFadeIn(false);
     switch(popupData[firstTimePopupNumber]?.buttonType){
       case "Move":
-        let type = "canvas";
-        if(firstTimePopupNumber === 1){
-          type = "ui"
-        }
+        let type = "ui";
         dispatch(setShowFirstTimePopup({
           showFirstTimePopup: true,
           firstTimePopupType: type,

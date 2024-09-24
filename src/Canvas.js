@@ -26,6 +26,7 @@ import {
   drawToolData,
   setHelpVideo,
   setStoreLines,
+  updateLineTypeId,
 } from "./Actions/ApplicationStateAction.js";
 import ContextualMenu from "./component/CanvasOverLays/ContextualMenu.js";
 import ButtonComponent from "./component/Overlays/ButtonComponent.js";
@@ -221,6 +222,20 @@ export const CanvasComponent = () => {
     }
     if (event.key === "Shift") {
       dispatch(setShiftPressed(true));
+    }
+    if(!selectionMode && designStep === 2){
+      if(event.key === "W" || event.key === "w"){
+        dispatch(updateLineTypeId(1))
+      }
+      if(event.key === "D" || event.key === "d"){
+        dispatch(updateLineTypeId(2))
+      }
+      if(event.key === "R" || event.key === "r"){
+        dispatch(updateLineTypeId(4))
+      }
+      if(event.key === "N" || event.key === "n"){
+        dispatch(updateLineTypeId(3))
+      }
     }
   };
 

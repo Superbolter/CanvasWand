@@ -72,7 +72,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
   const { showFirstTimePopup, firstTimePopupNumber, enableFirstTimePopup } = useSelector((state) => state.PopupState);
   
   useEffect (()=>{
-    if(index === 0 && !showFirstTimePopup && firstTimePopupNumber < 11 && enableFirstTimePopup && polygon){
+    if(index === 0 && !showFirstTimePopup && firstTimePopupNumber < 11 && firstTimePopupNumber >6 && enableFirstTimePopup && polygon){
       const centroid = getCentroid(polygon);
       dispatch(setShowFirstTimePopup({
         showFirstTimePopup: true,

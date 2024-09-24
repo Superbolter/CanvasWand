@@ -35,6 +35,7 @@ import useModes from "../../hooks/useModes.js";
 import { useDrawing } from "../../hooks/useDrawing.js";
 import HowTo from "./HowTo.js";
 import toast from "react-hot-toast";
+import { resetShowFirstTimePopup } from "../../Actions/PopupAction.js";
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
   "label + &": {
@@ -88,6 +89,7 @@ const RoomNamePopup = () => {
   const { roomSelectors } = useSelector((state) => state.drawing);
   const { toggleSelectionMode } = useModes();
   const { addRoom,deleteSelectedRoom } = useDrawing();
+  const {showFirstTimePopup} = useSelector((state) => state.PopupState);
 
   useEffect(() => {
     if (selectedRoomName) {
@@ -172,6 +174,9 @@ const RoomNamePopup = () => {
       setName(name);
     } else {
       setName(name);
+    }
+    if(showFirstTimePopup){
+      dispatch(resetShowFirstTimePopup())
     }
     if (roomEditingMode) {
       if (name.length === 0) {
