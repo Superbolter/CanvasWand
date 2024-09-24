@@ -4,6 +4,7 @@ import ZoomInIcon from "@mui/icons-material/ZoomIn";
 import { Typography } from "../../design_system/StyledComponents/components/Typography";
 import { useDispatch, useSelector } from "react-redux";
 import { setImageOpacity } from "../../Actions/ApplicationStateAction";
+import ReportButton from "../Overlays/ReportButton";
 
 const BottomComponent = ({ zoom, setZoom }) => {
   const {imageOpacity, img} = useSelector((state) => state.ApplicationState);
@@ -71,6 +72,7 @@ const BottomComponent = ({ zoom, setZoom }) => {
           <Typography>Image opacity</Typography>
         </div>
       )}
+      <ReportButton/>
     </div>
   );
 };

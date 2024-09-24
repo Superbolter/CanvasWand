@@ -697,7 +697,7 @@ export const useDrawing = () => {
       if (designStep === 2) {
         const pointToSend = [point?.x + 40, point?.y + 100, point?.z];
         dispatch(setContextualMenuStatus(true, pointToSend, "neutral"));
-        if(!showFirstTimePopup && firstTimePopupNumber < 5 && enableFirstTimePopup && storeLines.length === 0){
+        if(!showFirstTimePopup && firstTimePopupNumber < 5 && enableFirstTimePopup && storeLines.length === 0 && points.length >=2){
           dispatch(setShowFirstTimePopup({
             showFirstTimePopup: true,
             firstTimePopupNumber: 5,

@@ -257,6 +257,7 @@ export const CanvasComponent = () => {
   ]);
 
   useEffect(() => {
+    window.GAEvent("Page View", "Canvas", "Canvas");
     const floorplanId = getUrlParameter("floorplanId");
     RomeDataManager.instantiate();
     if (cookies.get("USER-SESSION", { path: "/" }) !== undefined) {

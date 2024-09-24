@@ -9,7 +9,7 @@ const HowTo = ({type}) => {
   const { helpVideoType} = useSelector(state => state.ApplicationState)
 
   return (
-    <div onClick={()=> dispatch(setHelpVideo(helpVideoType !== type, helpVideoType !== type? type : ''))} style={{cursor:"pointer", display:"flex", justifyContent:"center", alignItems:"center", gap:"4px"}}>
+    <div onClick={()=> dispatch(setHelpVideo(helpVideoType !== type, helpVideoType !== type? type : ''))} style={{cursor:"pointer", display:"flex", justifyContent: type === "setScale"?"flex-start":"center", alignItems:"center", gap:"4px"}}>
       <Typography modifiers={["helpText", "blue"]}>How to </Typography>
       <img src={play} alt="play" />
     </div>

@@ -43,7 +43,7 @@ const useLengthUnitSelector = () => {
 
     return (
         <div>
-            <label htmlFor="lengthUnit"><Typography className="thickness-text">Select Length Unit:</Typography></label>
+            <label htmlFor="lengthUnit"><Typography className="thickness-text">Select Unit:</Typography></label>
             <Select
                 input={<BootstrapInput />}
                 MenuProps={{
