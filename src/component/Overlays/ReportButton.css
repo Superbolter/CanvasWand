@@ -1,0 +1,16 @@
+.report-button-container{
+    background-color: #FCEDE6;
+    padding: 8px 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    box-shadow: 0 20px 30px 0 #00000026;
+    transition: all 0.2s ease-in-out;
+    &:hover{
+        background-color: #FCE2D5;
+        transform: translateY(-3px);
+    }
+}

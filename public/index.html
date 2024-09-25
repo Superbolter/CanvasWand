@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      property="og:description"
+      content="SuperBolter is an online platform that helps anyone convert their floorplan into 3D home using AI."
+    />
+    <meta
+      property="og:title"
+      content="SuperBolter: Free 3D Home Design Software | Online Interior Design Tool"
+    />
+    <meta
+      name="description"
+      content="Discover the freedom of 3D home design with SuperBolter. Design your dream home, explore furniture from real brands and get live estimates. Start designing for free!"
+    />
+    <meta
+      name="msapplication-TileImage"
+      content="%REACT_APP_ASSET_URL%/rome/assets/landing/superbolter-preview-medium.png"
+    />
+    <meta
+      property="og:image:secure_url"
+      content="%REACT_APP_ASSET_URL%/rome/assets/landing/superbolter-preview-medium.png"
+    />
+    <meta property="og:locale" content="en_GB" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link
+      href="https://fonts.googleapis.com/css?family=DM Sans"
+      rel="stylesheet"
+    />
+    <script src="https://tally.so/widgets/embed.js"></script>
+    <title>SuperBolter: Draw Tool</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script>
+      function GAEvent(eventCategory, eventAction, eventLabel, eventValue, extraparams="" ) {
+      // ga('send', 'event', {
+      //   eventCategory: eventCategory,
+      //   eventAction: eventAction,
+      //   eventLabel: eventLabel,
+      //   eventValue: eventValue
+      // });
+      window.FBPixel(eventCategory, eventAction, eventLabel, eventValue)
+      window.GTMEVENT(eventCategory, eventAction, eventLabel, eventValue,  extraparams)
+
+
+    }
+
+    function FBPixel(eventCategory, eventAction, eventLabel, eventValue) {
+      if (typeof fbq === "function") {
+        fbq('trackCustom', eventCategory, {
+          "eventAction": eventAction,
+          "eventLabel": eventLabel,
+          "eventValue": eventValue
+
+        });
+      }
+
+    }
+
+    function GTMEVENT(eventCategory, eventAction, eventLabel, eventValue, extraparams="" ) {
+        window.dataLayer = window.dataLayer || [];
+        const user_id = window?.curentUserSession?.user_id? window?.curentUserSession?.user_id : "";
+        dataLayer.push({
+          'event': 'customEvent',
+          'eventCategory': eventCategory,
+          'eventAction': eventAction,
+          'eventLabel': eventLabel,
+          'eventValue': eventValue,
+          "extraParams":extraparams ,
+          "user_id":user_id,
+          "source":"DrawTool",
+        });
+    }
+
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+          new Date().getTime(), event: 'gtm.js'
+      }); var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', '%REACT_APP_GTM_ID%')
+
+    </script>
+  </body>
+</html>

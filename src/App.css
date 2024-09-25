@@ -1,0 +1,436 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.swal2-popup {
+  border-radius: 16px !important; /* Apply the desired border radius */
+  padding: 16px;
+  width: 350px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for better visibility */
+}
+/* Title customization */
+.swal2-title-custom {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 21px;
+  line-height: 24px;
+  color: #2E2E2E;
+  font-weight: 500;
+  text-align: left;
+  width: 80%;
+  padding: 0;
+  margin-bottom: 8px; /* Added a small margin below title */
+}
+
+/* Text customization */
+.swal2-html-custom {
+  font-family: 'DM Sans', sans-serif;
+  margin: 0 !important;
+  padding: 0  !important;
+}
+
+.swal2-html-custom p{
+  font-size: 16px;
+  color: #2E2E2E;
+  line-height: 20px;
+  text-align: left;
+  margin: 0 !important;
+  padding: 0  !important;
+}
+.swal2-actions-custom {
+  display: flex;
+  justify-content: space-between; /* Ensures equal spacing */
+  gap: 8px; /* 8px gap between the buttons */
+  width: 100%; /* Make sure the actions container takes full width */
+  margin: 0 !important;
+  padding: 0  !important;
+  margin-top: 16px !important; /* Add some space between the text and buttons */
+}
+/* Confirm button style */
+.swal2-cancel-button-custom {
+  background-color: #000; /* Match the second image's black button */
+  color: #fff;
+  border: none;
+  border-radius: 8px; /* Rounded corners */
+  font-size: 14px;
+  padding: 8px 16px;
+  height: 42px;
+  margin: 0 !important;
+  display: block;
+  width: 48%;
+  transform: all 0.2s ease-in-out;
+  &:hover {
+    background-color: #2E2E2E;
+    color: #fff;
+    transform: scale(1.02);
+  }
+}
+
+/* Cancel button style */
+.swal2-confirm-button-custom {
+  background-color: transparent;
+  border: 1px solid #000; /* Add border for cancel button */
+  color: #000;
+  border-radius: 8px;
+  font-size: 14px;
+  height: 42px;
+  padding: 8px 16px;
+  margin: 0 !important;
+  display: block;
+  width: 48%;
+  transform: all 0.2s ease-in-out;
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+/* Close icon positioning */
+.swal2-close {
+  font-size: 28px;
+  background-color: #F4F4F4;
+  color: #2E2E2E;
+  position: absolute; /* Make it absolutely positioned */
+  top: 12px; /* Adjust as needed to move it vertically */
+  right: 12px; /* Adjust as needed to move it horizontally */
+  &:hover {
+    background-color: #eaeaea;
+    color: #2E2E2E !important;
+    transform: scale(1.05);
+  }
+}
+
+
+
+.container {
+  display: flex;
+  height: 100%; /* Full height of viewport */
+  max-width: 100vw !important;
+  min-width: 100vw !important;
+}
+
+.canvas-container {
+ width:100%; /* 70% of the width */
+  height: 100%; /* Full height of viewport */
+  background-color: #f0f0f0; /* Optional: Background color for clarity */
+  overflow: hidden; /* Ensure content doesn't overflow */
+  cursor: url('./assets/blade.png') 16 16, crosshair;
+}
+
+
+
+.button-container {
+  /* flex: 0 0 30%; 30% of the width */
+  /* display: flex;
+  flex-direction: column; */
+  width:0%;
+  
+  display: grid;
+  grid-template-rows: repeat(2, 1fr); /* Two rows with automatic height */
+ 
+  
+  /* Full height of viewport */
+  background-color: #e0e0e0; /* Optional: Background color for clarity */
+}
+
+/* .perspective-canvas {
+  flex: 1; Take up 50% of the container height
+  
+} */
+
+.buttons {
+  flex: 1; /* Take up 50% of the container height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-container1 {
+/* //flex: 1; */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  /* display: flex;
+  flex-direction: row; */
+  
+  
+  align-items: center;
+  /* Align buttons to the bottom */
+  /* height: 100vh; */
+  border-radius:red
+}
+
+.button-container1 button {
+  margin: 5px;
+  padding: 5px; /* Smaller padding for smaller buttons */
+  font-size: 12px; /* Smaller font size for smaller buttons */
+}
+
+.dimension-setter{
+  position: fixed;
+  top: 86px;
+  background-color: white;
+  left: calc(100vw - 460px);
+  padding: 8px 8px 8px 12px;
+  border-radius: 24px;
+  box-shadow: 0px 4px 14px -3px #0C0C0D21;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch .dimension-switch { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.dimension-switch:checked + .slider {
+  background-color: #2196F3;
+}
+
+.dimension-switch:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+.dimension-switch:checked + .slider:before {
+  -webkit-transform: translateX(20px);
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.bottom-container{
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Container for the slider */
+.slider-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background-color: white;
+  border-radius: 12px;
+  gap:8px;
+}
+
+/* Wrapper to control the positioning of the tooltip */
+.slider-wrapper {
+  position: relative;
+  width: 126px;
+}
+
+/* Customizing the slider (input range) */
+.opacity-slider{
+  -webkit-appearance: none; /* Remove default appearance */
+  width: 100%;
+  height: 18px;
+  background: linear-gradient(to right, transparent, #000); /* Gradient background */
+  border-radius: 16px;
+  outline: none;
+  transition: opacity 0.2s ease;
+  padding: 0;
+  z-index: 1;
+  position: relative;
+}
+
+.opacity-slider::before{
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 18px;
+  background-image:url('./assets/opacityMesh.png') ;
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+  opacity: 0.1;
+  border-radius: 16px;
+}
+
+/* Styling the thumb of the slider */
+.opacity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Remove default appearance */
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: white; /* White circular thumb */
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.opacity-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Tooltip displaying the value */
+.tooltip {
+  position: absolute;
+  top: -40px;
+  transform: translateX(-50%);
+  background-color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  color: #333;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* Style the tooltip's arrow */
+.tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  /* border-width: 5px;
+  border-style: solid;
+  border-color: white transparent transparent transparent; */
+  border-top: 10px solid white;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+}
+
+.zoom-container{
+  display: flex;
+  flex-direction: row;
+  width: fit-content;
+  height: 32px;
+  border-radius: 12px;
+  background-color: #FFFFFF;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 4px;
+  overflow: hidden;
+  box-shadow: 0px 13px 13px 0px #8F8F8F08;
+}
+
+.zoom-container button{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  padding: 4px 5px;
+  &:hover{
+    transform: scale(1.05);
+    background-color: #F4F4F4;
+  }
+}
+
+.zoom-slider {
+  -webkit-appearance: none;
+  width: 150px;
+  height: 4px;
+  background: linear-gradient(to right, #007AFF 0%, #007AFF 50%, #0000000D 50%, #0000000D 100%);
+  outline: none;
+  opacity: 0.7;
+  transition: opacity .2s;
+  border-radius: 8px;
+}
+
+.zoom-slider:hover {
+  opacity: 1;
+}
+
+.zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #FFFFFF;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 0.5px solid #00000055;
+  box-shadow: 0px 1px 0.75px 0px #0000000D;
+}
+
+.zoom-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #FFFFFF;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 0.5px solid #00000055;
+  box-shadow: 0px 1px 0.75px 0px #0000000D;
+}
+
+/* .zoom-slider::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  height: 4px;
+}
+
+.zoom-slider::-moz-range-track {
+  -moz-appearance: none;
+  height: 4px;
+} */
+
+
+.logo{
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+}
