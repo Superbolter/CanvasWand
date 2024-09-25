@@ -480,7 +480,7 @@ export const useDrawing = () => {
   };
 
   const handleClick = (event) => {
-    window.GAEvent("DrawTool","Canvas", "CanvasClicked")
+    // window.GAEvent("DrawTool","Canvas", "CanvasClicked")
     if(showFirstTimePopup && firstTimePopupNumber === 4 || firstTimePopupNumber === 5) {
       dispatch(resetShowFirstTimePopup());
     }
@@ -885,7 +885,7 @@ export const useDrawing = () => {
         return
       }
     }
-    window.GAEvent("DrawTool", "Canvas", "LineClicked");
+    // window.GAEvent("DrawTool", "Canvas", "LineClicked");
     setLineClick(true);
     let storeid = [];
     if (merge) {
