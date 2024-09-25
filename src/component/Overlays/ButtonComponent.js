@@ -20,10 +20,10 @@ const ButtonComponent = () => {
   const {designStep, selectionMode} = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch()
   const {toggleSelectionMode} = useModes();
-  const { showFirstTimePopup, firstTimePopupNumber, enableFirstTimePopup } =useSelector((state) => state.PopupState);
+  const { firstTimePopupNumber, enableFirstTimePopup } =useSelector((state) => state.PopupState);
 
   const handleButtonClick = (buttonName) => {
-    if(showFirstTimePopup && enableFirstTimePopup && firstTimePopupNumber === 3){
+    if(enableFirstTimePopup && firstTimePopupNumber === 3){
       dispatch(setShowFirstTimePopup({
         showFirstTimePopup: true,
         firstTimePopupType: "canvas",
