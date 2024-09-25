@@ -12,22 +12,22 @@ const videoData = {
   addRoom: {
     title: "How to add a room",
     subtitle: "to understand how adding a room works, watch this video",
-    videoUrl: "/videos/drawTool/addRoom.mov",
+    videoUrl: "/videos/drawTool/addNewRoom.mov",
   },
   divideRoom: {
     title: "How to divide a room",
     subtitle: "to understand how dividing a room works, watch this video",
-    videoUrl: "/videos/drawTool/divideRoom.mov",
+    videoUrl: "/videos/drawTool/divideARoom.mov",
   },
   setScale: {
     title: "How to set scale",
     subtitle: "to understand how setting scale works, watch this video",
-    videoUrl: "/videos/drawTool/setScale.mov",
+    videoUrl: "/videos/drawTool/setTheScale.mov",
   },
   addWall: {
     title: "How to add a wall",
     subtitle: "to understand how adding a wall works, watch this video",
-    videoUrl: "/videos/drawTool/addWall.mov",
+    videoUrl: "/videos/drawTool/addNewWall.mov",
   },
   defineRoom: {
     title: "How to define a room",
@@ -58,7 +58,6 @@ const HelpVideoPopup = () => {
         playing={true}
         controls
         loop
-        muted
         pip
         className="help-popup-video"
         url={getRomeCdnUrl() + videoData[helpVideoType].videoUrl}
