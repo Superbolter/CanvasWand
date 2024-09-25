@@ -480,7 +480,7 @@ export const useDrawing = () => {
   };
 
   const handleClick = (event) => {
-    window.GAEvent("DrawTool","Canvas", "CanvasClicked")
+    // window.GAEvent("DrawTool","Canvas", "CanvasClicked")
     if(showFirstTimePopup && firstTimePopupNumber === 4 || firstTimePopupNumber === 5) {
       dispatch(resetShowFirstTimePopup());
     }
@@ -875,7 +875,7 @@ export const useDrawing = () => {
     }
   }, [lineClick]);
 
-  const handleLineClick = (event, id) => {
+  const handleLineClick = (id) => {
     if(designStep === 3){
       if(expandRoomPopup){
         if(enablePolygonSelection){
@@ -900,16 +900,13 @@ export const useDrawing = () => {
       let pointToSend = [0, 0, 0];
       let idx = 0;
       let position = "neutral";
-      if (line?.points[0]?.x > line?.points[1]?.x) {
-        idx = 1;
-      }
-      if (line?.points[1]?.y > line?.points[0]?.y) {
-        idx = 1;
-      }
       if (
         Math.abs(line?.points[0]?.x - line?.points[1]?.x) <
         Math.abs(line?.points[0]?.y - line?.points[1]?.y)
       ) {
+        if (line?.points[1]?.y > line?.points[0]?.y) {
+          idx = 1;
+        }
         pointToSend = [
           line?.points[idx]?.x + 40,
           line?.points[idx]?.y - 20,
@@ -917,6 +914,9 @@ export const useDrawing = () => {
         ];
         position = "right";
       } else {
+        if (line?.points[0]?.x > line?.points[1]?.x) {
+          idx = 1;
+        }
         pointToSend = [
           line?.points[idx]?.x + 20,
           line?.points[idx]?.y - 40,

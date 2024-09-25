@@ -3,11 +3,12 @@ import ZoomOutIcon from "@mui/icons-material/ZoomOut";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
 import { Typography } from "../../design_system/StyledComponents/components/Typography";
 import { useDispatch, useSelector } from "react-redux";
-import { setImageOpacity } from "../../Actions/ApplicationStateAction";
-import ReportButton from "../Overlays/ReportButton";
+import { setHelpVideo, setImageOpacity } from "../../Actions/ApplicationStateAction";
+import ReportButton from "./ReportButton";
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
 const BottomComponent = ({ zoom, setZoom }) => {
-  const {imageOpacity, img} = useSelector((state) => state.ApplicationState);
+  const {imageOpacity, img, designStep} = useSelector((state) => state.ApplicationState);
   const dispatch = useDispatch();
   const [value, setValue] = useState(imageOpacity * 100); // Default value of 30%
 
@@ -40,6 +41,19 @@ const BottomComponent = ({ zoom, setZoom }) => {
 
   const handleMouseLeave = () => {
     setIsHovered(false);
+  };
+
+  const handleVideoClick = () => {
+    var type = "";
+    if(designStep  === 1){
+      type = "setScale";
+    }else if(designStep === 2){
+      type = "addWall";
+    }else if(designStep === 3){
+      type = "defineRoom";
+    }
+    dispatch(setHelpVideo(true, type));
+    window.GAEvent("DrawTool", "ButtonClicked", "ShowHelpVideo", type);
   };
   return (
     <div className="bottom-container">
@@ -89,6 +103,10 @@ const BottomComponent = ({ zoom, setZoom }) => {
         </div>
       )}
       <ReportButton/>
+      <div className="video-help-container" onClick={handleVideoClick}>
+        <PlayCircleOutlineIcon/>
+        <Typography modifiers={["subtitle2","medium"]}>Video help</Typography>
+      </div>
     </div>
   );
 };
