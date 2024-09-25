@@ -9,7 +9,7 @@ const HowTo = ({type}) => {
   const { helpVideoType} = useSelector(state => state.ApplicationState)
 
   const handleClick = () => {
-    dispatch(setHelpVideo(helpVideoType !== type, helpVideoType !== type? type : ''))
+    dispatch(setHelpVideo(true, type))
     window.GAEvent("DrawTool", "ButtonClicked", "HowTo", type)
   }
 
