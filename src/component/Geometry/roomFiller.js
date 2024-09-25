@@ -168,9 +168,9 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
   const shape = createShape(sortedPoints);
   const geometry = new ShapeGeometry(shape);
   const material = new MeshBasicMaterial({
-    color: activeRoomIndex === index ? "#4B73EC" :  colors[index % colors.length],
+    color: activeRoomIndex === index ? "#4B73EC" : activeRoomIndex !== -1 ? "#91989C" : colors[index % colors.length],
     transparent: true,
-    opacity: activeRoomIndex !== index && activeRoomIndex!==-1 ?0.1: 0.3,
+    opacity: activeRoomIndex === index ? 0.6 : activeRoomIndex !== -1 ? 0.4 : 0.3,
   });
 
   const centroid = getCentroid(sortedPoints);
@@ -253,7 +253,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
           />:
           <mesh key={i} position={[point.x, point.y, 0]}>
             <sphereGeometry args={[6, 6, 32]} />
-            <meshBasicMaterial color={colors[index % colors.length]} />
+            <meshBasicMaterial color={activeRoomIndex === index ? "#4B73EC" : activeRoomIndex !== -1 ? "#91989C" : colors[index % colors.length]} transparent={true} opacity={activeRoomIndex === index ? 1 : activeRoomIndex !== -1 ? 0.4 : 1} />
           </mesh>
         }
           {i < sortedPoints.length - 1 ? (
@@ -262,7 +262,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
                 [point.x, point.y, activeRoomIndex === index ? 5 : 0],
                 [sortedPoints[i + 1].x, sortedPoints[i + 1].y, activeRoomIndex === index ? 5 : 0],
               ]}
-              color={activeRoomIndex === index ? "blue" : colors[index % colors.length]}
+              color={activeRoomIndex === index ? "#4B73EC" : activeRoomIndex !== -1 ? "#91989C" : colors[index % colors.length]}
               lineWidth={2}
             />
           ) : null}
@@ -272,7 +272,7 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
                 [point.x, point.y, activeRoomIndex === index ? 5 : 0],
                 [sortedPoints[0].x, sortedPoints[0].y, activeRoomIndex === index ? 5 : 0],
               ]}
-              color={activeRoomIndex === index ? "blue" : colors[index % colors.length]}
+              color={activeRoomIndex === index ? "#4B73EC" : activeRoomIndex !== -1 ? "#91989C" : colors[index % colors.length]}
               lineWidth={2}
             />
           ) : null}
