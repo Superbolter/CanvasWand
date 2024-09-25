@@ -125,6 +125,7 @@ const RoomNamePopup = () => {
     }
     setName("");
     handleReset(true);
+    window.GAEvent("DrawTool", "ButtonClicked", "AddRoom")
   };
 
   const divideRoomClick = () => {
@@ -158,6 +159,7 @@ const RoomNamePopup = () => {
     dispatch(setSelectedLinesState([]));
     dispatch(setExpandRoomNamePopup(false));
     dispatch(updateTemoraryPolygon([]))
+    window.GAEvent("DrawTool", "ButtonClicked", "DivideRoom");
   };
 
   const handleChange = (event) => {
@@ -209,12 +211,14 @@ const RoomNamePopup = () => {
         setError("Please select room type");
       }
     }
+    window.GAEvent("DrawTool","RoomNamePopup","ButtonClicked", "SaveRoom")
   };
 
   const handleDeleteClick = () => {
     deleteSelectedRoom();
     setName("");
     dispatch(setEnablePolygonSelection(false))
+    window.GAEvent("DrawTool","RoomNamePopup","ButtonClicked", "DeleteRoom")
   };
 
   useEffect(() => {

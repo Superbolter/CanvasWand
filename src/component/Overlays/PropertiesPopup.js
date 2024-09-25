@@ -32,6 +32,7 @@ const PropertiesPopup = ({}) => {
     dispatch(setContextualMenuStatus(false));
     dispatch(setLineBreakState(false));
     dispatch(setMergeState(false));
+    window.GAEvent("DrawTool", "PropertyPopup", "ButtonClicked", "Close");
   };
 
   const handleMerge = () => {
@@ -41,6 +42,7 @@ const PropertiesPopup = ({}) => {
       toggleSelectionSplitMode();
     }
     dispatch(setMergeState(!merge));
+    window.GAEvent("DrawTool", "PropertyPopup", "ButtonClicked", "Merge");
   };
 
   const handleSplitClick = () => {
@@ -51,6 +53,7 @@ const PropertiesPopup = ({}) => {
       toggleSelectionSplitMode();
     }
     dispatch(setLineBreakState(!lineBreak));
+    window.GAEvent("DrawTool", "PropertyPopup", "ButtonClicked", "Split");
   };
 
   const handlDeleteClick = () => {
@@ -59,10 +62,12 @@ const PropertiesPopup = ({}) => {
     } else {
       deleteSelectedLines();
     }
+    window.GAEvent("DrawTool", "PropertyPopup", "ButtonClicked", "Delete");
   };
 
   const handleLockClick = () => {
     dispatch(setLockForLines(!locked));
+    window.GAEvent("DrawTool", "PropertyPopup", "ButtonClicked", "Lock");
   };
 
   return (

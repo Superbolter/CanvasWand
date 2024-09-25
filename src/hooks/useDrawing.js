@@ -165,7 +165,7 @@ export const useDrawing = () => {
       locked: false,
       isCustomised: null,
     };
-
+    window.GAEvent("DrawTool","AddPoint", "LineCreated",type)
     let updatedStoreLines = [...storeLines];
     let intersections = [];
     let newPoints = [...points];
@@ -480,6 +480,7 @@ export const useDrawing = () => {
   };
 
   const handleClick = (event) => {
+    window.GAEvent("DrawTool","Canvas", "CanvasClicked")
     if(showFirstTimePopup && firstTimePopupNumber === 4 || firstTimePopupNumber === 5) {
       dispatch(resetShowFirstTimePopup());
     }
@@ -533,6 +534,7 @@ export const useDrawing = () => {
           newPolygon: [...polygon],
         });
       }
+      window.GAEvent("DrawTool","Polygon", "PointAdded")
       dispatch(setRoomUndoStack(history));
       dispatch(setRoomRedoStack([]));
       dispatch(updateTemoraryPolygon(polygon));
@@ -569,6 +571,7 @@ export const useDrawing = () => {
         const polygon = roomSelectors[activeRoomIndex].polygon;
         const newPolygon = dividePolygon(polygon, line);
         if (newPolygon.length > 1) {
+          window.GAEvent("DrawTool","Polygon", "PolygonDivided")
           const newRooms = roomSelectors.filter(
             (room, index) => index !== activeRoomIndex
           );
@@ -882,6 +885,7 @@ export const useDrawing = () => {
         return
       }
     }
+    window.GAEvent("DrawTool", "Canvas", "LineClicked");
     setLineClick(true);
     let storeid = [];
     if (merge) {

@@ -8,8 +8,13 @@ const HowTo = ({type}) => {
   const dispatch = useDispatch();
   const { helpVideoType} = useSelector(state => state.ApplicationState)
 
+  const handleClick = () => {
+    dispatch(setHelpVideo(helpVideoType !== type, helpVideoType !== type? type : ''))
+    window.GAEvent("DrawTool", "ButtonClicked", "HowTo", type)
+  }
+
   return (
-    <div onClick={()=> dispatch(setHelpVideo(helpVideoType !== type, helpVideoType !== type? type : ''))} style={{cursor:"pointer", display:"flex", justifyContent: type === "setScale"?"flex-start":"center", alignItems:"center", gap:"4px"}}>
+    <div onClick={handleClick} style={{cursor:"pointer", display:"flex", justifyContent: type === "setScale"?"flex-start":"center", alignItems:"center", gap:"4px"}}>
       <Typography modifiers={["helpText", "blue"]}>How to </Typography>
       <img src={play} alt="play" />
     </div>

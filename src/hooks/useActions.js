@@ -83,7 +83,7 @@ export const useActions = () => {
 
       const redoStackCopy = [...redoStack, lastAction];
       dispatch(setRedoStack(redoStackCopy));
-
+      window.GAEvent("DrawTool","UndoCalled","LineUndo", lastAction.type);
       switch (lastAction.type) {
         case "delete":
           // Undo deletion by adding back the deleted lines
@@ -148,6 +148,7 @@ export const useActions = () => {
 
       const redoStackCopy = [...roomRedoStack, lastAction];
       dispatch(setRoomRedoStack(redoStackCopy));
+      window.GAEvent("DrawTool","UndoCalled","RoomUndo", lastAction.type);
 
       switch (lastAction.type) {
         case "updateRoom":
@@ -181,6 +182,7 @@ export const useActions = () => {
       // Push the redone action back to the undo stack
       const updatedHistory = [...actionHistory, lastRedoAction];
       dispatch(setUndoStack(updatedHistory));
+      window.GAEvent("DrawTool","RedoCalled","LineRedo", lastRedoAction.type);
 
       switch (lastRedoAction.type) {
         case "delete":
@@ -253,6 +255,7 @@ export const useActions = () => {
       // Push the redone action back to the undo stack
       const updatedHistory = [...roomActionHistory, lastRedoAction];
       dispatch(setRoomUndoStack(updatedHistory));
+      window.GAEvent("DrawTool","RedoCalled","RoomRedo", lastRedoAction.type);
 
       switch (lastRedoAction.type) {
         case "updateRoom":
@@ -379,6 +382,7 @@ export const useActions = () => {
   };
 
   const handleDoubleClick = async (length, width) => {
+    window.GAEvent("DrawTool", "ContinueClick", "ScaleSet", length, {unit: measured});
     let height = userHeight;
     switch (measured) {
       case "in":

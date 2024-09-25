@@ -44,17 +44,21 @@ const FirstTimePopupUI = () => {
     return () => clearInterval(timerId);
   }, [timeLeft]);
 
-  const handleClose = () =>{
+  const handleClose = (val = true) =>{
     dispatch(setShowFirstTimePopup({
       showFirstTimePopup: false,
       firstTimePopupType: "",
       customisedPosition: null,
       popupDismissable: false
     }))
+    if(val){
+      window.GAEvent("DrawTool", "FirstTimePopup", "ButtonClicked", "Close");
+    }
   }
 
   const handleClick1 = () => {
     setFadeIn(false);
+    window.GAEvent("DrawTool", "FirstTimePopup", "ButtonClicked", popupData[firstTimePopupNumber]?.buttonType);
     switch(popupData[firstTimePopupNumber]?.buttonType){
       case "Move":
         dispatch(setShowFirstTimePopup({
@@ -65,7 +69,7 @@ const FirstTimePopupUI = () => {
         }))
       break;
       case "Okay":
-        handleClose();
+        handleClose(false);
       break;
       case "Navigate":
         dispatch(setShowFirstTimePopup({
@@ -81,6 +85,7 @@ const FirstTimePopupUI = () => {
   }
 
   const handleClick2 = () => {
+    window.GAEvent("DrawTool", "FirstTimePopup", "ButtonClicked", "No");
     setFadeIn(false);
     if(firstTimePopupNumber === 7){
       dispatch(setShowFirstTimePopup({
@@ -90,7 +95,7 @@ const FirstTimePopupUI = () => {
         popupDismissable: true
       }))
     }else{
-      handleClose();
+      handleClose(false);
     }
   }
 

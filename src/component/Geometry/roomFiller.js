@@ -134,8 +134,10 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
       dispatch(setRoomDetails(""));
       dispatch(setActiveRoomIndex(-1));
       dispatch(resetShowFirstTimePopup())
+      window.GAEvent("DrawTool","RoomNameClicked", "Deselect", roomName)
       return;
     }
+    window.GAEvent("DrawTool","RoomNameClicked", "Select", roomName)
     if(firstTimePopupNumber < 12 && enableFirstTimePopup){
       const centroid = getCentroid(polygon);
       dispatch(setShowFirstTimePopup({

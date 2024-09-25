@@ -9,6 +9,7 @@ const EscapeHelper = () => {
     const dispatch = useDispatch();
     const handleClick = () => {
         dispatch(setEscapeMessageShow(false));
+        window.GAEvent("DrawTool", "EscapeHelper", "DontShowAgain");
     }
   return (
     <div className='escape-helper-container'>

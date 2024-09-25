@@ -13,7 +13,7 @@ import {
   showRoomNamePopup,
   updateDrawData,
 } from "../../Actions/ApplicationStateAction.js";
-import { ArrowBack, Check } from "@mui/icons-material";
+import { ArrowBack, Check, WindowRounded } from "@mui/icons-material";
 import { Switch } from "@mui/material";
 import { setSeeDimensions } from "../../Actions/DrawingActions.js";
 import { useActions } from "../../hooks/useActions.js";
@@ -31,6 +31,7 @@ const DrawtoolHeader = ({ }) => {
     dispatch(resetShowFirstTimePopup());
     dispatch(setDesignStep(1));
     handleReset();
+    window.GAEvent("DrawTool", "ButtonClicked", "BacktoScale");
   };
 
   const handleBackToDrawing = () => {
@@ -61,6 +62,17 @@ const DrawtoolHeader = ({ }) => {
         dispatch(resetShowFirstTimePopup());
       }
     });
+    window.GAEvent("DrawTool", "ButtonClicked", "BackToDrawing");
+  };
+
+  const handleClick = () =>{
+    handleSaveClick();
+    window.GAEvent("DrawTool", "ButtonClicked", "Save",designStep);
+  }
+
+  const handleSeeDimensions = () => {
+    dispatch(setSeeDimensions(!seeDimensions));
+    window.GAEvent("DrawTool", "ButtonClicked", "SeeDimensions", !seeDimensions );
   };
 
   return (
@@ -158,7 +170,7 @@ const DrawtoolHeader = ({ }) => {
             <Button
               className="save-btn"
               modifiers={["blue"]}
-              onClick={handleSaveClick}
+              onClick={handleClick}
             >
               {designStep < 3? "Save & next": "Finish & generate 3D" }
             </Button>
@@ -173,7 +185,7 @@ const DrawtoolHeader = ({ }) => {
               className="dimension-switch"
               type="checkbox"
               checked={seeDimensions}
-              onChange={() => dispatch(setSeeDimensions(!seeDimensions))}
+              onChange={handleSeeDimensions}
             />
             <span class="slider round"></span>
           </label>

@@ -10,12 +10,28 @@ import { Typography } from "../../design_system/StyledComponents/components/Typo
 const UndoRedoButton = () => {
   const { designStep } = useSelector((state) => state.ApplicationState);
   const { undo, redo } = useActions();
+
+  const handleUndo = () => {
+    if (designStep === 1) {
+      return;
+    }
+    undo();
+    window.GAEvent("DrawTool", "ButtonClicked", "Undo");
+  };
+
+  const handleRedo = () => {
+    if (designStep === 1) {
+      return;
+    }
+    redo();
+    window.GAEvent("DrawTool", "ButtonClicked", "Redo");
+  };
   return designStep === 1 ? null : (
     <div className="undo-redo-btn-container">
       <Button
         modifiers={["white", "sm"]}
         className="undo-redo-btn"
-        onClick={undo}
+        onClick={handleUndo}
       >
         <img style={{ width: "24px", height: "24px" }} src={Undo} alt="" />
         <Typography>Undo</Typography>
@@ -23,7 +39,7 @@ const UndoRedoButton = () => {
       <Button
         modifiers={["white", "sm"]}
         className="undo-redo-btn"
-        onClick={redo}
+        onClick={handleRedo}
       >
         <img style={{ width: "24px", height: "24px" }} src={Redo} alt="" />
         <Typography>Redo</Typography>

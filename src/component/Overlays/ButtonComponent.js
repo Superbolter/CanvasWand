@@ -37,10 +37,12 @@ const ButtonComponent = () => {
     if(buttonName=== selectedButton){
       dispatch(setSelectedButton(null))
       dispatch(setTypeId(0))
+      window.GAEvent("DrawTool", "ButtonClicked", "StructureDeactivated", buttonName);
       return
     }else{
       dispatch(setSelectedButton(buttonName))
     }
+    window.GAEvent("DrawTool", "ButtonClicked", "StructureActivated", buttonName);
     // dispatch(setShowPopup(true));
     if (buttonName === 'Walls') {
       dispatch(setTypeId(1))

@@ -9,6 +9,7 @@ const ReportButton = () => {
       layout: "modal",
       width: "800",
     })
+    window.GAEvent("DrawTool", "ButtonClicked", "ReportIssue")
   }
   return (
     <div className='report-button-container' onClick={handleClick}>

@@ -46,6 +46,7 @@ const Properties = () => {
     const newLength = convert(lengthValue).from(lengthMeasuredValue).to(unit);
     setLengthValue(newLength);
     setLengthMeasuredValue(unit);
+    window.GAEvent("DrawTool", "PropertyPopup", "LengthUnitChange", unit);
   };
 
   const handleWidthChange = (event) => {

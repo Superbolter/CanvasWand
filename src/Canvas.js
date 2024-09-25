@@ -149,30 +149,35 @@ export const CanvasComponent = () => {
   const handleKeyDown = (event) => {
     if (event.key === "s" || event.key === "S") {
       dispatch(setStop(!stop));
+      window.GAEvent("DrawTool", "Shortcut", "SetStop");
     }
     if (
       (event.ctrlKey || event.metaKey) &&
       (event.key === "x" || event.key === "X")
     ) {
       perpendicularHandler();
+      window.GAEvent("DrawTool", "Shortcut", "PerpendicularChange");
     }
     if (
       (event.ctrlKey || event.metaKey) &&
       (event.key === "z" || event.key === "Z")
     ) {
       undo();
+      window.GAEvent("DrawTool", "Shortcut", "Undo");
     }
     if (
       (event.ctrlKey || event.metaKey) &&
       (event.key === "y" || event.key === "Y")
     ) {
       redo();
+      window.GAEvent("DrawTool", "Shortcut", "Redo");
     }
     if (
       (event.ctrlKey || event.metaKey) &&
       (event.key === "c" || event.key === "C")
     ) {
       dispatch(setSnapActive(!snapActive));
+      window.GAEvent("DrawTool", "Shortcut", "SnapActive");
     }
    
     if (
@@ -181,8 +186,10 @@ export const CanvasComponent = () => {
     ) {
       if (snapPoint === "normal") {
         dispatch(setSnapPoint("upper"));
+        window.GAEvent("DrawTool", "Shortcut", "SnapPointUpper");
       } else {
         dispatch(setSnapPoint("normal"));
+        window.GAEvent("DrawTool", "Shortcut", "SnapPointNormal");
       }
     }
     if (
@@ -191,8 +198,10 @@ export const CanvasComponent = () => {
     ) {
       if (linePlacementMode === "midpoint") {
         dispatch(setLinePlacementMode("below"));
+        window.GAEvent("DrawTool", "Shortcut", "LinePlacementModeBelow");
       } else {
         dispatch(setLinePlacementMode("midpoint"));
+        window.GAEvent("DrawTool", "Shortcut", "LinePlacementModeMidpoint");
       }
     }
     if (
@@ -212,29 +221,37 @@ export const CanvasComponent = () => {
         dispatch(setShowSnapLine(false));
         dispatch(setContextualMenuStatus(false));
       }
+      window.GAEvent("DrawTool", "Shortcut", "Escape");
     }
     if (selectionMode && (event.key === "Delete" || event.keyCode === 46)) {
       if (designStep === 3 && activeRoomIndex !== -1) {
         deleteSelectedRoom();
+        window.GAEvent("DrawTool", "Shortcut", "DeleteRoom");
       } else {
         deleteSelectedLines();
+        window.GAEvent("DrawTool", "Shortcut", "DeleteLine");
       }
     }
     if (event.key === "Shift") {
       dispatch(setShiftPressed(true));
+      window.GAEvent("DrawTool", "Shortcut", "ShiftPressed");
     }
     if(!selectionMode && designStep === 2){
       if(event.key === "W" || event.key === "w"){
         dispatch(updateLineTypeId(1))
+        window.GAEvent("DrawTool", "Shortcut", "LineTypeWall")
       }
       if(event.key === "D" || event.key === "d"){
         dispatch(updateLineTypeId(2))
+        window.GAEvent("DrawTool", "Shortcut", "LineTypeDoor")
       }
       if(event.key === "R" || event.key === "r"){
         dispatch(updateLineTypeId(4))
+        window.GAEvent("DrawTool", "Shortcut", "LineTypeRailing")
       }
       if(event.key === "N" || event.key === "n"){
         dispatch(updateLineTypeId(3))
+        window.GAEvent("DrawTool", "Shortcut", "LineTypeWindow")
       }
     }
   };
@@ -272,14 +289,19 @@ export const CanvasComponent = () => {
   ]);
 
   useEffect(() => {
-    window.GAEvent("Page View", "Canvas", "Canvas");
     const floorplanId = getUrlParameter("floorplanId");
+    if (floorplanId) {
+      window.GAEvent("DrawTool", "AppOpened", "FloorplanOpened", floorplanId);
+    }else{
+      window.GAEvent("DrawTool", "AppOpened", "NoFloorplanId", "");
+    }
     RomeDataManager.instantiate();
     if (cookies.get("USER-SESSION", { path: "/" }) !== undefined) {
       const result = cookies.get("LOGIN-RESPONSE", { path: "/" });
 
       RomeDataManager.setUserEmail(result.email, result.persistence_token);
       window.curentUserSession = result;
+      window.GAEvent("DrawTool", "UserLanded", "LoggedIn", result.user_id);
     }
 
     dispatch(drawToolData(floorplanId));

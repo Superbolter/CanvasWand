@@ -33,24 +33,28 @@ const ContextualMenu = () => {
     dispatch(updateLineTypeId(1));
     // dispatch(setTypeId(1));
     dispatch(setSelectedLinesState([]));
+    window.GAEvent("DrawTool", "ContextualMenu", "ButtonClicked", "Wall");
   };
   const handleDoorClick = (e) => {
     e.stopPropagation();
     dispatch(updateLineTypeId(2));
     // dispatch(setTypeId(2));
     dispatch(setSelectedLinesState([]));
+    window.GAEvent("DrawTool", "ContextualMenu", "ButtonClicked", "Door");
   };
   const handleWindowClick = (e) => {
     e.stopPropagation();
     dispatch(updateLineTypeId(3));
     // dispatch(setTypeId(3));
     dispatch(setSelectedLinesState([]));
+    window.GAEvent("DrawTool", "ContextualMenu", "ButtonClicked", "Window"); 
   };
   const handleRailingClick = (e) => {
     e.stopPropagation();
     dispatch(updateLineTypeId(4));
     // dispatch(setTypeId(4));
     dispatch(setSelectedLinesState([]));
+    window.GAEvent("DrawTool", "ContextualMenu", "ButtonClicked", "Railing");
   };
 
   const handleDivideClick = (e) => {
@@ -58,6 +62,7 @@ const ContextualMenu = () => {
     dispatch(updateLineTypeId(5));
     // dispatch(setTypeId(5));
     dispatch(setSelectedLinesState([]));
+    window.GAEvent("DrawTool", "ContextualMenu", "ButtonClicked", "Opening");
   };
 
   const handleMerge = (e) => {
@@ -68,6 +73,7 @@ const ContextualMenu = () => {
       toggleSelectionSplitMode();
     }
     dispatch(setMergeState(!merge));
+    window.GAEvent("DrawTool", "ContextualMenu", "ButtonClicked", "Merge");
   };
 
   const handleSplitClick = (e) => {
@@ -79,6 +85,7 @@ const ContextualMenu = () => {
       toggleSelectionSplitMode();
     }
     dispatch(setLineBreakState(!lineBreak));
+    window.GAEvent("DrawTool", "ContextualMenu", "ButtonClicked", "Split");
   };
 
   const handlDeleteClick = (e) => {
@@ -88,11 +95,13 @@ const ContextualMenu = () => {
     } else {
       deleteSelectedLines();
     }
+    window.GAEvent("DrawTool", "ContextualMenu", "ButtonClicked", "Delete");
   };
 
   const handleLockClick = (e) => {
     e.stopPropagation()
     dispatch(setLockForLines(!locked));
+    window.GAEvent("DrawTool", "ContextualMenu", "ButtonClicked", "Lock");
   };
 
   return (
