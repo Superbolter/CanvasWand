@@ -64,8 +64,8 @@ import useMouse from "./hooks/useMouse.js";
 import FirstTimePopupCanvas from "./component/Popups/FirstTimePopupCanvas.js";
 import FirstTimePopupUI from "./component/Popups/FirstTimePopupUI.js";
 import UndoRedoButton from "./component/Overlays/UndoRedoButton.js";
-import Logo from "./component/Overlays/Logo.js";
-import EscapeHelper from "./component/Overlays/EscapeHelper.js";
+import Logo from "./component/CanvasOverLays/Logo.js";
+import EscapeHelper from "./component/CanvasOverLays/EscapeHelper.js";
 
 export const CanvasComponent = () => {
   const dispatch = useDispatch();
@@ -381,7 +381,15 @@ export const CanvasComponent = () => {
   },[measured])
 
   useEffect(()=>{
-    dispatch(setHelpVideo(false));
+    var type = "";
+    if(designStep  === 1){
+      type = "setScale";
+    }else if(designStep === 2){
+      type = "addWall";
+    }else if(designStep === 3){
+      type = "defineRoom";
+    }
+    dispatch(setHelpVideo(true, type));
   },[designStep])
 
   var feetLength = 0;

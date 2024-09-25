@@ -29,6 +29,11 @@ const videoData = {
     subtitle: "to understand how adding a wall works, watch this video",
     videoUrl: "/videos/drawTool/addWall.mov",
   },
+  defineRoom: {
+    title: "How to define a room",
+    subtitle: "to understand how to define a room, watch this video",
+    videoUrl: "/videos/drawTool/defineRoom.mov",
+  }
 };
 
 const HelpVideoPopup = () => {
@@ -55,8 +60,6 @@ const HelpVideoPopup = () => {
         loop
         muted
         pip
-        width="50vw"
-        height="60vh"
         className="help-popup-video"
         url={getRomeCdnUrl() + videoData[helpVideoType].videoUrl}
       />
@@ -68,6 +71,7 @@ const HelpVideoPopup = () => {
     setTimeout(() => {
       dispatch(setHelpVideo(false));
     }, 600)
+    window.GAEvent("DrawTool", "ButtonClicked", "CloseHelpVideo", helpVideoType);
   };
 
   if (!helpVideo || !helpVideoType) return null;
@@ -83,10 +87,10 @@ const HelpVideoPopup = () => {
           <Close/>
         </div>
         {videoPlayer}
-        <Typography modifiers={["black600", "body", "medium"]}>
+        <Typography modifiers={["black600", "body", "bold"]}>
           {videoData[helpVideoType].title}
         </Typography>
-        <Typography modifiers={["subtitle2"]} style={{ color: "#6E757A" }}>
+        <Typography modifiers={["subtitle2", "medium"]} style={{ color: "#6E757A" }}>
           {videoData[helpVideoType].subtitle}
         </Typography>
         <div className="help-popup-button-wrapper">
