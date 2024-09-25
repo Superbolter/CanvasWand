@@ -1,0 +1,9 @@
+.undo-redo-btn-container{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
