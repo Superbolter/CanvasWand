@@ -7,3 +7,18 @@
     flex-direction: column;
     gap: 8px;
 }
+
+.undo-redo-btn{
+    display: flex;
+    width: 93px;
+    height: 36px !important;
+    padding: 8px 12px 8px 8px;
+    gap: 4px;
+    border-radius: 8px;
+    border: 1px solid #B6BABD !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 3px 0 #00000026;
+    transition: all 0.2s ease-in-out;
+  }
