@@ -109,20 +109,6 @@ text-align: left;
 
 }
 
-.undo-redo-btn{
-  display: flex;
-  width: 93px;
-  height: 36px !important;
-  padding: 8px 12px 8px 8px;
-  gap: 4px;
-  border-radius: 8px;
-  border: 1.5px solid #B6BABD !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 5px 0px #0C0C0D21;
-}
-
 .save-btn{
     display: flex;
     align-items: center;
