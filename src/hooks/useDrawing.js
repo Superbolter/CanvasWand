@@ -895,7 +895,7 @@ export const useDrawing = () => {
       }
     }
 
-    if (!lineBreak && !merge && designStep === 2) {
+    if (!lineBreak && !merge && designStep === 2 && selectionMode) {
       const line = storeLines.find((line) => line.id === id);
       let pointToSend = [0, 0, 0];
       let idx = 0;

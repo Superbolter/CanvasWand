@@ -53,6 +53,7 @@ const useMouse = () => {
   const [curvePoints, setCurvePoints] = useState(null);
   const [curveAngle, setCurveAngle] = useState(0);
   const [curveAnglePosition, setCurveAnglePosition] = useState(null);
+  const [lineAngle, setLineAngle] = useState(null);
 
   const xMap = new Map();
   const yMap = new Map();
@@ -236,10 +237,12 @@ const useMouse = () => {
       }else{
         setCurveAngle(angleInDegrees);
       }
+      const angle = Math.atan2(position.y - lastPoint.y, position.x - lastPoint.x);
+      setLineAngle(angle)
       const curve = new QuadraticBezierCurve3(
-        new Vector3(currentStrightMousePosition?.x, currentStrightMousePosition?.y, 0), // Start point (last point) 
+        new Vector3(position?.x, position?.y, 0), // Start point (last point) 
         controlPoint(position, point, angleInDegrees),                            // Control point
-        new Vector3(currentMousePosition?.x, currentMousePosition?.y, 0) // End point (mouse position)
+        new Vector3(point?.x, point?.y, 0) // End point (mouse position)
       );
       const curvePoints = curve.getPoints(100);
       setCurvePoints(curvePoints);
@@ -346,12 +349,12 @@ const useMouse = () => {
 
       if (draggingPointIndex !== null && designStep === 2) {
         let point = screenToNDC(event.clientX, event.clientY);
+        let beforeUpdation = points[draggingPointIndex];
         pts.map((pt) => {
-          if (point.distanceTo(pt) < 15) {
+          if (point.distanceTo(pt) < 15 && pt.x !== beforeUpdation.x && pt.y !== beforeUpdation.y) {
             point = pt;
           } 
         });
-        let beforeUpdation = points[draggingPointIndex];
         let updatedPoints = points.map((p) => {
           if (p.equals(beforeUpdation)) {
             return point;
@@ -505,7 +508,8 @@ const useMouse = () => {
     distance,
     curvePoints,
     curveAngle,
-    curveAnglePosition
+    curveAnglePosition,
+    lineAngle
   };
 };
 

@@ -26,6 +26,7 @@ const initialState = {
     helpVideo: false,
     helpVideoType: "",
     escapeMessageShow: true,
+    helpVideoNumber: 1,
   };
   
   const ApplicationStateReducer = (state = initialState, action) => {
