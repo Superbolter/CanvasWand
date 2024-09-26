@@ -410,7 +410,7 @@ const BoxGeometry = ({
         {(seeDimensions || showDimension) && typeId !== 5 && (
           <Text
             position={textPosition}
-            rotation={[0, 0, textRotation]}
+            rotation={[0, 0, textRotation < 3 ? textRotation: 0]}
             fontSize={9}
             color="black"
             anchorX="center"

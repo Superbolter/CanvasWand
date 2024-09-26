@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   drawToolData,
   setHelpVideo,
+  setHelpVideoNumberr,
   setStoreLines,
   updateLineTypeId,
 } from "./Actions/ApplicationStateAction.js";
@@ -90,7 +91,8 @@ export const CanvasComponent = () => {
     distance,
     curvePoints,
     curveAngle,
-    curveAnglePosition
+    curveAnglePosition,
+    lineAngle
    } = useMouse();
   const { undo, redo } = useActions();
   const { toggleSelectionMode, perpendicularHandler } = useModes();
@@ -124,7 +126,8 @@ export const CanvasComponent = () => {
     activeRoomButton,
     showSetScalePopup,
     img,
-    escapeMessageShow
+    escapeMessageShow,
+    helpVideoNumber
   } = useSelector((state) => state.ApplicationState);
   const { typeId, stop, showSnapLine, snappingPoint, temporaryPolygon, enablePolygonSelection,} = useSelector(
     (state) => state.Drawing
@@ -382,12 +385,15 @@ export const CanvasComponent = () => {
 
   useEffect(()=>{
     var type = "";
-    if(designStep  === 1){
+    if(designStep  === 1 && helpVideoNumber === 1){
       type = "setScale";
-    }else if(designStep === 2){
+      dispatch(setHelpVideoNumberr(2));
+    }else if(designStep === 2 && helpVideoNumber === 2){
       type = "addWall";
-    }else if(designStep === 3){
+      dispatch(setHelpVideoNumberr(3));
+    }else if(designStep === 3 && helpVideoNumber === 3){
       type = "defineRoom";
+      dispatch(setHelpVideoNumberr(4));
     }
     dispatch(setHelpVideo(true, type));
   },[designStep])
@@ -540,7 +546,7 @@ export const CanvasComponent = () => {
                   }
                   onClick={() => {}}
                 />
-                {currentStrightMousePosition && !perpendicularLine && (
+                {currentStrightMousePosition && !perpendicularLine && curveAngle > 3 &&(
                   <>
                     <Line
                       points={[
@@ -553,15 +559,22 @@ export const CanvasComponent = () => {
                     <Line points={curvePoints} color="black" lineWidth={1} transparent={true} opacity={0.5}/>
                     <Text
                       position={[
-                        (points[points.length - 1].x +
+                        currentMousePosition.x - points[points.length - 1].x > 0 ? (points[points.length - 1].x +
                           currentStrightMousePosition.x) /
-                          2,
+                          2 - 10: (points[points.length - 1].x +
+                            currentStrightMousePosition.x) /
+                            2 + 10,
+                        currentMousePosition.y - points[points.length - 1].y > 0?
                         (points[points.length - 1].y +
                           currentStrightMousePosition.y) /
-                          2 +
-                          10,
+                          2 -
+                          20: (points[points.length - 1].y +
+                            currentStrightMousePosition.y) /
+                            2 +
+                            20,
                         0,
                       ]}
+                      rotation={[0, 0 , lineAngle< 3? lineAngle: 0]}
                       color="black"
                       anchorX="center"
                       anchorY="middle"
