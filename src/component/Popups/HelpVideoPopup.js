@@ -78,6 +78,7 @@ const HelpVideoPopup = () => {
   return (
     <div className="help-popup-wrapper" onClick={handleClose}>
       <div
+        onClick={(e) => e.stopPropagation()}
         className={
           slideIn ? "help-popup-container" : "help-popup-container-hidden"
         }

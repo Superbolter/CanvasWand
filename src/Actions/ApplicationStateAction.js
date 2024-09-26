@@ -418,3 +418,12 @@ export const setUserStatus = () =>{
     dispatch(setShowFirstTimePopup({enableFirstTimePopup: false}))
   }
 }
+
+export const setHelpVideoNumberr = (val) => {
+  return (dispatch) => {
+    dispatch({
+      type: "UPDATE_APPLICATION_STATE",
+      helpVideoNumber: val
+    })
+  }
+}
