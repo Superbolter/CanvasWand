@@ -375,7 +375,12 @@ export const useActions = () => {
             //   "_blank"
             // );
             // window.location = `https://sbst-beta.getsuperbolt.com/3d-home/floorplans/${floorplanId}`
-            window.history.back();
+            // window.history.back();
+            if(window.history.length > 2){
+              window.history.back();
+            }else{
+              window.location = process.env.REACT_APP_ROME_URL
+            }
           });
       }, 1000);
     }
