@@ -151,7 +151,7 @@ export const drawToolData = (floorplan_id) => {
             }))
           }
         }else{
-          if(designStep === 1 && enableFirstTimePopup && firstTimePopupNumber <= 1){
+          if(designStep === 1 && enableFirstTimePopup && firstTimePopupNumber <= 1 && response.data.image_uri){
             dispatch(setShowFirstTimePopup({
               showFirstTimePopup: true,
               firstTimePopupType: "canvas",
@@ -162,6 +162,12 @@ export const drawToolData = (floorplan_id) => {
         }
         if(!response.data.image_uri && response.data.scale === null){
           dispatch(setDesignStep(2));
+          dispatch(setShowFirstTimePopup({
+            showFirstTimePopup: true,
+            firstTimePopupType: "ui",
+            firstTimePopupNumber: 3,
+            popupDismissable: false
+          }))
         }
       })
       .catch((error) => {
