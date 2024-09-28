@@ -352,8 +352,16 @@ export const CanvasComponent = () => {
     if(draggingLine){
       canvasContainer.addEventListener("pointermove", handlePointerMove);
     }
+    canvasContainer.addEventListener('contextmenu', (event)=>{
+      event.preventDefault();
+      event.stopPropagation();
+    })
     return () => {
       canvasContainer.removeEventListener("pointermove", handlePointerMove);
+      canvasContainer.removeEventListener('contextmenu', (event)=>{
+        event.preventDefault();
+        event.stopPropagation();
+      })
     };
   },[draggingLine])
 
