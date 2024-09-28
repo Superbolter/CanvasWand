@@ -39,7 +39,7 @@ export const snapToPoint = (
 
   // Check against all points and endpoints of existing lines
   for (let p of points) {
-    if (p.distanceTo(point) < (snapActive ? SNAPPING_THRESHOLD : 0)) {
+    if (p.distanceTo(point) < (snapActive ? 5 : 0)) {
       if (snapPoint === "upper" && linePlacementMode === "below") {
         for (let line of storeLines) {
           if (line.points[0].equals(p) || line.points[1].equals(p)) {
@@ -60,7 +60,7 @@ export const snapToPoint = (
 
   for (let line of storeLines) {
     if (
-      line.points[0].distanceTo(point) < (snapActive ? SNAPPING_THRESHOLD : 0)
+      line.points[0].distanceTo(point) < (snapActive ? 5 : 0)
     ) {
       let closestPoint = line.points[0];
       if(snapPoint === "upper" && linePlacementMode === "below"){
@@ -76,7 +76,7 @@ export const snapToPoint = (
       return closestPoint;
     }
     if (
-      line.points[1].distanceTo(point) < (snapActive ? SNAPPING_THRESHOLD : 0)
+      line.points[1].distanceTo(point) < (snapActive ? 5 : 0)
     ) {
       let closestPoint = line.points[1];
       if(snapPoint === "upper" && linePlacementMode === "below"){
@@ -98,7 +98,7 @@ export const snapToPoint = (
       line.points[1],
       point
     );
-    if (closestPointOnLine.distanceTo(point) < SNAPPING_THRESHOLD) {
+    if (closestPointOnLine.distanceTo(point) < 5) {
       if (snapPoint === "upper" && linePlacementMode === "below") {
         closestPointOnLine = upperPoints(
           line.points[0],
