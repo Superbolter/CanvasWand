@@ -155,7 +155,6 @@ const RoomFiller = ({ roomName, roomType, wallIds, index, polygon }) => {
         popupDismissable: true,
         customisedPosition: null,
       }))
-      dispatch(setUserStatus())
     }
     dispatch(setSelectedLinesState(wallIds));
     dispatch(setExpandRoomNamePopup(true));

@@ -35,6 +35,7 @@ import {
   setShowSetScalePopup,
   setFirstLinePoints,
   setHelpVideo,
+  setUserStatus,
 } from "../Actions/ApplicationStateAction.js";
 import {
   setContextualMenuStatus,
@@ -498,6 +499,9 @@ export const useDrawing = () => {
         dispatch(setActiveRoomIndex(-1));
         if(showFirstTimePopup){
           dispatch(resetShowFirstTimePopup());
+          if(firstTimePopupNumber === 13){
+            dispatch(setUserStatus())
+          }
         }
       }
       return;

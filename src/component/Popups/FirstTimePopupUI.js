@@ -7,6 +7,7 @@ import { setShowFirstTimePopup } from "../../Actions/PopupAction";
 import { popupData } from "./PopupData";
 import { Close } from "@mui/icons-material";
 import { Button } from "../../design_system/StyledComponents/components/Button";
+import { setUserStatus } from "../../Actions/ApplicationStateAction";
 
 const FirstTimePopupUI = () => {
   const { showFirstTimePopup, popupDismissable, firstTimePopupNumber } =
@@ -53,6 +54,9 @@ const FirstTimePopupUI = () => {
     }))
     if(val){
       window.GAEvent("DrawTool", "FirstTimePopup", "ButtonClicked", "Close");
+    }
+    if(firstTimePopupNumber === 13){
+      dispatch(setUserStatus())
     }
   }
 
