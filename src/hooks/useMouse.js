@@ -21,7 +21,7 @@ import {
 const useMouse = () => {
   const dispatch = useDispatch();
   const { screenToNDC } = usePoints();
-  const { perpendicularLine, measured, roomSelectors, lineBreak, snapActive } =
+  const { perpendicularLine, measured, roomSelectors, lineBreak, snapActive , merge } =
     useSelector((state) => state.drawing);
   const { dragMode, enablePolygonSelection, actionHistory } = useSelector(
     (state) => state.Drawing
@@ -59,8 +59,8 @@ const useMouse = () => {
   const yMap = new Map();
 
   points.forEach((point) => {
-    const xKey = point.x;
-    const yKey = point.y;
+    const xKey = parseInt(point.x);
+    const yKey = parseInt(point.y);
 
     // Store x and y points
     xMap.set(xKey, point);
@@ -172,10 +172,10 @@ const useMouse = () => {
     //     dispatch(setHiglightPoint(null))
     // }
     const threshold = 5;
-    const xStart = point.x - threshold;
-    const xEnd = point.x + threshold;
-    const yStart = point.y - threshold;
-    const yEnd = point.y + threshold;
+    const xStart = parseInt(point.x) - threshold;
+    const xEnd = parseInt(point.x) + threshold;
+    const yStart = parseInt(point.y) - threshold;
+    const yEnd = parseInt(point.y) + threshold;
 
     let cuuPoint = point; // Copy the point
     const lastPoint = points[points.length - 1];
@@ -260,8 +260,8 @@ const useMouse = () => {
     //   const start = screenToNDC(event.clientX, event.clientY);
     //   setStartPoint(start);
     // }
-    if (!dragMode) return;
-
+    if (!dragMode || merge) return;
+    
     if (designStep === 2) {
       const point = screenToNDC(event.clientX, event.clientY);
       const pointIndex = points.findIndex((p) => p.distanceTo(point) < 6.5);

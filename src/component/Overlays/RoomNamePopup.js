@@ -168,7 +168,7 @@ const RoomNamePopup = () => {
     );
     dispatch(setRoomDetails(event.target.value));
     const length = roomSelectors.filter((room) =>
-      room.roomName.includes(event.target.value)
+      room.roomType.includes(event.target.value)
     ).length;
     let name = selectedItem.value;
     if (length > 0) {
