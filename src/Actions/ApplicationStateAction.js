@@ -40,7 +40,7 @@ export const drawToolData = (floorplan_id) => {
           type:"UPDATE_APPLICATION_STATE",
           floorplanId: floorplan_id,
         })
-        if(response.data?.draw_tool_guidance === "0"){
+        if(response.data?.draw_tool_guidance === "1"){
           enableFirstTimePopup = false;
           dispatch(setShowFirstTimePopup({enableFirstTimePopup: enableFirstTimePopup}));
         }
@@ -413,7 +413,7 @@ export const setEscapeMessageShow = (val) => {
 export const setUserStatus = () =>{
   return (dispatch) => {
     const formData = new FormData();
-    formData.append('status', "0")
+    formData.append('status', "1")
     fetchWrapper.post('/user_preferences/data_tool_guidance', formData)
     dispatch(setShowFirstTimePopup({enableFirstTimePopup: false}))
   }
