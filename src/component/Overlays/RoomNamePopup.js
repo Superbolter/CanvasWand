@@ -19,6 +19,7 @@ import {
   setRoomEditingMode,
   setRoomName,
   setSelectedLinesState,
+  setUserStatus,
   showRoomNamePopup,
 } from "../../Actions/ApplicationStateAction.js";
 import plus from "../../assets/plus.svg";
@@ -89,7 +90,7 @@ const RoomNamePopup = () => {
   const { roomSelectors } = useSelector((state) => state.drawing);
   const { toggleSelectionMode } = useModes();
   const { addRoom,deleteSelectedRoom } = useDrawing();
-  const {showFirstTimePopup} = useSelector((state) => state.PopupState);
+  const {showFirstTimePopup, firstTimePopupNumber} = useSelector((state) => state.PopupState);
 
   useEffect(() => {
     if (selectedRoomName) {
@@ -179,6 +180,9 @@ const RoomNamePopup = () => {
     }
     if(showFirstTimePopup){
       dispatch(resetShowFirstTimePopup())
+      if(firstTimePopupNumber === 13){
+        dispatch(setUserStatus())
+      }
     }
     if (roomEditingMode) {
       if (name.length === 0) {
