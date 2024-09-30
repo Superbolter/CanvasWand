@@ -519,7 +519,7 @@ export const CanvasComponent = () => {
               />
             )}
 
-          {designStep > 1 &&
+          {designStep === 2 &&
             currentMousePosition &&
             points.length > 0 &&
             !stop && (

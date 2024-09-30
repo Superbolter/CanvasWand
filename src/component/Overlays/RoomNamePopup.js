@@ -145,11 +145,11 @@ const RoomNamePopup = () => {
     } 
     if (activeRoomButton === "divide") {
       dispatch(setActiveRoomButton(""));
-      dispatch(setTypeId(0));
       if (!selectionMode) {
         toggleSelectionMode();
       }
       dispatch(updateTemoraryPolygon([]))
+      dispatch(setEnablePolygonSelection(false))
       return;
     }
     dispatch(setEnablePolygonSelection(true))
