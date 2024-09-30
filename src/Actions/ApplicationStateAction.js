@@ -232,12 +232,25 @@ export const updateLineTypeId = (typeId) => {
     const selectionMode = state.ApplicationState.selectionMode;
     const storeLines = [...state.ApplicationState.storeLines];
     if (selectionMode && selectedLines) {
+      let type =
+      typeId === 1
+        ? "wall"
+        : typeId === 2
+        ? "door"
+        : typeId === 3
+        ? "window"
+        : typeId === 4
+        ? "railing"
+        : typeId === 5
+        ? "imaginary"
+        : "";
         const updateLines = storeLines.map(line => {
             const matchingSelectedLine = selectedLines.find(selectedLine => selectedLine === line.id);
             if (matchingSelectedLine) {
               return {
                 ...line,
                 typeId,  
+                type
               };
             }
             return line; // Keep the line unchanged if no match is found
