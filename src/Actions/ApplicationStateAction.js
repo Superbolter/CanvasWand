@@ -227,6 +227,18 @@ export const setFactor = (factor) => {
 };
 export const updateLineTypeId = (typeId) => {
   return (dispatch, getState) => {
+    let type =
+      typeId === 1
+        ? "wall"
+        : typeId === 2
+        ? "door"
+        : typeId === 3
+        ? "window"
+        : typeId === 4
+        ? "railing"
+        : typeId === 5
+        ? "imaginary"
+        : "";
     const state = getState();
     const selectedLines = [...state.ApplicationState.selectedLines];
     const selectionMode = state.ApplicationState.selectionMode;
@@ -238,6 +250,7 @@ export const updateLineTypeId = (typeId) => {
               return {
                 ...line,
                 typeId,  
+                type
               };
             }
             return line; // Keep the line unchanged if no match is found
@@ -258,6 +271,7 @@ export const updateLineTypeId = (typeId) => {
         storeLines[lineIndex] = {
           ...storeLines[lineIndex], // Create a copy of the line object
           typeId, // Update the typeId
+          type,
         };
         // dispatch({
         //   type: "SET_PROPERTY_POPUP",

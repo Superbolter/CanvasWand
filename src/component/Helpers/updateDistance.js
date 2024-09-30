@@ -55,7 +55,7 @@ const UpdateDistance = ({nearVal})=>{
     <>
     <Text
         position={textPosition1}
-        rotation={[0, 0, textRotation1]}
+        rotation={[0, 0, textRotation1 < 3 ? textRotation1 : 0]}
         fontSize={12}
         color="black"
         anchorX="center"
@@ -65,7 +65,7 @@ const UpdateDistance = ({nearVal})=>{
       </Text>
       <Text
       position={textPosition2}
-      rotation={[0, 0, textRotation2]}
+      rotation={[0, 0, textRotation2 < 3 ? textRotation2: 0]}
       fontSize={12}
       color="black"
       anchorX="center"

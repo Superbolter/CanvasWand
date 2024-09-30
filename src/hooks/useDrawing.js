@@ -117,7 +117,6 @@ export const useDrawing = () => {
   const [breakPoint, setBreakPoint] = useState([]);
   const [dimensions, setDimensions] = useState({ l: 50, w: 10, h: 50 });
   const [selectId, setId] = useState(null);
-  const [lineClick, setLineClick] = useState(false);
 
   const setSelectedLines = (data) => {
     dispatch(setSelectedLinesState(data));
@@ -486,7 +485,7 @@ export const useDrawing = () => {
       dispatch(resetShowFirstTimePopup());
     }
     dispatch(setHelpVideo(false))
-    if (selectionMode && !lineClick && !enablePolygonSelection && activeRoomButton !== "divide") {
+    if (selectionMode && !enablePolygonSelection && activeRoomButton !== "divide") {
       setSelectedLines([]);
       dispatch(setContextualMenuStatus(false));
       dispatch(setShowPopup(false));
@@ -631,18 +630,9 @@ export const useDrawing = () => {
     }
     if (selectionMode || merge || designStep === 1) return; // Prevent drawing new lines in selection mode
     //if (dragMode) return;
-    
-
 
     if (lineBreak) {
-      if (findLineForPoint(point, storeLines, snapActive)) {
-        let { closestPointOnLine } = findLineForPoint(
-          point,
-          storeLines,
-          snapActive
-        );
-        breakingLine(closestPointOnLine);
-      } else {
+      if (!findLineForPoint(point, storeLines, snapActive)) {
         dispatch(setLineBreakState(false));
         if (!selectionMode) {
           toggleSelectionSplitMode();
@@ -871,15 +861,10 @@ export const useDrawing = () => {
     return merged;
   };
 
-  useEffect(() => {
-    if (lineClick) {
-      setTimeout(() => {
-        setLineClick(false);
-      }, 100);
+  const handleLineClick = (e,id) => {
+    if(selectionMode){
+      e.nativeEvent.stopPropagation();
     }
-  }, [lineClick]);
-
-  const handleLineClick = (id) => {
     if(designStep === 3){
       if(expandRoomPopup){
         if(enablePolygonSelection){
@@ -890,7 +875,6 @@ export const useDrawing = () => {
       }
     }
     window.GAEvent("DrawTool", "Canvas", "LineClicked");
-    setLineClick(true);
     let storeid = [];
     if (merge) {
       if (!mergeLine.find((line) => line === id)) {
@@ -932,8 +916,23 @@ export const useDrawing = () => {
     }
 
     if (lineBreak) {
-      setId(id);
+      const point = screenToNDC(e.clientX, e.clientY)
+      if (findLineForPoint(point, storeLines, snapActive)) {
+        let { closestPointOnLine } = findLineForPoint(
+          point,
+          storeLines,
+          snapActive
+        );
+        breakingLine(closestPointOnLine, id);
+      } else {
+        dispatch(setLineBreakState(false));
+        if (!selectionMode) {
+          toggleSelectionSplitMode();
+        }
+      }
+      return;
     }
+
     let merged = false;
     if (merge && storeid.length >= 2) {
       merged = handleMerge(storeid);
@@ -966,20 +965,11 @@ export const useDrawing = () => {
         dispatch(setTypeId(1));
       }
     }
-    // if(type ==='door'){
-    //   setaddOn(!addOn);
-    //   setdoorPoint(...points);
-    //   const midpoint = new Vector3().addVectors(points[0],points[1]).multiplyScalar(0.5);
-    //   const length = points[0].distanceTo(points[1]);
-    //   setDoorPosition(midpoint);
-    //   setDimensions({l:length,W:10,h:50});
-
-    //dispatch(setIdSelection([...selectedLines]));
   };
 
-  const breakingLine = (point) => {
-    const idx = storeLines.findIndex((line) => line.id === selectId);
-    const line = storeLines.filter((line) => line.id === selectId);
+  const breakingLine = (point, id) => {
+    const idx = storeLines.findIndex((line) => line.id === id);
+    const line = storeLines.filter((line) => line.id === id);
     if (line[0] && line[0]?.locked) {
       toast("Line is locked and cannot be split.", {
         icon: "⚠️",
