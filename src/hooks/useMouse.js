@@ -262,7 +262,7 @@ const useMouse = () => {
     //   const start = screenToNDC(event.clientX, event.clientY);
     //   setStartPoint(start);
     // }
-    if (!dragMode || merge) return;
+    if (!dragMode || merge || lineBreak) return;
     
     if (designStep === 2) {
       const point = screenToNDC(event.clientX, event.clientY);

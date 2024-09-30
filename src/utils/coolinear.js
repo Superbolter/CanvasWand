@@ -16,12 +16,12 @@ const upperPoints = (start, end, width, point) => {
 export const findLineForPoint = (point, storeLines, snapActive) => {
   for (let line of storeLines) {
     if (
-      line.points[0].distanceTo(point) < (snapActive ? SNAPPING_THRESHOLD : 0)
+      line.points[0].distanceTo(point) < (snapActive ? 5 : 0)
     ) {
       return line.points[0];
     }
     if (
-      line.points[1].distanceTo(point) < (snapActive ? SNAPPING_THRESHOLD : 0)
+      line.points[1].distanceTo(point) < (snapActive ? 5 : 0)
     ) {
       return line.points[1];
     }
@@ -34,7 +34,7 @@ export const findLineForPoint = (point, storeLines, snapActive) => {
     );
     if (
       closestPointOnLine.distanceTo(point) <
-      (snapActive ? SNAPPING_THRESHOLD : 0)
+      (snapActive ? 5 : 0)
     ) {
       return { closestPointOnLine, line };
     }
