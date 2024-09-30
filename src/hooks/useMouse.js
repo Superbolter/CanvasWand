@@ -17,6 +17,7 @@ import {
   setSelectedLinesState,
   setStoreLines,
 } from "../Actions/ApplicationStateAction.js";
+import _ from 'lodash';
 
 const useMouse = () => {
   const dispatch = useDispatch();
@@ -59,13 +60,48 @@ const useMouse = () => {
   const yMap = new Map();
 
   points.forEach((point) => {
-    const xKey = parseInt(point.x);
-    const yKey = parseInt(point.y);
+    const xKey = point.x;
+    const yKey = point.y;
 
     // Store x and y points
     xMap.set(xKey, point);
     yMap.set(yKey, point);
   });
+
+  const findInMap = (map, callback) => {
+    let found;
+    map.forEach((value, key) => {
+      if (callback(value, key)) {
+        found = { key, value };
+      }
+    });
+    return found;
+  };
+
+  const snapToPoint = _.debounce((cuuPoint, lastPoint) => {
+    let snapX = xMap.get(cuuPoint.x);
+      let snapY = yMap.get(cuuPoint.y);
+      const findX = findInMap(xMap, (value, key) => Math.abs(cuuPoint.x - key) < 5 && lastPoint !== value)
+      const findY = findInMap(yMap, (value, key) => Math.abs(cuuPoint.x - key) < 5 && lastPoint !== value)
+      if(findX){
+        snapX = findX.value;
+      }
+      if(findY){
+        snapY = findY.value;
+      }
+      // Snap to the found x or y if they exist
+      if (snapX && snapX.x !== lastPoint.x) cuuPoint.x = snapX.x;
+      if (snapY && snapY.y !== lastPoint.y) cuuPoint.y = snapY.y;
+
+      // Dispatch snapping actions
+      if (snapX || snapY) {
+        dispatch(setSnappingPoint([cuuPoint, snapX || snapY]));
+        dispatch(setShowSnapLine(true));
+      } else {
+        dispatch(setSnappingPoint([]));
+        dispatch(setShowSnapLine(false));
+      }
+  },100)
 
   const controlPoint = (point1, point2, angle = 0) => {
     let x = (point1?.x + point2?.x) / 2;
@@ -171,45 +207,11 @@ const useMouse = () => {
     // }else{
     //     dispatch(setHiglightPoint(null))
     // }
-    const threshold = 5;
-    const xStart = parseInt(point.x) - threshold;
-    const xEnd = parseInt(point.x) + threshold;
-    const yStart = parseInt(point.y) - threshold;
-    const yEnd = parseInt(point.y) + threshold;
 
     let cuuPoint = point; // Copy the point
     const lastPoint = points[points.length - 1];
     if (cuuPoint.x !== lastPoint.x && cuuPoint.y !== lastPoint.y) {
-      let snapX = xMap.get(cuuPoint.x);
-      let snapY = yMap.get(cuuPoint.y);
-      for (let x = xStart; x <= xEnd; x++) {
-        const candidate = xMap.get(x);
-        if (candidate) {
-          snapX = candidate;
-          break; // Stop searching once we find a valid point
-        }
-      }
-
-      for (let y = yStart; y <= yEnd; y++) {
-        const candidate = yMap.get(y);
-        if (candidate) {
-          snapY = candidate;
-          break; // Stop searching once we find a valid point
-        }
-      }
-
-      // Snap to the found x or y if they exist
-      if (snapX && snapX.x !== lastPoint.x) cuuPoint.x = snapX.x;
-      if (snapY && snapY.y !== lastPoint.y) cuuPoint.y = snapY.y;
-
-      // Dispatch snapping actions
-      if (snapX || snapY) {
-        dispatch(setSnappingPoint([cuuPoint, snapX || snapY]));
-        dispatch(setShowSnapLine(true));
-      } else {
-        dispatch(setSnappingPoint([]));
-        dispatch(setShowSnapLine(false));
-      }
+      snapToPoint(cuuPoint, lastPoint)
     }
 
     if (
