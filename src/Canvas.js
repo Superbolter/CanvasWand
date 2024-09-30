@@ -443,6 +443,7 @@ export const CanvasComponent = () => {
           raycaster={{ params: { Line: { threshold: 5 } } }}
           camera={{ position: [0, 0, 500], zoom: 1 }}
           onClick={handleClick}
+          gl={{ powerPreference: 'high-performance' }}
         >
           <CameraController zoom={zoom} setZoom={setZoom} isNeeded={isNeeded} />
 
