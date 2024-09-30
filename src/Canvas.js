@@ -497,6 +497,7 @@ export const CanvasComponent = () => {
                   typeId={line.typeId}
                   isCustomised={line.isCustomised}
                   isSelected={selectedLines.includes(line.id)}
+                  lineId={line.id}
                   onClick={() => handleLineClick(line.id)}
                 />
               );

@@ -23,6 +23,7 @@ import { setStoreBoxes } from "../../Actions/ApplicationStateAction";
 import cursor from "../../assets/Default.png";
 import usePoints from "../../hooks/usePoints";
 import { setHiglightPoint } from "../../Actions/DrawingActions";
+import { useDrawing } from "../../hooks/useDrawing";
 // Extend the R3F renderer with ShapeGeometry
 extend({ ShapeGeometry });
 
@@ -100,6 +101,7 @@ const BoxGeometry = ({
   isCustomised,
   opacity = 0.5,
   distance = null,
+  lineId = null
 }) => {
   const dispatch = useDispatch();
   const [hovered, setHovered] = useState(false);
@@ -120,6 +122,8 @@ const BoxGeometry = ({
   const { seeDimensions, higlightPoint } = useSelector(
     (state) => state.Drawing
   );
+
+  const {handleLineClick} = useDrawing();
 
   const { decimalToFeetInches } = usePoints();
 
@@ -350,7 +354,7 @@ const BoxGeometry = ({
         <mesh
           position={midpoint}
           rotation={[0, 0, angle]}
-          onClick={onClick}
+          onClick={(e) => handleLineClick(e,lineId)}
           onPointerOver={() => {
             // if (activeRoomIndex !== -1) {
             //   document.getElementsByClassName(
