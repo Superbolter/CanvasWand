@@ -80,6 +80,7 @@ const CreateFiller = ({ p1, p2, p3, p4 }) => {
 
   return (
     <mesh>
+      {console.log("ola")}
     <shapeGeometry attach="geometry" args={[shape]} />
     {/* <meshBasicMaterial attach="material" args={[material]} transparent={true} opacity={0.75}/> */}
     <meshBasicMaterial map={wallTexture} transparent={true} opacity={0.9}/>

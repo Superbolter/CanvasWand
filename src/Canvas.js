@@ -496,20 +496,20 @@ export const CanvasComponent = () => {
                   }
                   dimension={{ width: line.width, height: line.height }}
                   typeId={line.typeId}
-                  isCustomised={line.isCustomised}
                   isSelected={selectedLines.includes(line.id)}
                   lineId={line.id}
-                  onClick={() => handleLineClick(line.id)}
                 />
               );
             })}
           {designStep === 2 &&
             draggingLineIndex.length === 0 &&
-            !currentLinePostion && (
-              // <LineSegments lines={storeLines} />
-              // <BoxSegments lines={storeLines} />
-              <CappedLine lines={storeLines} />
-            )}
+            !currentLinePostion && 
+              storeLines.map((line, index) => {
+                return(
+                  <CappedLine line={line} index={index} />
+                )
+              })
+            }
           {designStep > 1 &&
             showSnapLine &&
             snappingPoint.length > 0 &&
@@ -545,7 +545,6 @@ export const CanvasComponent = () => {
                   typeId={typeId}
                   isSelected={false}
                   showDimension={true}
-                  isCustomised={null}
                   distance={
                     storeLines.length === 0 &&
                     userLength === 0 &&
@@ -554,7 +553,6 @@ export const CanvasComponent = () => {
                       ? true
                       : null
                   }
-                  onClick={() => {}}
                 />
                 {currentStrightMousePosition && !perpendicularLine && curveAngle > 3 &&(
                   <>
@@ -609,7 +607,7 @@ export const CanvasComponent = () => {
                 )}
               </>
             )}
-          {designStep === 2 &&
+          {/* {designStep === 2 &&
             storeBoxes.map((box, index) => (
               <CreateFiller
                 key={index}
@@ -618,7 +616,7 @@ export const CanvasComponent = () => {
                 p3={box.p3}
                 p4={box.p4}
               />
-            ))}
+            ))} */}
 
           {designStep > 1 && <ContextualMenu />}
           {showFirstTimePopup && enableFirstTimePopup && firstTimePopupType==="canvas" && <FirstTimePopupCanvas />}

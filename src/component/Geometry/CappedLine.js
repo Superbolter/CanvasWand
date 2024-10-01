@@ -1,45 +1,31 @@
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
-import Window from "../../assets/Window.png";
-import Door from "../../assets/Door.png";
-import Railing from "../../assets/Railing.png";
-import Wall from "../../assets/Walll.png";
-import newWall from "../../assets/newWall.png";
-import newWall2 from "../../assets/newWall2.png"
 import { useSelector } from 'react-redux';
-import New from "../../assets/New.png";
+import useTexture from '../../hooks/useTexture';
 
-function CappedLine({ lines }) {
-  const textureLoader = useMemo(() => new THREE.TextureLoader(), []);
-  const windowTexture = useMemo(() => textureLoader.load(Window), [textureLoader]);
-  const wallTexture = useMemo(() => textureLoader.load(New), [textureLoader]);
-  const railingTexture = useMemo(() => textureLoader.load(Railing), [textureLoader]);
-  const doorTexture = useMemo(() => textureLoader.load(Door), [textureLoader]);
+function CappedLine({ line, index }) {
+  const { wallTexture } = useTexture();
 
-  const {linePlacementMode } = useSelector(
+  const { linePlacementMode } = useSelector(
     (state) => state.drawing
   );
 
-  const quadrilateralShape = new THREE.Shape();
-  quadrilateralShape.moveTo(-8, -8);
-  quadrilateralShape.lineTo(8, -8);
-  quadrilateralShape.lineTo(8, 8);
-  quadrilateralShape.lineTo(-8, 8);
-  quadrilateralShape.lineTo(-8, -8);
+  const { storeLines } = useSelector((state) => state.ApplicationState);
 
-  const edgeShape = new THREE.Shape();
-  edgeShape.moveTo(-8, -8);
-  edgeShape.lineTo(8, -8);  
-  edgeShape.lineTo(8, 8);
-  edgeShape.lineTo(-8, 8);
-  edgeShape.lineTo(-8, -8);
-  edgeShape.lineTo(-8, -8);
+  const quadrilateralShape = useMemo(() => {
+    const shape = new THREE.Shape();
+    shape.moveTo(-8, -8);
+    shape.lineTo(8, -8);
+    shape.lineTo(8, 8);
+    shape.lineTo(-8, 8);
+    shape.lineTo(-8, -8);
+    return shape;
+  }, []); 
 
-  const capGeometry = new THREE.ShapeGeometry(quadrilateralShape);
 
-  const countPointOccurrences = (point, allLines) => {
+  const countPointOccurrences = (point) => {
     let count = 0;
-    allLines.forEach(line => {
+    storeLines.forEach(line => {
       line.points.forEach(p => {
         if (p.equals(point)) {
           count++;
@@ -58,50 +44,55 @@ function CappedLine({ lines }) {
     return THREE.MathUtils.radToDeg(angle); // Convert to degrees
   };
 
-  return (
-    <>
-      {lines.map((line, index) => {
-        const lineGeometry = new THREE.BufferGeometry().setFromPoints(line.points);
-        return linePlacementMode!=="midpoint"? null : (
-          <React.Fragment key={index}>
-            <line
-              geometry={lineGeometry}
-              material={new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 })}
-            />
-            {line.points.map((point, idx) => {
-              const occurrences = countPointOccurrences(point, lines);
 
-              // Handle cap for angles  
-              if (occurrences > 1) {
-                const prevLine = lines[index - 1];
-                const nextLine = lines[index + 1];
+  const memoisedLine = useMemo(()=>{
+    const lineGeometry = new THREE.BufferGeometry().setFromPoints(line.points);
+    const capGeometry = new THREE.ShapeGeometry(quadrilateralShape);
 
-                if (prevLine) {
-                  if(prevLine.typeId !== 1 || line.typeId === 4 || (nextLine && nextLine?.typeId !== 1)) return null;
-                  const angle = calculateAngleBetweenLines(
-                    { start: prevLine.points[0], end: prevLine.points[1] },
-                    { start: line.points[0], end: line.points[1] }
-                  );
+    return(
+      <React.Fragment key={index}>
+      <line
+        geometry={lineGeometry}
+        material={new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 })}
+      />
+      {line.points.map((point, idx) => {
+        const occurrences = countPointOccurrences(point);
 
-                  // Only show the cap if the angle exceeds 15 degrees
-                  if (angle > 15) {
-                    return (
-                      <mesh
-                        key={`${index}-${idx}`}
-                        position={[point.x, point.y, - 1]}
-                        geometry={capGeometry}
-                      >
-                        <meshBasicMaterial map={wallTexture} transparent={true} opacity={0.7} />
-                      </mesh>
-                    );
-                  }
-                }
-              }
-              return null; // Skip cap if conditions aren't met
-            })}
-          </React.Fragment>
-        );
+        // Handle cap for angles  
+        if (occurrences > 1) {
+          const prevLine = storeLines[index - 1];
+          const nextLine = storeLines[index + 1];
+
+          if (prevLine) {
+            if (prevLine.typeId !== 1 || line.typeId === 4 || (nextLine && nextLine?.typeId !== 1)) return null;
+            const angle = calculateAngleBetweenLines(
+              { start: prevLine.points[0], end: prevLine.points[1] },
+              { start: line.points[0], end: line.points[1] }
+            );
+
+            // Only show the cap if the angle exceeds 15 degrees
+            if (angle > 15) {
+              return (
+                <mesh
+                  key={`${index}-${idx}`}
+                  position={[point.x, point.y, - 1]}
+                  geometry={capGeometry}
+                >
+                  <meshBasicMaterial map={wallTexture} transparent={true} opacity={0.7} />
+                </mesh>
+              );
+            }
+          }
+        }
+        return null; // Skip cap if conditions aren't met
       })}
+    </React.Fragment>
+    )
+  },[line.points])
+
+  return linePlacementMode !== "midpoint" ? null : (
+    <>
+      {memoisedLine}
     </>
   );
 }
